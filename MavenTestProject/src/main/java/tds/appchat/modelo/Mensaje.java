@@ -36,6 +36,9 @@ public class Mensaje {
 	public Usuario getEmisor() {
 		return emisor;
 	}
-	
+
+	public Usuario getReceptor() {
+		return receptor;
+	}
 
 }
