@@ -5,12 +5,18 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import tds.appchat.modelo.Mensaje;
+import tds.appchat.modelo.MensajeCellRenderer;
+
 import java.awt.BorderLayout;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+
 import java.awt.Component;
 import javax.swing.Box;
 import javax.swing.JList;
@@ -77,9 +83,22 @@ public class VentanaPrincipal extends JFrame {
 		JLabel lblNewLabel_1 = new JLabel("IconoUsuario");
 		panelNorte.add(lblNewLabel_1);
 		
-		JPanel panel = new JPanel();
-		contentPane.add(panel, BorderLayout.WEST);
-		panel.setLayout(new BorderLayout(0, 0));
+		JPanel panelMensajes = new JPanel();
+		contentPane.add(panelMensajes, BorderLayout.WEST);
+		panelMensajes.setLayout(new BorderLayout(0, 0));
+		
+		JList<Mensaje> lista = new JList<Mensaje>();
+		lista.setCellRenderer(new MensajeCellRenderer());
+		
+		DefaultListModel<Mensaje> modelo = new DefaultListModel<>();
+		modelo.addElement(new Mensaje("Pedro", "hola", "Pedro"));
+		modelo.addElement(new Mensaje("Juan", "hola", "Pedro"));
+		modelo.addElement(new Mensaje("Maria", "hola", "Pedro"));
+		lista.setModel(modelo);
+		
+		
+		
+		panelMensajes.add(lista, BorderLayout.NORTH);
 		
 		
 	}

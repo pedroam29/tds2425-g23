@@ -1,6 +1,7 @@
 package tds.appchat.modelo;
 
 import java.sql.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -10,8 +11,8 @@ public class Usuario {
 	private final String email;
 	private final String telefono;
 	private final String contrasena;
-	private final String imagenPerfilUrl;
-	private final String saludo;
+	private String imagenPerfilUrl;
+	private String saludo;
 	private List<Mensaje> recibidos;
 	private List<Mensaje> enviados;
 	private List<Contacto> contactos;
@@ -24,6 +25,9 @@ public class Usuario {
 		this.fechaNacimiento = fechaNacimiento;
 		this.imagenPerfilUrl = imagenPerfilUrl;
 		this.saludo = saludo;
+		this.recibidos=new LinkedList<>();
+		this.enviados=new LinkedList<>();
+		this.contactos=new LinkedList<>();
 	}
 	
 	public ContactoIndividual getContactoIndividual(Usuario u) {
@@ -38,17 +42,28 @@ public class Usuario {
 	public String getImagenPerfilUrl() {
 		return imagenPerfilUrl;
 	}
-
-	public List<Mensaje> getRecibidos() {
-		return recibidos;
-	}
-
 	public List<Mensaje> getEnviados() {
-		return enviados;
+		return new LinkedList<Mensaje>(enviados);
 	}
-
+	
+	public void setEnviados(List<Mensaje> enviados) {
+		this.enviados = new LinkedList<Mensaje>(enviados);
+	}
+	
+	public List<Mensaje> getRecibidos() {
+		return new LinkedList<Mensaje>(recibidos);
+	}
+	
+	public void setRecibidos(List<Mensaje> recibidos) {
+		this.enviados = new LinkedList<Mensaje>(recibidos);
+	}
+	
 	public List<Contacto> getContactos() {
-		return contactos;
+		return new LinkedList<Contacto>(contactos);
+	}
+	
+	public void setContactos(List<Contacto> contactos) {
+		this.contactos = new LinkedList<Contacto>(contactos);
 	}
 
 	public String getNombre() {
@@ -76,6 +91,17 @@ public class Usuario {
 
 	public String getSaludo() {
 		return saludo;
+	}
+	
+	public void addContacto(String nombre, String telefono, RepositorioUsuarios repo) {
+		Usuario usuarioAgregar = repo.obtenerUsuario(telefono);
+		if(usuarioAgregar == null) {
+			
+		}
+		
+		ContactoIndividual nuevoContacto = new ContactoIndividual(nombre, usuarioAgregar);
+		this.contactos.add(nuevoContacto);
+		
 	}
 	
 	
