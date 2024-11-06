@@ -1,6 +1,7 @@
 package tds.appchat.vista;
 
 import java.awt.EventQueue;
+import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import tds.BubbleText;
 import tds.appchat.controlador.AppChat;
 import tds.appchat.modelo.Mensaje;
 import tds.appchat.modelo.MensajeCellRenderer;
+import tds.appchat.modelo.Usuario;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -105,13 +107,13 @@ public class VentanaPrincipal extends JFrame {
 		
 		JList<Mensaje> lista = new JList<Mensaje>();
 		lista.setCellRenderer(new MensajeCellRenderer());
-		List<Mensaje> mensajes = AppChat.getUnicaInstancia().obtenerChatsRecientesUsuario();
 		DefaultListModel<Mensaje> modelo = new DefaultListModel<Mensaje>();
 		
+		List<Mensaje> mensajes = AppChat.getUnicaInstancia().obtenerChatsRecientesUsuario();						
+		//Conversión manual de List<Mensaje> a DefaultListModel<Mensaje> 
 		for(Mensaje mensaje: mensajes) {
 			modelo.addElement(mensaje);
 		}
-		
 		lista.setModel(modelo);
 		
 		panelMensajes.add(new JScrollPane(lista), BorderLayout.NORTH);

@@ -12,7 +12,7 @@ import tds.appchat.modelo.Usuario;
 public class AppChat {
 	private static AppChat unicaInstancia;
 	private static Usuario usuarioActual;
-	private static RepositorioUsuarios repoUsuarios;
+	private static RepositorioUsuarios repoUsuarios = new RepositorioUsuarios();
 	
 	public static AppChat getUnicaInstancia() {
 		if (unicaInstancia == null)
@@ -32,9 +32,11 @@ public class AppChat {
 	
 	public boolean registrarUsuario(String nombre, String telefono, String contrasena, Date fechaNacimiento, String imagenPerfilUrl, String saludo, String email) {
 		Usuario usr = new Usuario(nombre, email, contrasena, fechaNacimiento, imagenPerfilUrl, saludo, email);
-		repoUsuarios.agregarUsuario(usr);
-		usuarioActual = usr;
-		return true;
+		if(repoUsuarios.agregarUsuario(usr)) {
+			usuarioActual = usr;
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean loginUsuario(String usuario, String contrasena) {

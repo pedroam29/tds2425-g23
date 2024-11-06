@@ -1,8 +1,14 @@
 package tds.appchat.modelo;
 
+import java.awt.Image;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 
 public class Usuario {
@@ -17,7 +23,7 @@ public class Usuario {
 	private List<Mensaje> enviados;
 	private List<Contacto> contactos;
 	
-	public Usuario(String nombre, String telefono, String contrasena, Date fechaNacimiento, String imagenPerfilUrl, String saludo, String email) {
+	public Usuario(String nombre, String telefono, String contrasena,Date fechaNacimiento, String imagenPerfilUrl, String saludo, String email) {
 		this.nombre = nombre;
 		this.email = email;
 		this.telefono = telefono;
@@ -84,8 +90,27 @@ public class Usuario {
 	public Date getFechaNacimiento() {
 		return fechaNacimiento;
 	}
-
-	public String getImagen() {
+	
+	/**
+	 * Devuelve la Imagen a partir de la URL de los parámetros
+	 * @return imagen de perfil
+	 */
+	public Image getImagen()
+	{
+		Image imagen = null;
+		try {
+			URL urlImagen = new URL(imagenPerfilUrl);
+			imagen = (Image) ImageIO.read(urlImagen);
+		} catch (MalformedURLException e) {
+			// La url no es correcta:
+			e.printStackTrace();
+		} catch (IOException e) {
+			// Fallo en la creación de la imagen.
+			e.printStackTrace();
+		}
+		return imagen;
+	}
+	public String getImagenUrl() {
 		return imagenPerfilUrl;
 	}
 

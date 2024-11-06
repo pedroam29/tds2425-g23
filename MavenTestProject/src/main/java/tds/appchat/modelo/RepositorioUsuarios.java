@@ -12,8 +12,12 @@ public class RepositorioUsuarios {
 	public Usuario obtenerUsuario(String telefono) {
 		return usuarios.get(telefono);
 	}
-	public void agregarUsuario(Usuario usuario) {
+	public boolean agregarUsuario(Usuario usuario) {
+		//Si ya está el telefono registrado devuelve falso y se indica:
+		if (usuarios.containsKey(usuario.getTelefono()))
+			return false;
 		usuarios.put(usuario.getTelefono(), usuario);
+		return true;
 	}
 	
 	public List<Usuario> getAllUsuarios() {

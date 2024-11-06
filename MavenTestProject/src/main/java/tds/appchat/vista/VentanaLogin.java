@@ -9,6 +9,9 @@ import javax.swing.JOptionPane;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import javax.swing.SwingConstants;
+
+import tds.appchat.controlador.AppChat;
+
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import java.awt.GridBagLayout;
@@ -22,8 +25,8 @@ import java.awt.event.ActionEvent;
 public class VentanaLogin {
 
 	private JFrame frame;
-	private JTextField textField;
-	private JPasswordField passwordField;
+	private JTextField textfieldTelefono;
+	private JPasswordField textfieldPassword;
 
 	/**
 	 * Launch the application.
@@ -56,35 +59,79 @@ public class VentanaLogin {
 		frame.setBounds(100, 100, 588, 430);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		JLabel lblNewLabel = new JLabel("APPCHAT");
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		frame.getContentPane().add(lblNewLabel, BorderLayout.NORTH);
+		JLabel lblLogo = new JLabel("APPCHAT");
+		lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLogo.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		frame.getContentPane().add(lblLogo, BorderLayout.NORTH);
 		
-		JPanel panel = new JPanel();
-		frame.getContentPane().add(panel, BorderLayout.SOUTH);
 		
-		JButton btnNewButton = new JButton("Registrar");
-		btnNewButton.addActionListener(new ActionListener() {
+		JPanel panelCentral = new JPanel();
+		frame.getContentPane().add(panelCentral, BorderLayout.CENTER);
+		GridBagLayout gbl_panel_1 = new GridBagLayout();
+		gbl_panel_1.columnWidths = new int[]{15, 0, 0, 15, 0};
+		gbl_panel_1.rowHeights = new int[]{50, 0, 0, 15, 0};
+		gbl_panel_1.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_1.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		panelCentral.setLayout(gbl_panel_1);
+		
+		JLabel labelTelefono = new JLabel("TELEFONO: ");
+		GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
+		gbc_lblNewLabel_1.anchor = GridBagConstraints.EAST;
+		gbc_lblNewLabel_1.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNewLabel_1.gridx = 1;
+		gbc_lblNewLabel_1.gridy = 1;
+		panelCentral.add(labelTelefono, gbc_lblNewLabel_1);
+		
+		textfieldTelefono = new JTextField();
+		GridBagConstraints gbc_textField = new GridBagConstraints();
+		gbc_textField.insets = new Insets(0, 0, 5, 5);
+		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField.gridx = 2;
+		gbc_textField.gridy = 1;
+		panelCentral.add(textfieldTelefono, gbc_textField);
+		textfieldTelefono.setColumns(15);
+		
+		JLabel labelPassword = new JLabel("CONTRASEÑA: ");
+		GridBagConstraints gbc_labelPassword = new GridBagConstraints();
+		gbc_labelPassword.anchor = GridBagConstraints.EAST;
+		gbc_labelPassword.insets = new Insets(0, 0, 5, 5);
+		gbc_labelPassword.gridx = 1;
+		gbc_labelPassword.gridy = 2;
+		panelCentral.add(labelPassword, gbc_labelPassword);
+		
+		textfieldPassword = new JPasswordField();
+		textfieldPassword.setColumns(15);
+		GridBagConstraints gbc_passwordField = new GridBagConstraints();
+		gbc_passwordField.insets = new Insets(0, 0, 5, 5);
+		gbc_passwordField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_passwordField.gridx = 2;
+		gbc_passwordField.gridy = 2;
+		panelCentral.add(textfieldPassword, gbc_passwordField);
+		
+		JPanel panelBotones = new JPanel();
+		frame.getContentPane().add(panelBotones, BorderLayout.SOUTH);
+		
+		JButton botonRegistrar = new JButton("Registrar");
+		botonRegistrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				VentanaRegister registro = new VentanaRegister();
 				registro.setVisible(true);
 			}
 		});
-		panel.add(btnNewButton);
+		panelBotones.add(botonRegistrar);
 		
-		JButton btnNewButton_1 = new JButton("Cancelar");
-		panel.add(btnNewButton_1);
+		JButton botonCancelar = new JButton("Cancelar");
+		panelBotones.add(botonCancelar);
 		
-		JButton btnNewButton_2 = new JButton("Aceptar");
-		btnNewButton_2.addActionListener(new ActionListener() {
+		JButton botonAceptar = new JButton("Aceptar");
+		botonAceptar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// recuperar datos de pantalla
-				String telefono=""; //textfieldtelefono.getText()
-				String clave=""; 
+				String telefono= textfieldTelefono.getText(); //textfieldtelefono.getText()
+				String clave= textfieldPassword.getText(); 
 				
 				//ejecutar negocio a traves de controlador
-				boolean login = false;//AppChat.hacerLogin();
+				boolean login = AppChat.loginUsuario(telefono, clave);	//AppChat.hacerLogin();
 				if(login) {
 					VentanaPrincipal principal = new VentanaPrincipal();
 					principal.setVisible(true);
@@ -93,50 +140,8 @@ public class VentanaLogin {
 				}
 			}
 		});
-		panel.add(btnNewButton_2);
+		panelBotones.add(botonAceptar);
 		
-		JPanel panel_1 = new JPanel();
-		frame.getContentPane().add(panel_1, BorderLayout.CENTER);
-		GridBagLayout gbl_panel_1 = new GridBagLayout();
-		gbl_panel_1.columnWidths = new int[]{15, 0, 0, 15, 0};
-		gbl_panel_1.rowHeights = new int[]{50, 0, 0, 15, 0};
-		gbl_panel_1.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-		gbl_panel_1.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		panel_1.setLayout(gbl_panel_1);
-		
-		JLabel lblNewLabel_1 = new JLabel("TELEFONO: ");
-		GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
-		gbc_lblNewLabel_1.anchor = GridBagConstraints.EAST;
-		gbc_lblNewLabel_1.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_1.gridx = 1;
-		gbc_lblNewLabel_1.gridy = 1;
-		panel_1.add(lblNewLabel_1, gbc_lblNewLabel_1);
-		
-		textField = new JTextField();
-		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.insets = new Insets(0, 0, 5, 5);
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.gridx = 2;
-		gbc_textField.gridy = 1;
-		panel_1.add(textField, gbc_textField);
-		textField.setColumns(15);
-		
-		JLabel lblNewLabel_2 = new JLabel("CONTRASEÑA: ");
-		GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
-		gbc_lblNewLabel_2.anchor = GridBagConstraints.EAST;
-		gbc_lblNewLabel_2.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_2.gridx = 1;
-		gbc_lblNewLabel_2.gridy = 2;
-		panel_1.add(lblNewLabel_2, gbc_lblNewLabel_2);
-		
-		passwordField = new JPasswordField();
-		passwordField.setColumns(15);
-		GridBagConstraints gbc_passwordField = new GridBagConstraints();
-		gbc_passwordField.insets = new Insets(0, 0, 5, 5);
-		gbc_passwordField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_passwordField.gridx = 2;
-		gbc_passwordField.gridy = 2;
-		panel_1.add(passwordField, gbc_passwordField);
 	}
 
 }
