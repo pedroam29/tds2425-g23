@@ -13,6 +13,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
+import tds.appchat.controlador.AppChat;
+
 public class MensajeCellRenderer extends JPanel
 		implements ListCellRenderer<Mensaje>{
 	private JLabel nameLabel;
@@ -28,7 +30,7 @@ public class MensajeCellRenderer extends JPanel
 
 		JPanel panelTexto = new JPanel(new BorderLayout());
 		panelTexto.add(nameLabel, BorderLayout.NORTH);
-		panelTexto.add(messageLabel, BorderLayout.CENTER);
+		panelTexto.add(messageLabel, BorderLayout.SOUTH);
 		
 		add(imageLabel, BorderLayout.WEST);
 		add(panelTexto, BorderLayout.CENTER);
@@ -38,12 +40,18 @@ public class MensajeCellRenderer extends JPanel
 	public Component getListCellRendererComponent(JList<? extends Mensaje> list, Mensaje mensaje, int index,
 			boolean isSelected, boolean cellHasFocus) {
 		
-		nameLabel.setText(mensaje.getUsuario());
+		String usuario="";
+		if(mensaje.getEmisor().getNombre().equals(AppChat.getUnicaInstancia().getNombreUsuarioActual())){
+			usuario = mensaje.getReceptor().getNombre();
+		} else {
+			usuario = mensaje.getEmisor().getNombre();
+		}
+		nameLabel.setText(mensaje.getNombreEmisor());
 		messageLabel.setText(mensaje.getTexto());
 
 		// Load the image from a random URL (for example, using "https://robohash.org")
 		try {
-			URL imageUrl = new URL("https://robohash.org/" + mensaje.getUsuario() + "?size=50x50");
+			URL imageUrl = new URL("https://robohash.org/" + mensaje.getNombreEmisor() + "?size=50x50");
 			Image image = ImageIO.read(imageUrl);
 			ImageIcon imageIcon = new ImageIcon(image.getScaledInstance(50, 50, Image.SCALE_SMOOTH));
 			imageLabel.setIcon(imageIcon);
@@ -56,6 +64,8 @@ public class MensajeCellRenderer extends JPanel
 		if (isSelected) {
 			setBackground(list.getSelectionBackground());
 			setForeground(list.getSelectionForeground());
+			//panelTexto.setBackground
+			
 		} else {
 			setBackground(list.getBackground());
 			setForeground(list.getForeground());

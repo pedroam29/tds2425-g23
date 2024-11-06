@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.BorderLayout;
 import java.awt.Font;
 import javax.swing.SwingConstants;
@@ -75,6 +77,22 @@ public class VentanaLogin {
 		panel.add(btnNewButton_1);
 		
 		JButton btnNewButton_2 = new JButton("Aceptar");
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// recuperar datos de pantalla
+				String telefono=""; //textfieldtelefono.getText()
+				String clave=""; 
+				
+				//ejecutar negocio a traves de controlador
+				boolean login = false;//AppChat.hacerLogin();
+				if(login) {
+					VentanaPrincipal principal = new VentanaPrincipal();
+					principal.setVisible(true);
+				}else {
+					JOptionPane.showMessageDialog(frame, "El login es incorrecto");
+				}
+			}
+		});
 		panel.add(btnNewButton_2);
 		
 		JPanel panel_1 = new JPanel();

@@ -1,15 +1,22 @@
 package tds.appchat.vista;
 
 import java.awt.EventQueue;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
+import tds.BubbleText;
+import tds.appchat.controlador.AppChat;
 import tds.appchat.modelo.Mensaje;
 import tds.appchat.modelo.MensajeCellRenderer;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.BoxLayout;
@@ -18,13 +25,18 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 
 import java.awt.Component;
+import java.awt.Dimension;
+
 import javax.swing.Box;
 import javax.swing.JList;
+import javax.swing.ImageIcon;
+import javax.swing.JTextField;
 
 public class VentanaPrincipal extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
+	private JTextField textField;
 
 	/**
 	 * Launch the application.
@@ -59,16 +71,20 @@ public class VentanaPrincipal extends JFrame {
 		panelNorte.setLayout(new BoxLayout(panelNorte, BoxLayout.X_AXIS));
 		
 		JComboBox comboBox = new JComboBox();
+		comboBox.setEditable(true);
 		comboBox.setModel(new DefaultComboBoxModel(new String[] {"Contacto 1", "Contacto 2"}));
 		panelNorte.add(comboBox);
 		
 		JButton btnNewButton = new JButton("Enviar");
+		btnNewButton.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/enviar-mensaje.png")));
 		panelNorte.add(btnNewButton);
 		
 		JButton btnNewButton_1 = new JButton("Buscar");
+		btnNewButton_1.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/buscar.png")));
 		panelNorte.add(btnNewButton_1);
 		
 		JButton btnNewButton_2 = new JButton("Contactos");
+		btnNewButton_2.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/personas.png")));
 		panelNorte.add(btnNewButton_2);
 		
 		JButton btnNewButton_3 = new JButton("Premium");
@@ -89,16 +105,50 @@ public class VentanaPrincipal extends JFrame {
 		
 		JList<Mensaje> lista = new JList<Mensaje>();
 		lista.setCellRenderer(new MensajeCellRenderer());
+		List<Mensaje> mensajes = AppChat.getUnicaInstancia().obtenerChatsRecientesUsuario();
+		DefaultListModel<Mensaje> modelo = new DefaultListModel<Mensaje>();
 		
-		DefaultListModel<Mensaje> modelo = new DefaultListModel<>();
-		modelo.addElement(new Mensaje("Pedro", "hola", "Pedro"));
-		modelo.addElement(new Mensaje("Juan", "hola", "Pedro"));
-		modelo.addElement(new Mensaje("Maria", "hola", "Pedro"));
+		for(Mensaje mensaje: mensajes) {
+			modelo.addElement(mensaje);
+		}
+		
 		lista.setModel(modelo);
 		
+		panelMensajes.add(new JScrollPane(lista), BorderLayout.NORTH);
 		
+		JPanel panelChatActual = new JPanel();
+		contentPane.add(panelChatActual, BorderLayout.CENTER);
+		panelChatActual.setLayout(new BorderLayout(0, 0));
 		
-		panelMensajes.add(lista, BorderLayout.NORTH);
+		JPanel enviar = new JPanel();
+		panelChatActual.add(enviar, BorderLayout.SOUTH);
+		enviar.setLayout(new BoxLayout(enviar, BoxLayout.X_AXIS));
+		
+		textField = new JTextField();
+		enviar.add(textField);
+		textField.setColumns(10);
+		
+		JButton btnNewButton_4 = new JButton("Enviar");
+		enviar.add(btnNewButton_4);
+		
+		JPanel chat = new JPanel();
+		panelChatActual.add(chat, BorderLayout.CENTER);
+		chat.setLayout(new BoxLayout(chat,BoxLayout.Y_AXIS));
+		chat.setSize(400,700);
+		chat.setMinimumSize(new Dimension(400,700));
+		chat.setMaximumSize(new Dimension(400,700));
+		chat.setPreferredSize(new Dimension(400,700));
+		//Appchat.obtenerMensajesChat(usuario)
+		
+		BubbleText burbuja;
+		burbuja=new BubbleText(chat,"Hola grupo!!", Color.GREEN, "J.Ramón", BubbleText.SENT);
+		chat.add(burbuja);
+		
+		BubbleText burbuja2;
+		burbuja2=new BubbleText(chat,
+		"Hola, ¿Está seguro de que la burbuja usa varias lineas si es necesario?",
+		Color.LIGHT_GRAY, "Alumno", BubbleText.RECEIVED);
+		chat.add(burbuja2);
 		
 		
 	}
