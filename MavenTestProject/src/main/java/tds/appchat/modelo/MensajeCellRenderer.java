@@ -39,12 +39,11 @@ public class MensajeCellRenderer extends JPanel
 	@Override
 	public Component getListCellRendererComponent(JList<? extends Mensaje> list, Mensaje mensaje, int index,
 			boolean isSelected, boolean cellHasFocus) {
-		
-		String usuario="";
+		//COMPLETAR
 		if(mensaje.getEmisor().getNombre().equals(AppChat.getUnicaInstancia().getNombreUsuarioActual())){
-			usuario = mensaje.getReceptor().getNombre();
+			
 		} else {
-			usuario = mensaje.getEmisor().getNombre();
+			
 		}
 		nameLabel.setText(mensaje.getNombreEmisor());
 		messageLabel.setText(mensaje.getTexto());

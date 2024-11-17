@@ -14,12 +14,13 @@ public class Mensaje {
         this.telefonoReceptor = telefonoReceptor;
         this.fechaHora = LocalDateTime.now();
 	}*/
-	public Mensaje (String texto, LocalDateTime fechaHora, Usuario emisor, Usuario receptor) {
+	public Mensaje (String texto, Usuario emisor, Usuario receptor) {
 		this.texto = texto;
-        this.fechaHora = fechaHora;
+        
         this.emisor = emisor;
         this.receptor = receptor;
 	}
+	
 	public String getTexto() {
 		return texto;
 	}
@@ -33,7 +34,9 @@ public class Mensaje {
 	public String getNombreEmisor() {
 		return this.emisor.getNombre();
 	}
-
+	public String getNombreReceptor() {
+		return this.receptor.getNombre();
+	}
 	public Usuario getReceptor() {
 		return receptor;
 	}

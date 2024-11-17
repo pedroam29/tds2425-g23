@@ -36,6 +36,14 @@ public class Usuario {
 		this.contactos=new LinkedList<>();
 	}
 	
+	public Usuario(String nombre) {
+		this.nombre=nombre;
+		this.fechaNacimiento = new Date();
+		this.email = "";
+		this.telefono = "";
+		this.contrasena = "";
+	}
+	
 	public ContactoIndividual getContactoIndividual(Usuario u) {
 		return null;
 	}
