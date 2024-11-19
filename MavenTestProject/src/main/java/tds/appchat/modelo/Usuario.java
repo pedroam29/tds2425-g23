@@ -126,16 +126,44 @@ public class Usuario {
 		return saludo;
 	}
 	
-	public void addContacto(String nombre, String telefono, RepositorioUsuarios repo) {
-		Usuario usuarioAgregar = repo.obtenerUsuario(telefono);
-		if(usuarioAgregar == null) {
-			
-		}
-		
-		ContactoIndividual nuevoContacto = new ContactoIndividual(nombre, usuarioAgregar);
-		this.contactos.add(nuevoContacto);
-		
+	public void addContacto(ContactoIndividual c) {
+		this.contactos.add(c);
 	}
 	
+	public boolean hasContactoIndividual(ContactoIndividual cont) {
+		return contactos.stream().anyMatch(c -> c instanceof ContactoIndividual && c.equals(cont));
+	}
 	
+	public boolean hasGrupo(String nombreGrupo) {
+		return contactos.stream().anyMatch(g -> g instanceof Grupo && g.getNombre().equals(nombreGrupo));
+	}
+	
+	public void addGrupo(Grupo g) {
+		contactos.add(g);
+	}
+	
+	public boolean existeContacto(String telefono) {
+		return contactos.stream().anyMatch(c -> c instanceof ContactoIndividual && ((ContactoIndividual) c).getTelefono().equals(telefono));
+	}
+	
+	public ContactoIndividual crearContacto(String nombre, Usuario usuarioActual) {
+
+		ContactoIndividual nuevoContacto = new ContactoIndividual(nombre, usuarioActual.getTelefono(), usuarioActual);
+		addContacto(nuevoContacto);
+		return nuevoContacto;
+	}
+	
+	public Grupo crearGrupo(String nombreGrupo, String imagen) {
+
+		Grupo nuevoGrupo = new Grupo(nombreGrupo, imagen);
+		
+		this.addGrupo(nuevoGrupo);
+		return nuevoGrupo;
+	}
+	
+	public void addIntegranteGrupo(Grupo g, ContactoIndividual c) {
+		if(!g.contieneContacto(c)) {
+			g.addMiembro(c);
+		}
+	}
 }
