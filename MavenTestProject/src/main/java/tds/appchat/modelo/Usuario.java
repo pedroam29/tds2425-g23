@@ -137,5 +137,10 @@ public class Usuario {
 		
 	}
 	
+	public boolean isClave(String clave)
+	{
+		return this.contrasena.equals(clave);
+	}
+	
 	
 }

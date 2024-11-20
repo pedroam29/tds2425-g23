@@ -284,7 +284,7 @@ public class VentanaRegister extends JFrame {
 				String email = textFieldEmail.getText();
 				
 				
-				//Solución momentanea para comprobar que los campos están llenos
+				//Solución momentánea para comprobar que los campos están llenos
 				registroPosible = !((nombre == "") || (telefono == "") || (contrasena == "") ||
 						(contrasena2 == "")|| (imagenPerfilUrl == "") || (saludo == "") || (email == "") || (fechaNacimiento == null));
 				
