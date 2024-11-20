@@ -1,9 +1,11 @@
 package tds.appchat.modelo;
 
 import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 public class RepositorioUsuarios {
@@ -22,5 +24,9 @@ public class RepositorioUsuarios {
 	
 	public List<Usuario> getAllUsuarios() {
 		return new ArrayList<Usuario>(usuarios.values());
+	}
+	
+	public Optional<Usuario> getUsuarioNumTelf(String numTelefono) {
+		return usuarios.values().stream().filter(u -> u.getTelefono() == numTelefono).findAny();
 	}
 }
