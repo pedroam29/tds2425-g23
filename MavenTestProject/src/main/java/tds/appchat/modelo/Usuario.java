@@ -19,8 +19,8 @@ public class Usuario {
 	private final String contrasena;
 	private String imagenPerfilUrl;
 	private String saludo;
-	private List<Mensaje> recibidos;
-	private List<Mensaje> enviados;
+	private List<Mensaje> mensajesRecibidos;
+	private List<Mensaje> mensajesEnviados;
 	private List<Contacto> contactos;
 	
 	public Usuario(String nombre, String telefono, String contrasena,Date fechaNacimiento, String imagenPerfilUrl, String saludo, String email) {
@@ -31,8 +31,8 @@ public class Usuario {
 		this.fechaNacimiento = fechaNacimiento;
 		this.imagenPerfilUrl = imagenPerfilUrl;
 		this.saludo = saludo;
-		this.recibidos=new LinkedList<>();
-		this.enviados=new LinkedList<>();
+		this.mensajesRecibidos=new LinkedList<>();
+		this.mensajesEnviados=new LinkedList<>();
 		this.contactos=new LinkedList<>();
 	}
 	
@@ -44,10 +44,14 @@ public class Usuario {
 		this.contrasena = "";
 	}
 	
-	public ContactoIndividual getContactoIndividual(Usuario u) {
-		return null;
+	public ContactoIndividual getContactoIndividual(Usuario otroUsuario) {
+	    return contactos.stream()
+	            .filter(contacto -> contacto instanceof ContactoIndividual) // Filtra solo contactos individuales
+	            .map(contacto -> (ContactoIndividual) contacto)             // Mapea a ContactoIndividual
+	            .filter(contactoInd -> contactoInd.getUsuario().equals(otroUsuario)) // Compara usuarios
+	            .findFirst()                                                // Busca el primero que coincida
+	            .orElse(null);                                              // Devuelve null si no encuentra nada
 	}
-
 	public List<Mensaje> getChatMensajes(Usuario u){
 		return null;
 	}
@@ -57,19 +61,19 @@ public class Usuario {
 		return imagenPerfilUrl;
 	}
 	public List<Mensaje> getEnviados() {
-		return new LinkedList<Mensaje>(enviados);
+		return new LinkedList<Mensaje>(mensajesEnviados);
 	}
 	
 	public void setEnviados(List<Mensaje> enviados) {
-		this.enviados = new LinkedList<Mensaje>(enviados);
+		this.mensajesEnviados = new LinkedList<Mensaje>(enviados);
 	}
 	
 	public List<Mensaje> getRecibidos() {
-		return new LinkedList<Mensaje>(recibidos);
+		return new LinkedList<Mensaje>(mensajesRecibidos);
 	}
 	
 	public void setRecibidos(List<Mensaje> recibidos) {
-		this.enviados = new LinkedList<Mensaje>(recibidos);
+		this.mensajesEnviados = new LinkedList<Mensaje>(recibidos);
 	}
 	
 	public List<Contacto> getContactos() {
@@ -169,4 +173,25 @@ public class Usuario {
 			g.addMiembro(c);
 		}
 	}
+	
+	public void enviarMensaje(Usuario receptor, String contenido) {
+        // Crear mensaje y agregarlo a las listas de mensajes
+        Mensaje mensaje = new Mensaje(contenido, this, receptor);
+        this.mensajesEnviados.add(mensaje);
+        receptor.recibirMensaje(mensaje);
+ 
+    }
+	
+	private void recibirMensaje(Mensaje mensaje) {
+		this.mensajesRecibidos.add(mensaje);
+	}
+	public void enviarMensajeAGrupo(Grupo grupo, String contenido) {
+		for(ContactoIndividual contacto : grupo.getMiembros()) {
+			Usuario receptor = contacto.getUsuario();
+			Mensaje mensaje = new Mensaje(contenido, this, receptor);
+			this.mensajesEnviados.add(mensaje);
+			receptor.recibirMensaje(mensaje);
+		}
+	}
+	
 }

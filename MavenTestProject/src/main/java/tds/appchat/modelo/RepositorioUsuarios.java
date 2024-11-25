@@ -11,7 +11,7 @@ import java.util.Optional;
 public class RepositorioUsuarios {
 	private Map<String, Usuario> usuarios = new HashMap<>();
 	
-	public Usuario obtenerUsuario(String telefono) {
+	public Usuario obtenerUsuarioPorTelefono(String telefono) {
 		return usuarios.get(telefono);
 	}
 	public boolean agregarUsuario(Usuario usuario) {

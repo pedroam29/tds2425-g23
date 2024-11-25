@@ -1,7 +1,7 @@
 package tds.appchat.controlador;
 
+import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,6 +56,10 @@ public static AppChat getUnicaInstancia() {
 		
 	}
 	
+	public void logoutUsuario() {
+		usuarioActual = null;
+	}
+	
 	public static boolean existeTelefono(String telefono) {
 		//Solución temporal: puede ser necesario tener que crear una funcion dentre de usuario para comprobar 
 		boolean existe = repoUsuarios.getAllUsuarios().stream()
@@ -108,4 +112,43 @@ public static AppChat getUnicaInstancia() {
 		//Usuario usuario = contacto.getUsuario();
 		//adaptadorUsuario.modificarUsuario(usuario);
 	}
+	
+	public void enviarMensajePorTelefono(String telefonoReceptor, String texto) {
+        Usuario receptor = repoUsuarios.obtenerUsuarioPorTelefono(telefonoReceptor);
+        usuarioActual.enviarMensaje(receptor, texto);
+
+    }
+	
+	public void enviarMensajePorNombre(String nombreContacto, String texto) {
+        // Buscar al contacto en la lista de contactos del usuario actual
+        ContactoIndividual contacto = usuarioActual.getContactos().stream()
+                .filter(c -> c instanceof ContactoIndividual) // Filtrar contactos individuales
+                .map(c -> (ContactoIndividual) c) // Convertir a ContactoIndividual
+                .filter(c -> c.getNombre().equalsIgnoreCase(nombreContacto)) // Buscar por nombre
+                .findFirst()
+                .orElse(null);
+
+        // Enviar el mensaje al usuario asociado al contacto
+        Usuario receptor = contacto.getUsuario();
+        usuarioActual.enviarMensaje(receptor, texto);
+
+    }
+	
+	public void enviarMensajeAGrupo(String nombreGrupo, String texto) {
+		
+        // Buscar el grupo en la lista de contactos del usuario actual
+        Grupo grupo = usuarioActual.getContactos().stream()
+                .filter(c -> c instanceof Grupo) // Filtrar solo los contactos tipo Grupo
+                .map(c -> (Grupo) c) // Convertir a tipo Grupo
+                .filter(g -> g.getNombre().equals(nombreGrupo)) // Buscar por nombre
+                .findFirst()
+                .orElse(null);
+
+        // Enviar el mensaje de forma individual a cada miembro del grupo
+        usuarioActual.enviarMensajeAGrupo(grupo, texto);
+
+    }
+	
+	
+
 }
