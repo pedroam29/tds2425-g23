@@ -3,6 +3,7 @@ package tds.appchat.modelo;
 import java.time.LocalDateTime;
 
 public class Mensaje {
+	private int codigo;
 	private String texto;
 	private Usuario emisor;
 	private Usuario receptor;
@@ -10,6 +11,7 @@ public class Mensaje {
 	private int emoticono;
 	
 	public Mensaje (String texto, Usuario emisor, Usuario receptor) {
+		this.codigo = 0;
 		this.texto = texto;
         this.fechaHora = LocalDateTime.now();
         this.emisor = emisor;
@@ -18,6 +20,24 @@ public class Mensaje {
 	
 	
 	
+	public int getCodigo() {
+		return codigo;
+	}
+
+
+
+	public void setCodigo(int codigo) {
+		this.codigo = codigo;
+	}
+
+
+
+	public int getEmoticono() {
+		return emoticono;
+	}
+
+
+
 	public void setFechaHora(LocalDateTime fechaHora) {
 		this.fechaHora = fechaHora;
 	}

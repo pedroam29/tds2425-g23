@@ -16,6 +16,7 @@ import tds.appchat.modelo.Mensaje;
 import tds.appchat.modelo.MensajeCellRenderer;
 import tds.appchat.modelo.Usuario;
 
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 
@@ -95,7 +96,7 @@ public class VentanaPrincipal extends JFrame {
 		Component horizontalGlue = Box.createHorizontalGlue();
 		panelNorte.add(horizontalGlue);
 		
-		JLabel lblNewLabel = new JLabel("NombreUsuario");
+		JLabel lblNewLabel = new JLabel(AppChat.getUnicaInstancia().getNombreUsuarioActual());
 		panelNorte.add(lblNewLabel);
 		
 		JLabel lblNewLabel_1 = new JLabel("IconoUsuario");

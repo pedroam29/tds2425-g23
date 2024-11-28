@@ -1,29 +1,52 @@
 package tds.appchat.controlador;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import persistencia.DAOException;
+import persistencia.FactoriaDAO;
+import persistencia.IAdaptadorUsuarioDAO;
 import tds.appchat.modelo.ContactoIndividual;
 import tds.appchat.modelo.Grupo;
 import tds.appchat.modelo.Mensaje;
 import tds.appchat.modelo.RepositorioUsuarios;
 import tds.appchat.modelo.Usuario;
 
+
+
 public class AppChat {
 	private final static AppChat unicaInstancia = new AppChat();
-	private static Usuario usuarioActual;
-	private static RepositorioUsuarios repoUsuarios = new RepositorioUsuarios();
+	private Usuario usuarioActual;
+	private RepositorioUsuarios repoUsuarios;
+	private IAdaptadorUsuarioDAO adaptadorUsuario;
 	
-public static AppChat getUnicaInstancia() {
+	public static AppChat getUnicaInstancia() {
 //		if (unicaInstancia == null)
 //			unicaInstancia = new AppChat();
 		//Haciendo el constructor privado solo habrá una única instancia.
 		return unicaInstancia;
-}
+	}
 	//Para que no se pueda crear fuera de esta clase;
-	private AppChat(){}
+	private AppChat(){
+		inicializarAdaptadores();
+		inicializarRepositorios();
+	}
+	
+	private void inicializarAdaptadores() {
+		FactoriaDAO factoria = null;
+		try {
+			factoria = FactoriaDAO.getInstancia(FactoriaDAO.DAO_TDS);
+		} catch (DAOException e) {
+			e.printStackTrace();
+		}
+		adaptadorUsuario = factoria.getUsuarioDAO();
+	}
+	
+	private void inicializarRepositorios() {
+		repoUsuarios = RepositorioUsuarios.getUnicaInstancia();
+		
+	}
 	public String getNombreUsuarioActual() {
 		return usuarioActual.getNombre();
 	}
@@ -37,12 +60,14 @@ public static AppChat getUnicaInstancia() {
 		Usuario usr = new Usuario(nombre, email, contrasena, fechaNacimiento, imagenPerfilUrl, saludo, email);
 		if(repoUsuarios.agregarUsuario(usr)) {
 			usuarioActual = usr;
+			adaptadorUsuario.registrarUsuario(usr);
 			return true;
 		}
 		return false;
 	}
 	
-	public static boolean loginUsuario(String usuario, String contrasena) {
+	public boolean loginUsuario(String usuario, String contrasena) {
+		System.out.println(repoUsuarios.getAllUsuarios().get(0).getTelefono());
 		//En vez de hacer equals hacer funcion en usuario por patrón.
 		Optional<Usuario> optUsr = repoUsuarios.getAllUsuarios().stream()
 				.filter(usr -> usr.getNombre().equals(usuario) && usr.isClave(contrasena))
@@ -60,7 +85,7 @@ public static AppChat getUnicaInstancia() {
 		usuarioActual = null;
 	}
 	
-	public static boolean existeTelefono(String telefono) {
+	public boolean existeTelefono(String telefono) {
 		//Solución temporal: puede ser necesario tener que crear una funcion dentre de usuario para comprobar 
 		boolean existe = repoUsuarios.getAllUsuarios().stream()
 				.anyMatch(u->u.getTelefono().equals(telefono));

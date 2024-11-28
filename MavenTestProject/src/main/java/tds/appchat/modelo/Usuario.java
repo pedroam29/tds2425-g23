@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 
 
 public class Usuario {
+	private int codigo;
 	private final String nombre;
 	private final Date fechaNacimiento;
 	private final String email;
@@ -24,6 +25,7 @@ public class Usuario {
 	private List<Contacto> contactos;
 	
 	public Usuario(String nombre, String telefono, String contrasena,Date fechaNacimiento, String imagenPerfilUrl, String saludo, String email) {
+		this.codigo = 0;
 		this.nombre = nombre;
 		this.email = email;
 		this.telefono = telefono;
@@ -37,11 +39,20 @@ public class Usuario {
 	}
 	
 	public Usuario(String nombre) {
+		this.codigo = 0;
 		this.nombre=nombre;
 		this.fechaNacimiento = new Date();
 		this.email = "";
 		this.telefono = "";
 		this.contrasena = "";
+	}
+	
+	public int getCodigo() {
+		return this.codigo;
+	}
+	
+	public void setCodigo(int codigo) {
+		this.codigo = codigo;
 	}
 	
 	public ContactoIndividual getContactoIndividual(Usuario otroUsuario) {
@@ -122,10 +133,7 @@ public class Usuario {
 		}
 		return imagen;
 	}
-	public String getImagenUrl() {
-		return imagenPerfilUrl;
-	}
-
+	
 	public String getSaludo() {
 		return saludo;
 	}

@@ -7,9 +7,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import persistencia.DAOException;
+import persistencia.FactoriaDAO;
+import persistencia.IAdaptadorUsuarioDAO;
+
+
+
 
 public class RepositorioUsuarios {
 	private Map<String, Usuario> usuarios = new HashMap<>();
+	
+	private static RepositorioUsuarios unicaInstancia = new RepositorioUsuarios();
+	
+	private FactoriaDAO dao;
+	private IAdaptadorUsuarioDAO adaptadorUsuario;
+
+	
+	private RepositorioUsuarios() {
+		try {
+			dao = FactoriaDAO.getInstancia(FactoriaDAO.DAO_TDS);
+  			adaptadorUsuario = dao.getUsuarioDAO();
+  			this.cargarUsuarios();
+  		} catch (DAOException eDAO) {
+  			eDAO.printStackTrace();
+  		}
+	}
+	private void cargarUsuarios() {
+		usuarios = new HashMap<String, Usuario>();
+		List<Usuario> usuariosBD = adaptadorUsuario.recuperarTodosUsuarios();
+		usuariosBD.stream().forEach(u -> usuarios.put(u.getTelefono(), u));
+	}
+	public static RepositorioUsuarios getUnicaInstancia() {
+		return unicaInstancia;
+	}
 	
 	public Usuario obtenerUsuarioPorTelefono(String telefono) {
 		return usuarios.get(telefono);

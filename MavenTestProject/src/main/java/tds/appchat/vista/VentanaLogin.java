@@ -128,10 +128,10 @@ public class VentanaLogin {
 			public void actionPerformed(ActionEvent e) {
 				// recuperar datos de pantalla
 				String telefono= textfieldTelefono.getText(); //textfieldtelefono.getText()
-				String clave= textfieldPassword.getText(); 
+				String clave= new String(textfieldPassword.getPassword()); 
 				
 				//ejecutar negocio a traves de controlador
-				boolean login = AppChat.loginUsuario(telefono, clave);	//AppChat.hacerLogin();
+				boolean login = AppChat.getUnicaInstancia().loginUsuario(telefono, clave);	//AppChat.hacerLogin();
 				if(login) {
 					VentanaPrincipal principal = new VentanaPrincipal();
 					principal.setVisible(true);

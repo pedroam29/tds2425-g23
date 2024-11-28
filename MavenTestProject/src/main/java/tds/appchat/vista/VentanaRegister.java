@@ -276,8 +276,8 @@ public class VentanaRegister extends JFrame {
 				//Obtener todos los campos y mandarlos al registrar del AppChat
 				String nombre = textFieldNombre.getText();
 				String telefono = textFieldTelefono.getText();
-				String contrasena = textFieldPassword.getText();
-				String contrasena2 = textFieldConfirmarPassword.getText();
+				String contrasena = new String(textFieldPassword.getPassword());
+				String contrasena2 = new String(textFieldConfirmarPassword.getPassword());
 				Date fechaNacimiento = dateChooser.getDate();
 				String imagenPerfilUrl = textFieldImagenURL.getText();
 				String saludo = textAreaSaludo.getText();
@@ -287,6 +287,11 @@ public class VentanaRegister extends JFrame {
 				//Solución momentánea para comprobar que los campos están llenos
 				registroPosible = !((nombre == "") || (telefono == "") || (contrasena == "") ||
 						(contrasena2 == "")|| (imagenPerfilUrl == "") || (saludo == "") || (email == "") || (fechaNacimiento == null));
+				
+				if(!contrasena.equals(contrasena2)) {
+					JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden");
+					return;
+				}
 				
 				if (registroPosible) {				
 					//Se realiza el registro 
