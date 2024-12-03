@@ -41,6 +41,8 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.FlowLayout;
 import javax.swing.JSeparator;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class VentanaContactos extends JFrame {
 
@@ -113,10 +115,13 @@ public class VentanaContactos extends JFrame {
 		listaContactos.setCellRenderer(new ContactoCellRenderer());
 		DefaultListModel<Contacto> modeloContactos = new DefaultListModel<Contacto>();
 		
-        modeloContactos.addElement(new ContactoIndividual("Carlos", "332", null));
+        /*modeloContactos.addElement(new ContactoIndividual("Carlos", "332", null));
         modeloContactos.addElement(new ContactoIndividual("Simón","331" ,null));
         modeloContactos.addElement(new ContactoIndividual("Lucia", "330" ,null));
-		
+		*/
+		for(Contacto contacto : AppChat.getUnicaInstancia().contactosUsuarioActual()) {
+			modeloContactos.addElement(contacto);
+		}
 		listaContactos.setModel(modeloContactos);
 		
 		scrollPanelContactos.setViewportView(listaContactos);
@@ -157,6 +162,12 @@ public class VentanaContactos extends JFrame {
 		gridBagLayoutVentana.add(panelBotonInsertarContacto, gbc_panelBotonInsertarContacto);
 		
 		JButton botonInsertarContacto = new JButton("Añadir Contacto");
+		botonInsertarContacto.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				VentanaRegistrarContacto ventana = new VentanaRegistrarContacto();
+				ventana.setVisible(true);
+			}
+		});
 		panelBotonInsertarContacto.add(botonInsertarContacto);
 		
 		JPanel panel = new JPanel();

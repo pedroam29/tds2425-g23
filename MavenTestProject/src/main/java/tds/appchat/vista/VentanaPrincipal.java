@@ -34,6 +34,8 @@ import javax.swing.Box;
 import javax.swing.JList;
 import javax.swing.ImageIcon;
 import javax.swing.JTextField;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class VentanaPrincipal extends JFrame {
 
@@ -87,6 +89,13 @@ public class VentanaPrincipal extends JFrame {
 		panelNorte.add(btnNewButton_1);
 		
 		JButton btnNewButton_2 = new JButton("Contactos");
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				VentanaContactos vContactos = new VentanaContactos();
+				vContactos.setVisible(true);
+				
+			}
+		});
 		btnNewButton_2.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/personas.png")));
 		panelNorte.add(btnNewButton_2);
 		

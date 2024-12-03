@@ -127,7 +127,7 @@ public class VentanaLogin {
 		botonAceptar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// recuperar datos de pantalla
-				String telefono= textfieldTelefono.getText(); //textfieldtelefono.getText()
+				String telefono= new String(textfieldTelefono.getText()); //textfieldtelefono.getText()
 				String clave= new String(textfieldPassword.getPassword()); 
 				
 				//ejecutar negocio a traves de controlador

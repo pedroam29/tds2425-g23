@@ -6,7 +6,9 @@ import java.util.Optional;
 
 import persistencia.DAOException;
 import persistencia.FactoriaDAO;
+import persistencia.IAdaptadorContactoIndividualDAO;
 import persistencia.IAdaptadorUsuarioDAO;
+import tds.appchat.modelo.Contacto;
 import tds.appchat.modelo.ContactoIndividual;
 import tds.appchat.modelo.Grupo;
 import tds.appchat.modelo.Mensaje;
@@ -20,6 +22,7 @@ public class AppChat {
 	private Usuario usuarioActual;
 	private RepositorioUsuarios repoUsuarios;
 	private IAdaptadorUsuarioDAO adaptadorUsuario;
+	private IAdaptadorContactoIndividualDAO adaptadorContactoIndividual;
 	
 	public static AppChat getUnicaInstancia() {
 //		if (unicaInstancia == null)
@@ -41,6 +44,7 @@ public class AppChat {
 			e.printStackTrace();
 		}
 		adaptadorUsuario = factoria.getUsuarioDAO();
+		adaptadorContactoIndividual = factoria.getContactoDAO();
 	}
 	
 	private void inicializarRepositorios() {
@@ -55,9 +59,12 @@ public class AppChat {
 	public List<Mensaje> obtenerChatsRecientesUsuario(){
 		return usuarioActual.getRecibidos();
 	}
+	public List<Contacto> contactosUsuarioActual(){
+		return usuarioActual.getContactos();
+	}
 	
 	public boolean registrarUsuario(String nombre, String telefono, String contrasena, Date fechaNacimiento, String imagenPerfilUrl, String saludo, String email) {
-		Usuario usr = new Usuario(nombre, email, contrasena, fechaNacimiento, imagenPerfilUrl, saludo, email);
+		Usuario usr = new Usuario(nombre, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo, email);
 		if(repoUsuarios.agregarUsuario(usr)) {
 			usuarioActual = usr;
 			adaptadorUsuario.registrarUsuario(usr);
@@ -66,11 +73,11 @@ public class AppChat {
 		return false;
 	}
 	
-	public boolean loginUsuario(String usuario, String contrasena) {
-		System.out.println(repoUsuarios.getAllUsuarios().get(0).getTelefono());
+	public boolean loginUsuario(String telefono, String contrasena) {
+		
 		//En vez de hacer equals hacer funcion en usuario por patrón.
 		Optional<Usuario> optUsr = repoUsuarios.getAllUsuarios().stream()
-				.filter(usr -> usr.getNombre().equals(usuario) && usr.isClave(contrasena))
+				.filter(usr -> usr.getTelefono().equals(telefono) && usr.isClave(contrasena))
 				.findFirst();
 		
 		if(optUsr.isPresent()) {
@@ -95,20 +102,23 @@ public class AppChat {
 		// Si no tiene el contacto guardado lo guarda
 		if (!usuarioActual.existeContacto(numTelefono)) {
 			Optional<Usuario> usuarioOpt = repoUsuarios.getUsuarioNumTelf(numTelefono);
-
+				
+			
 			if (usuarioOpt.isPresent()) {
 				
 				ContactoIndividual nuevoContacto = usuarioActual.crearContacto(nombre, usuarioOpt.get());
 				
 
-				//adaptadorContactoIndividual.registrarContacto(nuevoContacto);
+				adaptadorContactoIndividual.registrarContacto(nuevoContacto);
 
-				//adaptadorUsuario.modificarUsuario(usuarioActual);
+				adaptadorUsuario.modificarUsuario(usuarioActual);
 				return nuevoContacto;
 			}
 		}
 		return null;
 	}
+	
+	
 	
 	public Grupo crearGrupo(String nombreGrupo, String imagen) {
 

@@ -6,6 +6,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.GridBagLayout;
+import java.awt.Image;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
@@ -13,6 +15,10 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
 
 import javax.swing.JTextField;
@@ -22,6 +28,8 @@ import javax.swing.BoxLayout;
 import java.awt.BorderLayout;
 import javax.swing.JButton;
 import java.awt.Component;
+
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import com.toedter.calendar.JDateChooser;
@@ -53,6 +61,7 @@ public class VentanaRegister extends JFrame {
 	private JDateChooser dateChooser;
 	private JTextField textFieldEmail;
 	private JLabel labelEmail;
+	private JButton btnNewButton;
 	
 	/**
 	 * Create the frame.
@@ -223,7 +232,7 @@ public class VentanaRegister extends JFrame {
 		contentPane.add(textFieldImagenURL, gbc_textFieldImagenURL);
 		textFieldImagenURL.setColumns(10);
 		
-		labelImagenObtenida = new JLabel("");
+		labelImagenObtenida = new JLabel();
 		labelImagenObtenida.setIcon(new ImageIcon(VentanaRegister.class.getResource("/imagenes/usuario.png")));
 		GridBagConstraints gbc_labelImagenObtenida = new GridBagConstraints();
 		gbc_labelImagenObtenida.insets = new Insets(0, 0, 5, 5);
@@ -256,6 +265,35 @@ public class VentanaRegister extends JFrame {
 		//Botón aceptar: para que se acepte se tienen que pasar los requisitos
 		botonAceptar = new JButton("Aceptar");
 		panelBotones.add(botonAceptar);
+		
+		btnNewButton = new JButton("Cargar Imagen");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String path = textFieldImagenURL.getText();  // Obtener la URL ingresada por el usuario
+				
+				URL url = null;
+				try {
+					url = new URL(path);
+				} catch (MalformedURLException e2) {
+					JOptionPane.showMessageDialog(contentPane, "La URL ingresada no es válida. Por favor, verifica la URL.", "Error de URL", JOptionPane.WARNING_MESSAGE);
+		        }
+				try {
+					BufferedImage image = ImageIO.read(url);
+					Image resizedImage = image.getScaledInstance(128, 128, Image.SCALE_SMOOTH); // Reescalar la imagen
+					ImageIcon icono = new ImageIcon(resizedImage);
+		            labelImagenObtenida.setIcon(icono); //Mostrar la nueva imagen donde estaba la anterior
+				} catch (IOException e1) {
+		            // Muestra un mensaje de error si hay un problema al cargar la imagen
+		            JOptionPane.showMessageDialog(contentPane, "No se pudo cargar la imagen desde la URL proporcionada.\n Compruebe su conexion a internet", "Error de Carga", JOptionPane.WARNING_MESSAGE);
+		        }
+			}
+		});
+		
+		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
+		gbc_btnNewButton.insets = new Insets(0, 0, 0, 5);
+		gbc_btnNewButton.gridx = 4;
+		gbc_btnNewButton.gridy = 8;
+		contentPane.add(btnNewButton, gbc_btnNewButton);
 		
 		botonAceptar.addActionListener(new ActionListener() {
 			

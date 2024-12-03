@@ -31,6 +31,7 @@ public abstract class FactoriaDAO {
 	// Metodos factoria que devuelven adaptadores que implementen estos interfaces
 
 	public abstract IAdaptadorUsuarioDAO getUsuarioDAO();
+	public abstract IAdaptadorContactoIndividualDAO getContactoDAO();
 
 
 }
