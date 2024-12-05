@@ -4,16 +4,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import persistencia.DAOException;
-import persistencia.FactoriaDAO;
-import persistencia.IAdaptadorContactoIndividualDAO;
-import persistencia.IAdaptadorUsuarioDAO;
 import tds.appchat.modelo.Contacto;
 import tds.appchat.modelo.ContactoIndividual;
 import tds.appchat.modelo.Grupo;
 import tds.appchat.modelo.Mensaje;
 import tds.appchat.modelo.RepositorioUsuarios;
 import tds.appchat.modelo.Usuario;
+import tds.appchat.persistencia.DAOException;
+import tds.appchat.persistencia.FactoriaDAO;
+import tds.appchat.persistencia.IAdaptadorContactoIndividualDAO;
+import tds.appchat.persistencia.IAdaptadorUsuarioDAO;
 
 
 

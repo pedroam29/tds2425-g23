@@ -1,4 +1,4 @@
-package persistencia;
+package tds.appchat.persistencia;
 
 public class TDSFactoriaDAO extends FactoriaDAO{
 	

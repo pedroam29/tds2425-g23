@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import persistencia.DAOException;
-import persistencia.FactoriaDAO;
-import persistencia.IAdaptadorUsuarioDAO;
+import tds.appchat.persistencia.DAOException;
+import tds.appchat.persistencia.FactoriaDAO;
+import tds.appchat.persistencia.IAdaptadorUsuarioDAO;
 
 
 

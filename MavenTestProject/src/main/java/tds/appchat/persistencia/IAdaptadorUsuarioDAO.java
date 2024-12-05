@@ -1,4 +1,4 @@
-package persistencia;
+package tds.appchat.persistencia;
 
 import java.util.List;
 

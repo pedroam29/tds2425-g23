@@ -1,4 +1,4 @@
-package persistencia;
+package tds.appchat.persistencia;
 
 public abstract class FactoriaDAO {
 	private static FactoriaDAO unicaInstancia;
