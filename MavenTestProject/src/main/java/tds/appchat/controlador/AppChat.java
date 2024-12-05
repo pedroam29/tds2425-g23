@@ -82,6 +82,10 @@ public class AppChat {
 		
 		if(optUsr.isPresent()) {
 			usuarioActual = optUsr.get();
+			
+			for(Contacto contacto: usuarioActual.getContactos()) {
+				System.out.println(contacto.getNombre());
+			}
 			return true;
 		}
 		return false;
@@ -102,7 +106,6 @@ public class AppChat {
 		// Si no tiene el contacto guardado lo guarda
 		if (!usuarioActual.existeContacto(numTelefono)) {
 			Optional<Usuario> usuarioOpt = repoUsuarios.getUsuarioNumTelf(numTelefono);
-				
 			
 			if (usuarioOpt.isPresent()) {
 				

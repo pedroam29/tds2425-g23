@@ -57,6 +57,6 @@ public class RepositorioUsuarios {
 	}
 	
 	public Optional<Usuario> getUsuarioNumTelf(String numTelefono) {
-		return usuarios.values().stream().filter(u -> u.getTelefono() == numTelefono).findAny();
+		return usuarios.values().stream().filter(u -> u.getTelefono().equals(numTelefono)).findAny();
 	}
 }

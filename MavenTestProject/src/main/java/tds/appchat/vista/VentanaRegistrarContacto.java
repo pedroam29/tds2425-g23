@@ -112,10 +112,17 @@ public class VentanaRegistrarContacto extends JFrame {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ContactoIndividual contacto = AppChat.getUnicaInstancia().crearContacto(textField_nombre.getText(), textField_telf.getText());
-				JOptionPane.showMessageDialog(VentanaRegistrarContacto.this, "Contact added successfully", "Info",
-						JOptionPane.INFORMATION_MESSAGE);
-				System.out.println(contacto.getNombre());
-				System.out.println(contacto.getTelefono());
+				if(contacto!=null) {
+					JOptionPane.showMessageDialog(VentanaRegistrarContacto.this, "Contact added successfully", "Info",
+							JOptionPane.INFORMATION_MESSAGE);
+				}else if(!AppChat.getUnicaInstancia().existeTelefono(textField_telf.getText())){
+					JOptionPane.showMessageDialog(VentanaRegistrarContacto.this, "El contacto no se pudo añadir porque no existe el número de telefono", "Error",
+							JOptionPane.ERROR_MESSAGE);
+				} else {
+					JOptionPane.showMessageDialog(VentanaRegistrarContacto.this, "Este teléfono ya existe en el sistema", "Info",
+							JOptionPane.INFORMATION_MESSAGE);
+				}
+				dispose();
 			}
 		});
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
@@ -125,6 +132,11 @@ public class VentanaRegistrarContacto extends JFrame {
 		panel_1.add(btnNewButton, gbc_btnNewButton);
 		
 		JButton btnNewButton_1 = new JButton("Cancelar");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
 		GridBagConstraints gbc_btnNewButton_1 = new GridBagConstraints();
 		gbc_btnNewButton_1.insets = new Insets(0, 0, 0, 5);
 		gbc_btnNewButton_1.gridx = 2;
