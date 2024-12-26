@@ -22,11 +22,13 @@ public class Grupo extends Contacto{
 		return miembros;
 	}
 	
-	public void addMiembro(ContactoIndividual c) {
-		miembros.add(c);
-
+	public boolean addMiembro(ContactoIndividual c) {
+		return miembros.add(c);
 	}
 	
+	public boolean eliminarMiembro(ContactoIndividual c){
+		return miembros.remove(c);
+	}
 	public boolean contieneContacto(ContactoIndividual c) {
 		return this.miembros.contains(c);
 	}

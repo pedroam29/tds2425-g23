@@ -182,6 +182,16 @@ public class Usuario {
 		}
 	}
 	
+	public boolean eliminarIntegranteGrupo(Grupo g, ContactoIndividual c) {
+		if(g.contieneContacto(c)) {
+			g.eliminarMiembro(c);
+			return true;
+		}
+		return false; 
+	}
+	
+	
+	
 	public void enviarMensaje(Usuario receptor, String contenido) {
         // Crear mensaje y agregarlo a las listas de mensajes
         Mensaje mensaje = new Mensaje(contenido, this, receptor);
@@ -189,7 +199,6 @@ public class Usuario {
         receptor.recibirMensaje(mensaje);
  
     }
-	
 	private void recibirMensaje(Mensaje mensaje) {
 		this.mensajesRecibidos.add(mensaje);
 	}

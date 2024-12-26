@@ -102,16 +102,13 @@ public class AppChat {
 		// Si no tiene el contacto guardado lo guarda
 		if (!usuarioActual.existeContacto(numTelefono)) {
 			Optional<Usuario> usuarioOpt = repoUsuarios.getUsuarioNumTelf(numTelefono);
-				
 			
 			if (usuarioOpt.isPresent()) {
 				
 				ContactoIndividual nuevoContacto = usuarioActual.crearContacto(nombre, usuarioOpt.get());
-				
-
 				adaptadorContactoIndividual.registrarContacto(nuevoContacto);
-
 				adaptadorUsuario.modificarUsuario(usuarioActual);
+				
 				return nuevoContacto;
 			}
 		}
@@ -121,10 +118,11 @@ public class AppChat {
 	
 	
 	public Grupo crearGrupo(String nombreGrupo, String imagen) {
-
+		//TODO: Se puede eliminar este ya que en la pestaña de crear grupo
 		if(nombreGrupo.isEmpty()) {
 			throw new IllegalArgumentException("El nombre del grupo no puede estar vacío.");
 		}
+		
 		if(usuarioActual.hasGrupo(nombreGrupo)){
 			throw new IllegalArgumentException("Ya existe un grupo con este nombre.");
 		}
@@ -140,12 +138,21 @@ public class AppChat {
 		return nuevoGrupo;
 	} 
 	
-	public void addContactoGrupo(Grupo grupo, ContactoIndividual contacto) {
-		if(usuarioActual.hasContactoIndividual(contacto)){
+	public boolean addContactoGrupo(Grupo grupo, ContactoIndividual contacto) {
+		//Necesario comprobar si el contacto lo tiene el usuario
+		// y también si el contacto está ya dentro del grupo
+		if(usuarioActual.hasContactoIndividual(contacto) && !grupo.contieneContacto(contacto)){
 			usuarioActual.addIntegranteGrupo(grupo, contacto);
+			//Valor de retorno para que sea más facil a la hora de hacer la vista
+			return true;
 		}
+		return false;
 		//Usuario usuario = contacto.getUsuario();
 		//adaptadorUsuario.modificarUsuario(usuario);
+	}
+	
+	public boolean eliminarContactoGrupo(Grupo grupo, ContactoIndividual contacto) {
+		return usuarioActual.eliminarIntegranteGrupo(grupo, contacto);
 	}
 	
 	public void enviarMensajePorTelefono(String telefonoReceptor, String texto) {

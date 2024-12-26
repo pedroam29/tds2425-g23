@@ -8,6 +8,7 @@ import javax.swing.border.EmptyBorder;
 
 import tds.appchat.controlador.AppChat;
 import tds.appchat.modelo.ContactoIndividual;
+import tds.appchat.modelo.Grupo;
 
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
@@ -22,12 +23,12 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-public class VentanaRegistrarContacto extends JFrame {
+public class VentanaRegistrarGrupo extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField textField_nombre;
-	private JTextField textField_telf;
+	private JTextField textField_imagen;
 
 	/**
 	 * Launch the application.
@@ -36,7 +37,7 @@ public class VentanaRegistrarContacto extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					VentanaRegistrarContacto frame = new VentanaRegistrarContacto();
+					VentanaRegistrarGrupo frame = new VentanaRegistrarGrupo();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -48,7 +49,7 @@ public class VentanaRegistrarContacto extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public VentanaRegistrarContacto() {
+	public VentanaRegistrarGrupo() {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -90,7 +91,7 @@ public class VentanaRegistrarContacto extends JFrame {
 		panel_1.add(textField_nombre, gbc_textField_nombre);
 		textField_nombre.setColumns(10);
 		
-		JLabel lblNewLabel_2 = new JLabel("Teléfono: ");
+		JLabel lblNewLabel_2 = new JLabel("Imagen: ");
 		GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
 		gbc_lblNewLabel_2.insets = new Insets(0, 0, 5, 5);
 		gbc_lblNewLabel_2.anchor = GridBagConstraints.EAST;
@@ -98,15 +99,15 @@ public class VentanaRegistrarContacto extends JFrame {
 		gbc_lblNewLabel_2.gridy = 3;
 		panel_1.add(lblNewLabel_2, gbc_lblNewLabel_2);
 		
-		textField_telf = new JTextField();
+		textField_imagen = new JTextField();
 		GridBagConstraints gbc_textField_telf = new GridBagConstraints();
 		gbc_textField_telf.gridwidth = 2;
 		gbc_textField_telf.insets = new Insets(0, 0, 5, 5);
 		gbc_textField_telf.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField_telf.gridx = 2;
 		gbc_textField_telf.gridy = 3;
-		panel_1.add(textField_telf, gbc_textField_telf);
-		textField_telf.setColumns(10);
+		panel_1.add(textField_imagen, gbc_textField_telf);
+		textField_imagen.setColumns(10);
 		
 		/**
 		 * Botón aceptar: 
@@ -120,12 +121,15 @@ public class VentanaRegistrarContacto extends JFrame {
 		
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (textField_nombre.getText().isEmpty() | textField_telf.getText().isEmpty())
-					JOptionPane.showMessageDialog(VentanaRegistrarContacto.this, "Es necesario llenar los campos");
+				if (textField_nombre.getText().isEmpty() | textField_imagen.getText().isEmpty())
+					JOptionPane.showMessageDialog(VentanaRegistrarGrupo.this, "Es necesario llenar los campos");
 				else {
-					ContactoIndividual contacto = AppChat.getUnicaInstancia().crearContacto(textField_nombre.getText(), textField_telf.getText());
-					if (contacto == null)
-						JOptionPane.showMessageDialog(VentanaRegistrarContacto.this, "El contacto no se ha podido registrar");
+					try {
+						AppChat.getUnicaInstancia().crearGrupo(textField_nombre.getText(), textField_imagen.getText());	
+					} catch (Exception e2) {
+						//Se mostrará el mensaje de error de la funcion del controlador
+						JOptionPane.showMessageDialog(VentanaRegistrarGrupo.this, e2.getMessage());
+					}
 				}
 			}
 		});
