@@ -1,4 +1,4 @@
-package persistencia;
+package tds.appchat.persistencia;
 
 @SuppressWarnings("serial")
 public class DAOException extends Exception {

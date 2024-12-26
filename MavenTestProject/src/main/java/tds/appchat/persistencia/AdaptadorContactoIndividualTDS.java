@@ -1,4 +1,4 @@
-package persistencia;
+package tds.appchat.persistencia;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,24 +34,26 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 		try {
 			eContact = servPersistencia.recuperarEntidad(contacto.getCodigo());
 		} catch (NullPointerException e) {
-			existe = false;
 		}
-		if (existe)
+		
+		if (eContact != null)
 			return;
-
 
 		// Registramos al usuario correspondiente al contacto si no existe.
 		registrarSiNoExisteUser(contacto.getUsuario());
 
 		// Atributos propios del contacto
+
+		eContact = new Entidad();
 		eContact.setNombre("contacto");
 		eContact.setPropiedades(new ArrayList<Propiedad>(Arrays.asList(new Propiedad("nombre", contacto.getNombre()),
 				new Propiedad("telefono", String.valueOf(contacto.getTelefono())),
 				new Propiedad("usuario", String.valueOf(contacto.getUsuario().getCodigo())))));
-
+		
 		// Registrar entidad usuario
 		eContact = servPersistencia.registrarEntidad(eContact);
-
+		
+		
 		// Identificador unico
 		contacto.setCodigo(eContact.getId());
 		
@@ -106,6 +108,7 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 		
 
 		// Obtener usuario del contacto
+		System.err.println(servPersistencia.recuperarPropiedadEntidad(eContact, "usuario"));
 		contact.setUsuario(obtenerUsuarioDesdeCodigo(servPersistencia.recuperarPropiedadEntidad(eContact, "usuario")));
 
 		// Devolvemos el objeto contacto

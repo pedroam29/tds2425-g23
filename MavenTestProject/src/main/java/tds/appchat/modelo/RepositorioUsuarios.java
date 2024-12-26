@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import persistencia.DAOException;
-import persistencia.FactoriaDAO;
-import persistencia.IAdaptadorUsuarioDAO;
+import tds.appchat.persistencia.DAOException;
+import tds.appchat.persistencia.FactoriaDAO;
+import tds.appchat.persistencia.IAdaptadorUsuarioDAO;
 
 
 
@@ -57,6 +57,6 @@ public class RepositorioUsuarios {
 	}
 	
 	public Optional<Usuario> getUsuarioNumTelf(String numTelefono) {
-		return usuarios.values().stream().filter(u -> u.getTelefono() == numTelefono).findAny();
+		return usuarios.values().stream().filter(u -> u.getTelefono().equals(numTelefono)).findAny();
 	}
 }

@@ -1,14 +1,12 @@
-package persistencia;
+package tds.appchat.persistencia;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import beans.Entidad;
@@ -16,7 +14,6 @@ import beans.Propiedad;
 import tds.appchat.modelo.Contacto;
 import tds.appchat.modelo.Mensaje;
 import tds.appchat.modelo.Usuario;
-
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;
 
@@ -63,11 +60,9 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 
 		// registrar entidad usuario
 		eUsuario = servPersistencia.registrarEntidad(eUsuario);
-		System.out.println(eUsuario);
 		// asignar identificador unico
 		// Se aprovecha el que genera el servicio de persistencia
 		usuario.setCodigo(eUsuario.getId());
-		System.out.println(eUsuario);
 	}
 
 	public void borrarUsuario(Usuario usuario) {
@@ -120,7 +115,7 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 	
 		List<Mensaje> recibidos;
 		List<Mensaje> enviados;
-		List<Contacto> contacto;
+		List<Contacto> contactos;
 
 		eUsuario = servPersistencia.recuperarEntidad(codigo);
 		usuario = servPersistencia.recuperarPropiedadEntidad(eUsuario, "usuario");
@@ -140,7 +135,10 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		recientes = obtenerCancionesDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "recientes"));
 
 */
+		contactos = obtenerContactosDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "contactos"));
+		
 		Usuario usr = new Usuario(usuario, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo, email);
+		usr.setContactos(contactos);
 		/*
 		usr.setPlayLists(playlists);
 		usr.setRecientes(recientes);
@@ -186,17 +184,17 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		}
 		return lineas.trim();
 	}
-	/*
-	private List<Mensaje> obtenerRecibidosDesdeCodigos(String lineas) {
-		List<Mensaje> recibidos = new LinkedList<Mensaje>();
+	
+	private List<Contacto> obtenerContactosDesdeCodigos(String lineas) {
+		List<Contacto> recibidos = new LinkedList<Contacto>();
 		StringTokenizer strTok = new StringTokenizer(lineas, " ");
-		AdaptadorMensajeTDS adaptadorC = AdaptadorMensajeTDS.getUnicaInstancia();
+		AdaptadorContactoIndividualTDS adaptador = AdaptadorContactoIndividualTDS.getInstancia();
 		while (strTok.hasMoreTokens()) {
-			recibidos.add(adaptadorC.recuperarCancion(Integer.valueOf((String) strTok.nextElement())));
+			recibidos.add(adaptador.recuperarContacto(Integer.valueOf((String) strTok.nextElement())));
 		}
 		return recibidos;
 	}
-
+	/*
 	private Set<PlayList> obtenerPlayListsDesdeCodigos(String lineas) {
 		Set<PlayList> playlists = new HashSet<PlayList>();
 		StringTokenizer strTok = new StringTokenizer(lineas, " ");

@@ -35,7 +35,7 @@ public class Usuario {
 		this.saludo = saludo;
 		this.mensajesRecibidos=new LinkedList<>();
 		this.mensajesEnviados=new LinkedList<>();
-		this.contactos=new LinkedList<>();
+		this.contactos=new LinkedList<Contacto>();
 	}
 	
 	public Usuario(String nombre) {

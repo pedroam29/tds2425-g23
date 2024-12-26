@@ -112,31 +112,25 @@ public class VentanaRegistrarContacto extends JFrame {
 		 * Botón aceptar: 
 		 */
 		JButton btnNewButton = new JButton("Aceptar");
-		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
-		gbc_btnNewButton.insets = new Insets(0, 0, 0, 5);
-		gbc_btnNewButton.gridx = 2;
-		gbc_btnNewButton.gridy = 6;
-		panel_1.add(btnNewButton, gbc_btnNewButton);
-		
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (textField_nombre.getText().isEmpty() | textField_telf.getText().isEmpty())
-					JOptionPane.showMessageDialog(VentanaRegistrarContacto.this, "Es necesario llenar los campos");
-				else {
-					ContactoIndividual contacto = AppChat.getUnicaInstancia().crearContacto(textField_nombre.getText(), textField_telf.getText());
-					if (contacto == null)
-						JOptionPane.showMessageDialog(VentanaRegistrarContacto.this, "El contacto no se ha podido registrar");
+				ContactoIndividual contacto = AppChat.getUnicaInstancia().crearContacto(textField_nombre.getText(), textField_telf.getText());
+				if(contacto!=null) {
+					JOptionPane.showMessageDialog(VentanaRegistrarContacto.this, "Contact added successfully", "Info",
+							JOptionPane.INFORMATION_MESSAGE);
+				}else if(!AppChat.getUnicaInstancia().existeTelefono(textField_telf.getText())){
+					JOptionPane.showMessageDialog(VentanaRegistrarContacto.this, "El contacto no se pudo añadir porque no existe el número de telefono", "Error",
+							JOptionPane.ERROR_MESSAGE);
+				} else {
+					JOptionPane.showMessageDialog(VentanaRegistrarContacto.this, "Este teléfono ya existe en el sistema", "Info",
+							JOptionPane.INFORMATION_MESSAGE);
 				}
+				dispose();
 			}
 		});
+
 				
 		JButton btnCancelar = new JButton("Cancelar");
-		GridBagConstraints gbc_btnNewButton_1 = new GridBagConstraints();
-		gbc_btnNewButton_1.insets = new Insets(0, 0, 0, 5);
-		gbc_btnNewButton_1.gridx = 3;
-		gbc_btnNewButton_1.gridy = 6;
-		panel_1.add(btnCancelar, gbc_btnNewButton_1);
-		
 		btnCancelar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
