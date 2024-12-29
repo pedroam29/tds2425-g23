@@ -1,13 +1,18 @@
 package tds.appchat.controlador;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import tds.appchat.modelo.Contacto;
 import tds.appchat.modelo.ContactoIndividual;
+import tds.appchat.modelo.Descuento;
+import tds.appchat.modelo.DescuentoIntervaloFechas;
+import tds.appchat.modelo.DescuentoMensaje;
 import tds.appchat.modelo.Grupo;
 import tds.appchat.modelo.Mensaje;
+import tds.appchat.modelo.Premium;
 import tds.appchat.modelo.RepositorioUsuarios;
 import tds.appchat.modelo.Usuario;
 import tds.appchat.persistencia.DAOException;
@@ -15,7 +20,13 @@ import tds.appchat.persistencia.FactoriaDAO;
 import tds.appchat.persistencia.IAdaptadorContactoIndividualDAO;
 import tds.appchat.persistencia.IAdaptadorUsuarioDAO;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 
 public class AppChat {
 	private final static AppChat unicaInstancia = new AppChat();
@@ -24,6 +35,8 @@ public class AppChat {
 	private IAdaptadorUsuarioDAO adaptadorUsuario;
 	private IAdaptadorContactoIndividualDAO adaptadorContactoIndividual;
 	
+	//Para escuentos:
+
 	public static AppChat getUnicaInstancia() {
 //		if (unicaInstancia == null)
 //			unicaInstancia = new AppChat();
@@ -66,7 +79,7 @@ public class AppChat {
 	public boolean registrarUsuario(String nombre, String telefono, String contrasena, Date fechaNacimiento, String imagenPerfilUrl, String saludo, String email) {
 		Usuario usr = new Usuario(nombre, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo, email);
 		if(repoUsuarios.agregarUsuario(usr)) {
-			usuarioActual = usr;
+			usuarioActual = usr;	
 			adaptadorUsuario.registrarUsuario(usr);
 			return true;
 		}
@@ -191,10 +204,56 @@ public class AppChat {
                 .orElse(null);
 
         // Enviar el mensaje de forma individual a cada miembro del grupo
-        usuarioActual.enviarMensajeAGrupo(grupo, texto);
-
-    }
+        usuarioActual.enviarMensajeAGrupo(grupo, texto);    
+	}
 	
+	public Descuento obtenerDescuentos() {
+		if (DescuentoMensaje.esUsuarioAptoDescuento(usuarioActual))
+			usuarioActual.nuevoDescuento(new DescuentoMensaje());
+		if (DescuentoIntervaloFechas.esUsuarioAptoDescuento(usuarioActual))
+			usuarioActual.nuevoDescuento(new DescuentoIntervaloFechas());
+		
+		//Si ninguno se ha insertado será null.
+		return usuarioActual.getDescuento();
+	}
 	
+	/**
+	 * El manejo de convertir en premium
+	 */
+	public void convertirPremium(){
+		//Si no es premium
+		if (!usuarioActual.isPremium()) {
+			//Con esta funcion se pondrá el descuento que más beneficie
+			obtenerDescuentos();
+			
+			boolean pagoExitoso = usuarioActual.realizarPago();
+			if (pagoExitoso) {
+				usuarioActual.convertirPremium();
+				adaptadorUsuario.modificarUsuario(usuarioActual);
+			}
+		}
+	}
+	
+	//TODO: Mejorar. Versión simple que solo 
+	public void convertirPDF(String ruta, List<Mensaje> conversacion) throws DocumentException {
+		FileOutputStream archivo = null;
+		try {
+			archivo = new FileOutputStream(ruta);
+		} catch (FileNotFoundException e) {	}
+		
+	    Document documento = new Document();
+		PdfWriter.getInstance(documento, archivo);
+		documento.open();
+		for (Mensaje m : conversacion)
+		{
+			documento.add(new Paragraph(m.toString()));
+		}
 
+		documento.close();
+	}
+	public double obtenerPrecioPremium()
+	{
+		//Se obtendrá de la clase premium
+		return Premium.getPrecioPremium();
+	}
 }

@@ -17,9 +17,7 @@ public class Mensaje {
         this.emisor = emisor;
         this.receptor = receptor;
 	}
-	
-	
-	
+
 	public int getCodigo() {
 		return codigo;
 	}
@@ -76,6 +74,14 @@ public class Mensaje {
 	}
 	public Usuario getReceptor() {
 		return receptor;
+	}
+	
+	//TODO: 
+	@Override
+	public String toString()
+	{
+		return "";
+		
 	}
 
 }

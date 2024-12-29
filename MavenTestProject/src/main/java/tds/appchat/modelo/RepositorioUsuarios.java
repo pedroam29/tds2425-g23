@@ -12,8 +12,6 @@ import tds.appchat.persistencia.FactoriaDAO;
 import tds.appchat.persistencia.IAdaptadorUsuarioDAO;
 
 
-
-
 public class RepositorioUsuarios {
 	private Map<String, Usuario> usuarios = new HashMap<>();
 	

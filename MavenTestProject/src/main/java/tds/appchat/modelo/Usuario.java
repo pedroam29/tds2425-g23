@@ -4,9 +4,12 @@ import java.awt.Image;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
@@ -20,6 +23,14 @@ public class Usuario {
 	private final String contrasena;
 	private String imagenPerfilUrl;
 	private String saludo;
+	
+	//Generacion de descuentos
+	private final LocalDate fechaRegistro;
+	private Descuento descuento;
+	//Tipo de Rol
+	private boolean premium;
+	private RolUsuario rolUsuario;
+	
 	private List<Mensaje> mensajesRecibidos;
 	private List<Mensaje> mensajesEnviados;
 	private List<Contacto> contactos;
@@ -36,6 +47,9 @@ public class Usuario {
 		this.mensajesRecibidos=new LinkedList<>();
 		this.mensajesEnviados=new LinkedList<>();
 		this.contactos=new LinkedList<Contacto>();
+		this.descuento = null;
+		this.fechaRegistro = LocalDate.now();
+		this.premium = false;
 	}
 	
 	public Usuario(String nombre) {
@@ -45,6 +59,8 @@ public class Usuario {
 		this.email = "";
 		this.telefono = "";
 		this.contrasena = "";
+		this.premium = false;
+		this.fechaRegistro = LocalDate.now();
 	}
 	
 	public int getCodigo() {
@@ -114,6 +130,13 @@ public class Usuario {
 		return fechaNacimiento;
 	}
 	
+	public LocalDate getFechaRegistro(){
+		return fechaRegistro;
+	}
+	
+	public Descuento getDescuento(){
+		return descuento;
+	}
 	/**
 	 * Devuelve la Imagen a partir de la URL de los parámetros
 	 * @return imagen de perfil
@@ -136,6 +159,10 @@ public class Usuario {
 	
 	public String getSaludo() {
 		return saludo;
+	}
+	
+	public boolean isPremium(){
+		return premium;
 	}
 	
 	public void addContacto(ContactoIndividual c) {
@@ -190,8 +217,6 @@ public class Usuario {
 		return false; 
 	}
 	
-	
-	
 	public void enviarMensaje(Usuario receptor, String contenido) {
         // Crear mensaje y agregarlo a las listas de mensajes
         Mensaje mensaje = new Mensaje(contenido, this, receptor);
@@ -199,9 +224,11 @@ public class Usuario {
         receptor.recibirMensaje(mensaje);
  
     }
+	
 	private void recibirMensaje(Mensaje mensaje) {
 		this.mensajesRecibidos.add(mensaje);
 	}
+	
 	public void enviarMensajeAGrupo(Grupo grupo, String contenido) {
 		for(ContactoIndividual contacto : grupo.getMiembros()) {
 			Usuario receptor = contacto.getUsuario();
@@ -210,5 +237,36 @@ public class Usuario {
 			receptor.recibirMensaje(mensaje);
 		}
 	}
+	
+	public long getTotalMensajesEnviadosUltimoMes()
+	{
+		//TODO: ¿Debería comprobarse si está en el mismo mes para el descuento la clase
+		// Mensaje o el Usuario?
+		long total = mensajesEnviados.stream()
+				.filter(m -> m.getFechaHora().isBefore(LocalDateTime.now().plusMonths(1)))
+				.count();
+		
+		return total;
+	}
+	
+	public void nuevoDescuento(Descuento descuento){
+		//Se supondrá que un descuento es mejor que otro siempre que
+		//De un precio menor en el momento en el que se 
+		if (descuento.calcularDescuento(Premium.getPrecioPremium()) < this.descuento.calcularDescuento(Premium.getPrecioPremium()))
+			this.descuento = descuento;
+	}
+	
+	//La realización del pago queda fuera del dominio de esta aplicación
+	//Se supondrá pago correcto para todos los casos.
+	public boolean realizarPago()
+	{
+		return true;
+	}
+	
+	public void convertirPremium(){
+		this.premium = true;
+		this.rolUsuario = new Premium(descuento);
+	}
+	
 	
 }

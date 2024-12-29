@@ -1,4 +1,4 @@
-package tds.appchat.modelo;
+package tds.appchat.vista;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -8,6 +8,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
+
+import tds.appchat.modelo.Mensaje;
 
 public class MensajeCellRenderer2 extends JPanel
 implements ListCellRenderer<Mensaje>{

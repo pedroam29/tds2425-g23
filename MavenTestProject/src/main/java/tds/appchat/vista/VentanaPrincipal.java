@@ -13,7 +13,6 @@ import javax.swing.border.EmptyBorder;
 import tds.BubbleText;
 import tds.appchat.controlador.AppChat;
 import tds.appchat.modelo.Mensaje;
-import tds.appchat.modelo.MensajeCellRenderer;
 import tds.appchat.modelo.Usuario;
 
 
@@ -99,8 +98,13 @@ public class VentanaPrincipal extends JFrame {
 		btnNewButton_2.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/personas.png")));
 		panelNorte.add(btnNewButton_2);
 		
-		JButton btnNewButton_3 = new JButton("Premium");
-		panelNorte.add(btnNewButton_3);
+		JButton btnPremium = new JButton("Premium");
+		btnPremium.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//Abrir la ventana de premium:
+			}
+		});
+		panelNorte.add(btnPremium);
 		
 		Component horizontalGlue = Box.createHorizontalGlue();
 		panelNorte.add(horizontalGlue);

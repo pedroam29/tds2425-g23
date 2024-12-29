@@ -25,8 +25,6 @@ import javax.swing.border.TitledBorder;
 
 import tds.appchat.controlador.AppChat;
 import tds.appchat.modelo.Mensaje;
-import tds.appchat.modelo.MensajeCellRenderer;
-import tds.appchat.modelo.MensajeCellRenderer2;
 import tds.appchat.modelo.Usuario;
 
 public class VentanaBuscar extends JFrame {
