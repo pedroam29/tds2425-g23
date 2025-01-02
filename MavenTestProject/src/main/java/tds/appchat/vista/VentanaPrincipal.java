@@ -10,9 +10,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
-import tds.BubbleText;
+//import tds.BubbleText;
 import tds.appchat.controlador.AppChat;
 import tds.appchat.modelo.Mensaje;
+import tds.appchat.vista.MensajeCellRenderer;
 import tds.appchat.modelo.Usuario;
 
 
@@ -63,7 +64,7 @@ public class VentanaPrincipal extends JFrame {
 	 */
 	public VentanaPrincipal() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 679, 486);
+		setBounds(100, 100, 854, 577);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -76,7 +77,9 @@ public class VentanaPrincipal extends JFrame {
 		
 		JComboBox comboBox = new JComboBox();
 		comboBox.setEditable(true);
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"Contacto 1", "Contacto 2"}));
+		String [] contactosString = AppChat.getUnicaInstancia().contactosUsuarioActual().stream()
+				.map(a -> a.getNombre()).toArray(String[]::new);
+		comboBox.setModel(new DefaultComboBoxModel(contactosString));
 		panelNorte.add(comboBox);
 		
 		JButton btnNewButton = new JButton("Enviar");
@@ -98,13 +101,19 @@ public class VentanaPrincipal extends JFrame {
 		btnNewButton_2.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/personas.png")));
 		panelNorte.add(btnNewButton_2);
 		
-		JButton btnPremium = new JButton("Premium");
-		btnPremium.addActionListener(new ActionListener() {
+		JButton btnNewButton_3 = new JButton("Premium");
+		panelNorte.add(btnNewButton_3);
+		
+		JButton btnAjustes = new JButton("Log Out");
+		btnAjustes.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//Abrir la ventana de premium:
+				AppChat.getUnicaInstancia().logoutUsuario();
+				VentanaLogin v = new VentanaLogin();
+				v.setVisible(true);
+				dispose();
 			}
 		});
-		panelNorte.add(btnPremium);
+		panelNorte.add(btnAjustes);
 		
 		Component horizontalGlue = Box.createHorizontalGlue();
 		panelNorte.add(horizontalGlue);
@@ -147,25 +156,25 @@ public class VentanaPrincipal extends JFrame {
 		JButton btnNewButton_4 = new JButton("Enviar");
 		enviar.add(btnNewButton_4);
 		
-		JPanel chat = new JPanel();
-		panelChatActual.add(chat, BorderLayout.CENTER);
-		chat.setLayout(new BoxLayout(chat,BoxLayout.Y_AXIS));
-		chat.setSize(400,700);
-		chat.setMinimumSize(new Dimension(400,700));
-		chat.setMaximumSize(new Dimension(400,700));
-		chat.setPreferredSize(new Dimension(400,700));
-		//Appchat.obtenerMensajesChat(usuario)
-		
-		BubbleText burbuja;
-		burbuja=new BubbleText(chat,"Hola grupo!!", Color.GREEN, "J.Ramón", BubbleText.SENT);
-		chat.add(burbuja);
-		
-		BubbleText burbuja2;
-		burbuja2=new BubbleText(chat,
-		"Hola, ¿Está seguro de que la burbuja usa varias lineas si es necesario?",
-		Color.LIGHT_GRAY, "Alumno", BubbleText.RECEIVED);
-		chat.add(burbuja2);
-		
+//		JPanel chat = new JPanel();
+//		panelChatActual.add(chat, BorderLayout.CENTER);
+//		chat.setLayout(new BoxLayout(chat,BoxLayout.Y_AXIS));
+//		chat.setSize(400,700);
+//		chat.setMinimumSize(new Dimension(400,700));
+//		chat.setMaximumSize(new Dimension(400,700));
+//		chat.setPreferredSize(new Dimension(400,700));
+//		//Appchat.obtenerMensajesChat(usuario)
+//		
+//		BubbleText burbuja;
+//		burbuja=new BubbleText(chat,"Hola grupo!!", Color.GREEN, "J.Ramón", BubbleText.SENT);
+//		chat.add(burbuja);
+//		
+//		BubbleText burbuja2;
+//		burbuja2=new BubbleText(chat,
+//		"Hola, ¿Está seguro de que la burbuja usa varias lineas si es necesario?",
+//		Color.LIGHT_GRAY, "Alumno", BubbleText.RECEIVED);
+//		chat.add(burbuja2);
+//		
 		
 	}
 

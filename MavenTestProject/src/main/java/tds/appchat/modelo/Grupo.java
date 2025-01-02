@@ -21,7 +21,10 @@ public class Grupo extends Contacto{
 	public List<ContactoIndividual> getMiembros() {
 		return miembros;
 	}
-	
+	public void setMiembros(List<ContactoIndividual> miembros)
+	{
+		this.miembros = miembros;
+	}
 	public boolean addMiembro(ContactoIndividual c) {
 		return miembros.add(c);
 	}

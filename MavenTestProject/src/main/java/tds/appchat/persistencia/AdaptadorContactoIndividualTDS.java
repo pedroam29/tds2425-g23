@@ -7,6 +7,7 @@ import java.util.List;
 
 import beans.Entidad;
 import beans.Propiedad;
+import tds.appchat.controlador.AppChat;
 import tds.appchat.modelo.ContactoIndividual;
 import tds.appchat.modelo.Usuario;
 import tds.driver.FactoriaServicioPersistencia;
@@ -45,7 +46,7 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 		// Atributos propios del contacto
 
 		eContact = new Entidad();
-		eContact.setNombre("contacto");
+		eContact.setNombre("contacto" + AppChat.getUnicaInstancia().getTelefonoUsuarioActual());
 		eContact.setPropiedades(new ArrayList<Propiedad>(Arrays.asList(new Propiedad("nombre", contacto.getNombre()),
 				new Propiedad("telefono", String.valueOf(contacto.getTelefono())),
 				new Propiedad("usuario", String.valueOf(contacto.getUsuario().getCodigo())))));
@@ -118,7 +119,7 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 	
 	public List<ContactoIndividual> recuperarTodosContactos() {
 		List<ContactoIndividual> contactos = new LinkedList<>();
-		List<Entidad> eContacts = servPersistencia.recuperarEntidades("contacto");
+		List<Entidad> eContacts = servPersistencia.recuperarEntidades("contacto"+AppChat.getUnicaInstancia().getTelefonoUsuarioActual());
 
 		for (Entidad eContact : eContacts) {
 			contactos.add(recuperarContacto(eContact.getId()));

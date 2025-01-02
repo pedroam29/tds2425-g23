@@ -17,6 +17,8 @@ import javax.swing.JButton;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Window;
+
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import java.awt.event.ActionListener;
@@ -51,6 +53,9 @@ public class VentanaLogin {
 		initialize();
 	}
 
+	public void setVisible(boolean b) {
+		frame.setVisible(b);
+	}
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -116,6 +121,7 @@ public class VentanaLogin {
 			public void actionPerformed(ActionEvent e) {
 				VentanaRegister registro = new VentanaRegister();
 				registro.setVisible(true);
+				frame.dispose();
 			}
 		});
 		panelBotones.add(botonRegistrar);
@@ -128,20 +134,18 @@ public class VentanaLogin {
 			public void actionPerformed(ActionEvent e) {
 				// recuperar datos de pantalla
 				String telefono= new String(textfieldTelefono.getText()); //textfieldtelefono.getText()
-				String clave= new String(textfieldPassword.getPassword()); 
-				
+				String clave= new String(textfieldPassword.getPassword());
 				//ejecutar negocio a traves de controlador
 				boolean login = AppChat.getUnicaInstancia().loginUsuario(telefono, clave);	//AppChat.hacerLogin();
 				if(login) {
 					VentanaPrincipal principal = new VentanaPrincipal();
 					principal.setVisible(true);
-				}else {
+					frame.dispose();
+				} else {
 					JOptionPane.showMessageDialog(frame, "El login es incorrecto");
 				}
 			}
 		});
-		panelBotones.add(botonAceptar);
-		
+		panelBotones.add(botonAceptar);		
 	}
-
 }

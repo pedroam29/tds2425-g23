@@ -15,7 +15,7 @@ import tds.appchat.persistencia.IAdaptadorUsuarioDAO;
 public class RepositorioUsuarios {
 	private Map<String, Usuario> usuarios = new HashMap<>();
 	
-	private static RepositorioUsuarios unicaInstancia = new RepositorioUsuarios();
+	private static RepositorioUsuarios unicaInstancia;
 	
 	private FactoriaDAO dao;
 	private IAdaptadorUsuarioDAO adaptadorUsuario;
@@ -35,7 +35,10 @@ public class RepositorioUsuarios {
 		List<Usuario> usuariosBD = adaptadorUsuario.recuperarTodosUsuarios();
 		usuariosBD.stream().forEach(u -> usuarios.put(u.getTelefono(), u));
 	}
+	
 	public static RepositorioUsuarios getUnicaInstancia() {
+		if (unicaInstancia == null)
+			unicaInstancia  = new RepositorioUsuarios();
 		return unicaInstancia;
 	}
 	

@@ -1,7 +1,7 @@
 package tds.appchat.controlador;
 
-import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +18,9 @@ import tds.appchat.modelo.Usuario;
 import tds.appchat.persistencia.DAOException;
 import tds.appchat.persistencia.FactoriaDAO;
 import tds.appchat.persistencia.IAdaptadorContactoIndividualDAO;
+import tds.appchat.persistencia.IAdaptadorGrupoDAO;
 import tds.appchat.persistencia.IAdaptadorUsuarioDAO;
+import tds.appchat.vista.VentanaLogin;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -29,17 +31,18 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 
 public class AppChat {
-	private final static AppChat unicaInstancia = new AppChat();
+	private static AppChat unicaInstancia;
 	private Usuario usuarioActual;
 	private RepositorioUsuarios repoUsuarios;
+	
 	private IAdaptadorUsuarioDAO adaptadorUsuario;
 	private IAdaptadorContactoIndividualDAO adaptadorContactoIndividual;
-	
+	private IAdaptadorGrupoDAO adaptadorGrupo;
 	//Para escuentos:
 
 	public static AppChat getUnicaInstancia() {
-//		if (unicaInstancia == null)
-//			unicaInstancia = new AppChat();
+		if (unicaInstancia == null)
+			unicaInstancia = new AppChat();
 		//Haciendo el constructor privado solo habrá una única instancia.
 		return unicaInstancia;
 	}
@@ -54,18 +57,24 @@ public class AppChat {
 		try {
 			factoria = FactoriaDAO.getInstancia(FactoriaDAO.DAO_TDS);
 		} catch (DAOException e) {
+			//TODO: Borrar sysouts cuando ya no hagan falta
+			System.out.println(e.getLocalizedMessage());
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
 		adaptadorUsuario = factoria.getUsuarioDAO();
 		adaptadorContactoIndividual = factoria.getContactoDAO();
+		adaptadorGrupo = factoria.getGrupoDAO();
 	}
 	
 	private void inicializarRepositorios() {
 		repoUsuarios = RepositorioUsuarios.getUnicaInstancia();
-		
 	}
 	public String getNombreUsuarioActual() {
 		return usuarioActual.getNombre();
+	}
+	public String getTelefonoUsuarioActual() {
+		return usuarioActual.getTelefono();
 	}
 	
 	//usando string de java 8
@@ -73,7 +82,11 @@ public class AppChat {
 		return usuarioActual.getRecibidos();
 	}
 	public List<Contacto> contactosUsuarioActual(){
-		return usuarioActual.getContactos();
+		//return usuarioActual.getContactos();
+		List<ContactoIndividual> contactosIndividuales = adaptadorContactoIndividual.recuperarTodosContactos();
+		List<Contacto> contactos = new LinkedList<Contacto>(contactosIndividuales);
+		contactos.addAll(adaptadorGrupo.recuperarTodosGrupos());
+		return contactos;
 	}
 	
 	public boolean registrarUsuario(String nombre, String telefono, String contrasena, Date fechaNacimiento, String imagenPerfilUrl, String saludo, String email) {
@@ -110,7 +123,7 @@ public class AppChat {
 	}
 	
 	public boolean existeTelefono(String telefono) {
-		//Solución temporal: puede ser necesario tener que crear una funcion dentre de usuario para comprobar 
+		//TODO: Solución temporal: puede ser necesario tener que crear una funcion dentre de usuario para comprobar 
 		boolean existe = repoUsuarios.getAllUsuarios().stream()
 				.anyMatch(u->u.getTelefono().equals(telefono));
 		return existe;
@@ -121,7 +134,6 @@ public class AppChat {
 			Optional<Usuario> usuarioOpt = repoUsuarios.getUsuarioNumTelf(numTelefono);
 			
 			if (usuarioOpt.isPresent()) {
-				
 				ContactoIndividual nuevoContacto = usuarioActual.crearContacto(nombre, usuarioOpt.get());
 				adaptadorContactoIndividual.registrarContacto(nuevoContacto);
 				adaptadorUsuario.modificarUsuario(usuarioActual);
@@ -132,8 +144,20 @@ public class AppChat {
 		return null;
 	}
 	
+	////
+	// GESTIÓN DE GRUPOS:
+	////
 	
-	
+	/**
+	 * Función para crear un grupo a partir de sus dos atributos imagen
+	 * y nombre. Se encarga también de añadirlo al servidor de persistencia
+	 * y a las estructuras de datos del usuario.
+	 * 
+	 * @param nombreGrupo
+	 * @param imagen: imagen del grupo en formato url
+	 * @return Se devuelve el grupo creado
+	 * @throws IllegalArgumentException cuando existe otro grupo con ese nombre
+	 */
 	public Grupo crearGrupo(String nombreGrupo, String imagen) {
 		//TODO: Se puede eliminar este ya que en la pestaña de crear grupo
 		if(nombreGrupo.isEmpty()) {
@@ -145,31 +169,55 @@ public class AppChat {
 		}
 		// Se crea el grupo y se añade el grupo al usuario actual
 		Grupo nuevoGrupo = usuarioActual.crearGrupo(nombreGrupo, imagen);
-	
-
-		// Conexion con persistencia
-		//adaptadorGrupo.registrarGrupo(nuevoGrupo);
-
-		//adaptadorUsuario.modificarUsuario(usuarioActual);
-
+		
+		// Para la persistencia
+		adaptadorGrupo.registrarGrupo(nuevoGrupo);
+		//Es necesario que se actualice en la bases de datos que contiene el 
+		adaptadorUsuario.modificarUsuario(usuarioActual);
 		return nuevoGrupo;
-	} 
+	}
 	
+	/**
+	 * Se añade el contacto al grupo siempre que el usuario lo tenga en su
+	 * estructura de contactos y este no sea miembro actual del grupo. Una
+	 * vez comprobado se añade a los contactos del usuario y miembros del 
+	 * grupo, también se modifica en el servidor de persistencia.
+	 * 
+	 * @param grupo
+	 * @param contacto
+	 * @return
+	 */
 	public boolean addContactoGrupo(Grupo grupo, ContactoIndividual contacto) {
-		//Necesario comprobar si el contacto lo tiene el usuario
-		// y también si el contacto está ya dentro del grupo
-		if(usuarioActual.hasContactoIndividual(contacto) && !grupo.contieneContacto(contacto)){
-			usuarioActual.addIntegranteGrupo(grupo, contacto);
+		//usuarioActual.hasContactoIndividual(contacto) && !grupo.contieneContacto(contacto)
+		if(usuarioActual.addIntegranteGrupo(grupo, contacto)){
+			adaptadorGrupo.modificarGrupo(grupo);
 			//Valor de retorno para que sea más facil a la hora de hacer la vista
 			return true;
 		}
 		return false;
-		//Usuario usuario = contacto.getUsuario();
-		//adaptadorUsuario.modificarUsuario(usuario);
+	}
+	/**
+	 * Se elimina el contacto de un grupo y se modifica en la persistencia
+	 * @param grupo
+	 * @param contacto
+	 * @return
+	 */
+	public boolean eliminarContactoGrupo(Grupo grupo, ContactoIndividual contacto) {
+		
+		if(usuarioActual.eliminarIntegranteGrupo(grupo, contacto)){
+			adaptadorGrupo.modificarGrupo(grupo);
+			return true;
+		}
+		return false;
 	}
 	
-	public boolean eliminarContactoGrupo(Grupo grupo, ContactoIndividual contacto) {
-		return usuarioActual.eliminarIntegranteGrupo(grupo, contacto);
+	public boolean eliminarGrupo(Grupo grupo){
+		
+		if(usuarioActual.eliminarGrupo(grupo)) {
+			adaptadorGrupo.borrarGrupo(grupo);
+			return true;
+		}
+		return false;	
 	}
 	
 	public void enviarMensajePorTelefono(String telefonoReceptor, String texto) {
@@ -251,9 +299,26 @@ public class AppChat {
 
 		documento.close();
 	}
+	/**
+	 * 
+	 * @return El precio actual de la suscripción Premium
+	 */
 	public double obtenerPrecioPremium()
 	{
 		//Se obtendrá de la clase premium
 		return Premium.getPrecioPremium();
+	}
+	
+	/**
+	 * En el main del controlador se comienza el programa, se creará siempre
+	 * una ventana login y a aprtir de esta se puede acceder a todo.
+	 * Es necesario haber ejecutado antes el jar del servidor de persistencia
+	 * sino el programa no funcionará
+	 * 
+	 * @param args Argumentos de inicio de programa, no se utilizan
+	 */
+	public static void main(String[] args) {
+		VentanaLogin window = new VentanaLogin();
+		window.setVisible(true);
 	}
 }

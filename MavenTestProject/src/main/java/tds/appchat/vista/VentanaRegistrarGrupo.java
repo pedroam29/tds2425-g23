@@ -129,6 +129,8 @@ public class VentanaRegistrarGrupo extends JFrame {
 					} catch (Exception e2) {
 						//Se mostrará el mensaje de error de la funcion del controlador
 						JOptionPane.showMessageDialog(VentanaRegistrarGrupo.this, e2.getMessage());
+					} finally {
+						JOptionPane.showMessageDialog(VentanaRegistrarGrupo.this, "Grupo creado correctamente");
 					}
 				}
 			}

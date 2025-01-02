@@ -198,25 +198,33 @@ public class Usuario {
 	public Grupo crearGrupo(String nombreGrupo, String imagen) {
 
 		Grupo nuevoGrupo = new Grupo(nombreGrupo, imagen);
-		
-		this.addGrupo(nuevoGrupo);
+		addGrupo(nuevoGrupo);
 		return nuevoGrupo;
 	}
 	
-	public void addIntegranteGrupo(Grupo g, ContactoIndividual c) {
-		if(!g.contieneContacto(c)) {
+	public boolean addIntegranteGrupo(Grupo g, ContactoIndividual c) {
+		if(contactos.contains(c) && contactos.contains(g) && !g.contieneContacto(c)) {
 			g.addMiembro(c);
+			return true;
 		}
+		return false;
 	}
 	
 	public boolean eliminarIntegranteGrupo(Grupo g, ContactoIndividual c) {
-		if(g.contieneContacto(c)) {
+		if(contactos.contains(c) && contactos.contains(g) &&  g.contieneContacto(c)) {
 			g.eliminarMiembro(c);
 			return true;
 		}
 		return false; 
 	}
 	
+	public boolean eliminarGrupo(Grupo g) {
+		if (contactos.contains(g)) {
+			contactos.remove(g);
+			return true;
+		}
+		return false; 
+	}
 	public void enviarMensaje(Usuario receptor, String contenido) {
         // Crear mensaje y agregarlo a las listas de mensajes
         Mensaje mensaje = new Mensaje(contenido, this, receptor);

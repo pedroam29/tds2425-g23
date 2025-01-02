@@ -49,7 +49,9 @@ public class VentanaRegistrarContacto extends JFrame {
 	 * Create the frame.
 	 */
 	public VentanaRegistrarContacto() {
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setResizable(false);
+		
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -68,7 +70,7 @@ public class VentanaRegistrarContacto extends JFrame {
 		GridBagLayout gbl_panel_1 = new GridBagLayout();
 		gbl_panel_1.columnWidths = new int[]{5, 0, 0, 0, 0, 0};
 		gbl_panel_1.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_panel_1.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_1.columnWeights = new double[]{0.0, 0.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
 		gbl_panel_1.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel_1.setLayout(gbl_panel_1);
 		
@@ -109,10 +111,31 @@ public class VentanaRegistrarContacto extends JFrame {
 		textField_telf.setColumns(10);
 		
 		/**
-		 * Botón aceptar: 
+		 * Botón aeceptar: 
+		 * 		 
 		 */
-		JButton btnNewButton = new JButton("Aceptar");
-		btnNewButton.addActionListener(new ActionListener() {
+		JButton btnAceptar = new JButton("Aceptar");
+		GridBagConstraints gbc_btnAceptar = new GridBagConstraints();
+		gbc_btnAceptar.insets = new Insets(0, 0, 5, 5);
+		gbc_btnAceptar.gridx = 2;
+		gbc_btnAceptar.gridy = 5;
+		panel_1.add(btnAceptar, gbc_btnAceptar);
+		
+						
+				JButton btnCancelar = new JButton("Cancelar");
+				GridBagConstraints gbc_btnCancelar = new GridBagConstraints();
+				gbc_btnCancelar.insets = new Insets(0, 0, 5, 5);
+				gbc_btnCancelar.gridx = 3;
+				gbc_btnCancelar.gridy = 5;
+				panel_1.add(btnCancelar, gbc_btnCancelar);	
+				
+				btnCancelar.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						dispose();
+					}
+				});
+		
+		btnAceptar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ContactoIndividual contacto = AppChat.getUnicaInstancia().crearContacto(textField_nombre.getText(), textField_telf.getText());
 				if(contacto!=null) {
@@ -123,17 +146,9 @@ public class VentanaRegistrarContacto extends JFrame {
 							JOptionPane.ERROR_MESSAGE);
 				} else {
 					JOptionPane.showMessageDialog(VentanaRegistrarContacto.this, "Este teléfono ya existe en el sistema", "Info",
-							JOptionPane.INFORMATION_MESSAGE);
+							JOptionPane.ERROR_MESSAGE);
 				}
-				dispose();
-			}
-		});
-
-				
-		JButton btnCancelar = new JButton("Cancelar");
-		btnCancelar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dispose();
+				//dispose();
 			}
 		});
 	}

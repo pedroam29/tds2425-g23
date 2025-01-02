@@ -67,7 +67,10 @@ public class VentanaRegister extends JFrame {
 	 * Create the frame.
 	 */
 	public VentanaRegister() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setResizable(false);
+		
 		setBounds(100, 100, 712, 506);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -253,7 +256,9 @@ public class VentanaRegister extends JFrame {
 		botonCancelar.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// Cuando se presione cancelar se cierra la ventana
+				// Cuando se presione cancelar se cierra la ventana y se abre la de login
+				VentanaLogin v = new VentanaLogin();
+				v.setVisible(true);
 				dispose();
 			}
 		});
@@ -322,7 +327,7 @@ public class VentanaRegister extends JFrame {
 				String email = textFieldEmail.getText();
 				
 				
-				//Solución momentánea para comprobar que los campos están llenos
+				//TODO: Solución momentánea para comprobar que los campos están llenos
 				registroPosible = !((nombre == "") || (telefono == "") || (contrasena == "") ||
 						(contrasena2 == "")|| (imagenPerfilUrl == "") || (saludo == "") || (email == "") || (fechaNacimiento == null));
 				
@@ -338,6 +343,8 @@ public class VentanaRegister extends JFrame {
 					{
 						VentanaPrincipal principal = new VentanaPrincipal();
 						principal.setVisible(true);
+						//Una vez abierta la ventana principal, esta se cierra
+						dispose();
 					} else 
 					{
 						//No se ha podido realizar el registro: AppChat lo rechaza

@@ -48,6 +48,8 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 
 public class VentanaContactos extends JFrame {
@@ -57,10 +59,15 @@ public class VentanaContactos extends JFrame {
 	private JTextField textField;
 	private JTextField txtListaDeContactos;
 	
-	//
+	//Grupos
 	private Grupo grupoSeleccionado = null;
 	private JList<ContactoIndividual> listaContactosGrupo = null;
-	private DefaultListModel<ContactoIndividual> modelContactosGrupo;
+	private DefaultListModel<ContactoIndividual> modelContactosGrupo = null;
+	
+	//Lista contactos
+	private DefaultListModel<Contacto> modeloContactos;
+	private JList<Contacto> listaContactos;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -76,12 +83,24 @@ public class VentanaContactos extends JFrame {
 			}
 		});
 	}
-
+	/**
+	 * función que se invoca cuando hay un cambio en los contactos,
+	 * por tanto cuando 
+	 */
+	private DefaultListModel<Contacto> actualizarListaContactos()
+	{
+		DefaultListModel<Contacto> modelo = new DefaultListModel<Contacto>();
+		List<Contacto> contactos = AppChat.getUnicaInstancia().contactosUsuarioActual();
+		for(Contacto contacto : contactos) {
+			modelo.addElement(contacto);
+		}
+		return modelo;
+	}
 	/**
 	 * Create the frame.
 	 */
 	public VentanaContactos() {		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 679, 486);
 		gridBagLayoutVentana = new JPanel();
 		gridBagLayoutVentana.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -102,6 +121,7 @@ public class VentanaContactos extends JFrame {
 		gridBagLayoutVentana.add(lblListaDeContactos, gbc_lblListaDeContactos);
 		
 		JLabel lblGrupo = new JLabel("Grupo: ");
+		
 		GridBagConstraints gbc_lblGrupo = new GridBagConstraints();
 		gbc_lblGrupo.insets = new Insets(0, 0, 5, 5);
 		gbc_lblGrupo.gridx = 3;
@@ -118,32 +138,12 @@ public class VentanaContactos extends JFrame {
 		gbc_scrollPanelContactos.gridy = 2;
 		gridBagLayoutVentana.add(scrollPaneContactos, gbc_scrollPanelContactos);
 		
-		//Obtencion de la lista para todos los contactos.
+		//Inizalización de las listas
 		JList<Contacto> listaContactos = new JList<Contacto>();
 		listaContactos.setCellRenderer(new ContactoCellRenderer());
-		DefaultListModel<Contacto> modeloContactos = new DefaultListModel<Contacto>();
-		
-//        modeloContactos.addElement(new ContactoIndividual("Carlos", "332", null));
-//        modeloContactos.addElement(new ContactoIndividual("Simón","331" ,null));
-//        modeloContactos.addElement(new ContactoIndividual("Lucia", "330" ,null));
-//        Grupo gA = new Grupo("Grupo A", null);
-//        gA.addMiembro(new ContactoIndividual("Pepe", "123", null));
-//        modeloContactos.addElement(gA);
-//        
-//        Grupo gB = new Grupo("Grupo B", null);
-//        gB.addMiembro(new ContactoIndividual("Jose", "1523", null));
-//        modeloContactos.addElement(gB);
-//        
-//        Grupo gC = new Grupo("Grupo C", null);
-//        gC.addMiembro(new ContactoIndividual("Maria", "223", null));
-//        modeloContactos.addElement(gC);
-		
-		List<Contacto> contactos = AppChat.getUnicaInstancia().contactosUsuarioActual();
-		for(Contacto contacto : contactos) {
-			modeloContactos.addElement(contacto);
-		}
-
-        listaContactos.setModel(modeloContactos);
+		modeloContactos = new DefaultListModel<Contacto>();
+		//Función para actualizarListaContactos
+		listaContactos.setModel(actualizarListaContactos());
 		scrollPaneContactos.setViewportView(listaContactos);
 		
 		
@@ -167,6 +167,8 @@ public class VentanaContactos extends JFrame {
 				if (listaContactos.getSelectedValue() instanceof Grupo)
 				{
 					grupoSeleccionado = (Grupo) listaContactos.getSelectedValue();
+					lblGrupo.setText(grupoSeleccionado.getNombre());
+					
 					List<ContactoIndividual> contactosGrupo = grupoSeleccionado.getMiembros();
 					modelContactosGrupo = new DefaultListModel<ContactoIndividual>();
 					
@@ -249,6 +251,15 @@ public class VentanaContactos extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				VentanaRegistrarContacto ventana = new VentanaRegistrarContacto();
 				ventana.setVisible(true);
+				//Una vez se haya añadido un contacto, cuando se cierre la ventana de añadir contactos, se
+				//actualizará la lista de contactos
+				ventana.addWindowListener(new WindowAdapter() {
+                    public void windowClosing(WindowEvent we) {
+                    	listaContactos.setModel(actualizarListaContactos());
+                		scrollPaneContactos.setViewportView(listaContactos);
+                		ventana.setVisible(false);
+                    }
+                });
 			}
 		});
 		panelBotonInsertarContacto.add(botonInsertarContacto);
@@ -267,6 +278,15 @@ public class VentanaContactos extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				VentanaRegistrarGrupo ventana = new VentanaRegistrarGrupo();
 				ventana.setVisible(true);
+				//Una vez se haya añadido un grupo, cuando se cierre la ventana de añadir contactos, se
+				//actualizará la lista de contactos.
+				ventana.addWindowListener(new WindowAdapter() {
+                    public void windowClosing(WindowEvent we) {
+                        listaContactos.setModel(actualizarListaContactos());
+                		scrollPaneContactos.setViewportView(listaContactos);
+                		ventana.setVisible(false);
+                    }
+                });
 			}
 		});
 		

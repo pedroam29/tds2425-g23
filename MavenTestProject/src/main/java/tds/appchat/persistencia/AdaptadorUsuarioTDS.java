@@ -31,7 +31,12 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 	}
 
 	private AdaptadorUsuarioTDS() {
+		try {
 		servPersistencia = FactoriaServicioPersistencia.getInstance().getServicioPersistencia();
+		}catch (Exception e){
+			//TODO: Quitar
+			System.out.println(e.getMessage());
+		}
 		dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	}
 
@@ -40,8 +45,7 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		try {
 			eUsuario = servPersistencia.recuperarEntidad(usuario.getCodigo());
 			
-		} catch (NullPointerException e) {
-		}
+		} catch (NullPointerException e) {}
 		if (eUsuario != null)
 			return;
 
@@ -56,7 +60,7 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 						new Propiedad("saludo", usuario.getSaludo()),
 						new Propiedad("mensajesRecibidos", obtenerCodigosRecibidos(usuario.getRecibidos())),
 						new Propiedad("mensajesEnviados", obtenerCodigosEnviados(usuario.getEnviados())),
-						new Propiedad("contactos", obtenerCodigosContactos(usuario.getContactos())))));
+						new Propiedad("contactos" + usuario.getTelefono(), obtenerCodigosContactos(usuario.getContactos())))));
 
 		// registrar entidad usuario
 		eUsuario = servPersistencia.registrarEntidad(eUsuario);
@@ -96,7 +100,7 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 				prop.setValor(obtenerCodigosRecibidos(usuario.getRecibidos()));
 			} else if(prop.getNombre().equals("mensajesEnviados")) {
 				prop.setValor(obtenerCodigosEnviados(usuario.getEnviados()));
-			} else if(prop.getNombre().equals("contactos")) {
+			} else if(prop.getNombre().equals("contactos" + usuario.getTelefono())) {
 				prop.setValor(obtenerCodigosContactos(usuario.getContactos()));
 			}
 			servPersistencia.modificarPropiedad(prop);
@@ -135,7 +139,8 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		recientes = obtenerCancionesDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "recientes"));
 
 */
-		contactos = obtenerContactosDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "contactos"));
+		contactos = obtenerContactosDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "contactos" + telefono));
+		//contactos.addAll(obtenerContactosDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "contactos" + telefono)));
 		
 		Usuario usr = new Usuario(usuario, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo, email);
 		usr.setContactos(contactos);

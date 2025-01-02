@@ -3,7 +3,7 @@ package tds.appchat.persistencia;
 public abstract class FactoriaDAO {
 	private static FactoriaDAO unicaInstancia;
 	
-	public static final String DAO_TDS = "persistencia.TDSFactoriaDAO";
+	public static final String DAO_TDS = "tds.appchat.persistencia.TDSFactoriaDAO";
 		
 	/** 
 	 * Crea un tipo de factoria DAO.
@@ -12,7 +12,8 @@ public abstract class FactoriaDAO {
 	public static FactoriaDAO getInstancia(String tipo) throws DAOException{
 		if (unicaInstancia == null)
 			try { unicaInstancia=(FactoriaDAO) Class.forName(tipo).newInstance();
-			} catch (Exception e) {	
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
 				throw new DAOException(e.getMessage());
 			} 
 		return unicaInstancia;
@@ -32,6 +33,6 @@ public abstract class FactoriaDAO {
 
 	public abstract IAdaptadorUsuarioDAO getUsuarioDAO();
 	public abstract IAdaptadorContactoIndividualDAO getContactoDAO();
-
+	public abstract IAdaptadorGrupoDAO getGrupoDAO();
 
 }
