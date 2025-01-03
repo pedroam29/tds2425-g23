@@ -86,9 +86,17 @@ public class VentanaPrincipal extends JFrame {
 		btnNewButton.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/enviar-mensaje.png")));
 		panelNorte.add(btnNewButton);
 		
-		JButton btnNewButton_1 = new JButton("Buscar");
-		btnNewButton_1.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/buscar.png")));
-		panelNorte.add(btnNewButton_1);
+		JButton btnBuscar = new JButton("Buscar");
+		btnBuscar.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/buscar.png")));
+		btnBuscar.addActionListener(new ActionListener() {	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				VentanaBuscar ventanaBuscar = new VentanaBuscar();
+				ventanaBuscar.setVisible(true);
+			}
+		});
+		
+		panelNorte.add(btnBuscar);
 		
 		JButton btnNewButton_2 = new JButton("Contactos");
 		btnNewButton_2.addActionListener(new ActionListener() {
@@ -101,8 +109,17 @@ public class VentanaPrincipal extends JFrame {
 		btnNewButton_2.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/personas.png")));
 		panelNorte.add(btnNewButton_2);
 		
-		JButton btnNewButton_3 = new JButton("Premium");
-		panelNorte.add(btnNewButton_3);
+		JButton btnPremium = new JButton("Premium");
+		btnPremium.addActionListener(new ActionListener() {	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//Se abre la vetnana premium
+				//TODO: Hacer que esta ventana se quede dormida
+				VentanaPremium v = new VentanaPremium();
+				v.setVisible(true);
+			}
+		});
+		panelNorte.add(btnPremium);
 		
 		JButton btnAjustes = new JButton("Log Out");
 		btnAjustes.addActionListener(new ActionListener() {
@@ -121,6 +138,8 @@ public class VentanaPrincipal extends JFrame {
 		JLabel lblNewLabel = new JLabel(AppChat.getUnicaInstancia().getNombreUsuarioActual());
 		panelNorte.add(lblNewLabel);
 		
+		//TODO: Hacer que en la esquina salga la foto de perfil
+		//AppChat.getUnicaInstancia.getFotoPerfilUsuarioActual()
 		JLabel lblNewLabel_1 = new JLabel("IconoUsuario");
 		panelNorte.add(lblNewLabel_1);
 		

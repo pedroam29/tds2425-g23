@@ -31,5 +31,9 @@ public class ContactoIndividual extends Contacto{
 	public void addGrupo(Grupo grupo) {
 		usuario.addGrupo(grupo);
 	}
-
+	
+	@Override
+	public String toString() {
+		return super.toString();
+	}
 }

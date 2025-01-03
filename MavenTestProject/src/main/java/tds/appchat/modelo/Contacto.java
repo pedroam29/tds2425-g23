@@ -27,4 +27,9 @@ public abstract class Contacto {
 	public void setNombre(String nombre) {
 		this.nombre=nombre;
 	}
+	
+	@Override
+	public String toString() {
+		return this.nombre + this.codigo;
+	}
 }

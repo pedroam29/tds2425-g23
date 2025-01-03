@@ -4,7 +4,7 @@ import java.util.List;
 
 import tds.appchat.modelo.Grupo;
 
-public interface IAdaptadorGrupoDAO {
+public interface IAdaptadorGrupoDAO extends IAdaptadorContacto {
 	public void registrarGrupo(Grupo grupo);
 	public void borrarGrupo(Grupo grupo);
 	public void modificarGrupo(Grupo grupo);

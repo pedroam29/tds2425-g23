@@ -38,7 +38,6 @@ public class AppChat {
 	private IAdaptadorUsuarioDAO adaptadorUsuario;
 	private IAdaptadorContactoIndividualDAO adaptadorContactoIndividual;
 	private IAdaptadorGrupoDAO adaptadorGrupo;
-	//Para escuentos:
 
 	public static AppChat getUnicaInstancia() {
 		if (unicaInstancia == null)
@@ -56,12 +55,8 @@ public class AppChat {
 		FactoriaDAO factoria = null;
 		try {
 			factoria = FactoriaDAO.getInstancia(FactoriaDAO.DAO_TDS);
-		} catch (DAOException e) {
-			//TODO: Borrar sysouts cuando ya no hagan falta
-			System.out.println(e.getLocalizedMessage());
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		}
+		} catch (DAOException e) {}
+		
 		adaptadorUsuario = factoria.getUsuarioDAO();
 		adaptadorContactoIndividual = factoria.getContactoDAO();
 		adaptadorGrupo = factoria.getGrupoDAO();
@@ -70,24 +65,27 @@ public class AppChat {
 	private void inicializarRepositorios() {
 		repoUsuarios = RepositorioUsuarios.getUnicaInstancia();
 	}
+	
+	////
+	//Operaciones intermedias de acceso a atributos del usuario actual
+	///
+	
 	public String getNombreUsuarioActual() {
 		return usuarioActual.getNombre();
 	}
 	public String getTelefonoUsuarioActual() {
 		return usuarioActual.getTelefono();
 	}
-	
-	//usando string de java 8
 	public List<Mensaje> obtenerChatsRecientesUsuario(){
 		return usuarioActual.getRecibidos();
 	}
 	public List<Contacto> contactosUsuarioActual(){
-		//return usuarioActual.getContactos();
-		List<ContactoIndividual> contactosIndividuales = adaptadorContactoIndividual.recuperarTodosContactos();
-		List<Contacto> contactos = new LinkedList<Contacto>(contactosIndividuales);
-		contactos.addAll(adaptadorGrupo.recuperarTodosGrupos());
-		return contactos;
+		return usuarioActual.getContactos();
 	}
+	
+	////
+	// Lógica del programa
+	////
 	
 	public boolean registrarUsuario(String nombre, String telefono, String contrasena, Date fechaNacimiento, String imagenPerfilUrl, String saludo, String email) {
 		Usuario usr = new Usuario(nombre, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo, email);
@@ -98,20 +96,14 @@ public class AppChat {
 		}
 		return false;
 	}
-	
-	public boolean loginUsuario(String telefono, String contrasena) {
-		
-		//En vez de hacer equals hacer funcion en usuario por patrón.
+	public boolean loginUsuario(String telefono, String contrasena) {	
+		//TODO: Cambiar equals para favorecer patrón experto.
 		Optional<Usuario> optUsr = repoUsuarios.getAllUsuarios().stream()
 				.filter(usr -> usr.getTelefono().equals(telefono) && usr.isClave(contrasena))
 				.findFirst();
 		
 		if(optUsr.isPresent()) {
 			usuarioActual = optUsr.get();
-			
-			for(Contacto contacto: usuarioActual.getContactos()) {
-				System.out.println(contacto.getNombre());
-			}
 			return true;
 		}
 		return false;
@@ -121,6 +113,7 @@ public class AppChat {
 	public void logoutUsuario() {
 		usuarioActual = null;
 	}
+	
 	
 	public boolean existeTelefono(String telefono) {
 		//TODO: Solución temporal: puede ser necesario tener que crear una funcion dentre de usuario para comprobar 
@@ -135,6 +128,8 @@ public class AppChat {
 			
 			if (usuarioOpt.isPresent()) {
 				ContactoIndividual nuevoContacto = usuarioActual.crearContacto(nombre, usuarioOpt.get());
+				
+				//Se registra el contacto en la persistencia de contactos
 				adaptadorContactoIndividual.registrarContacto(nuevoContacto);
 				adaptadorUsuario.modificarUsuario(usuarioActual);
 				
@@ -191,6 +186,7 @@ public class AppChat {
 		//usuarioActual.hasContactoIndividual(contacto) && !grupo.contieneContacto(contacto)
 		if(usuarioActual.addIntegranteGrupo(grupo, contacto)){
 			adaptadorGrupo.modificarGrupo(grupo);
+		
 			//Valor de retorno para que sea más facil a la hora de hacer la vista
 			return true;
 		}
@@ -254,16 +250,15 @@ public class AppChat {
         // Enviar el mensaje de forma individual a cada miembro del grupo
         usuarioActual.enviarMensajeAGrupo(grupo, texto);    
 	}
-	
-	public Descuento obtenerDescuentos() {
-		if (DescuentoMensaje.esUsuarioAptoDescuento(usuarioActual))
-			usuarioActual.nuevoDescuento(new DescuentoMensaje());
-		if (DescuentoIntervaloFechas.esUsuarioAptoDescuento(usuarioActual))
-			usuarioActual.nuevoDescuento(new DescuentoIntervaloFechas());
-		
+	/**
+	 * Se obtiene el mejor descuento posible para el usuario
+	 * @return Descuento con mayor reducción de precio
+	 */
+	public Descuento obtenerDescuento() {
+		usuarioActual.comprobarDescuentos();
 		//Si ninguno se ha insertado será null.
 		return usuarioActual.getDescuento();
-	}
+	}	
 	
 	/**
 	 * El manejo de convertir en premium
@@ -272,8 +267,7 @@ public class AppChat {
 		//Si no es premium
 		if (!usuarioActual.isPremium()) {
 			//Con esta funcion se pondrá el descuento que más beneficie
-			obtenerDescuentos();
-			
+			obtenerDescuento();
 			boolean pagoExitoso = usuarioActual.realizarPago();
 			if (pagoExitoso) {
 				usuarioActual.convertirPremium();
@@ -303,8 +297,7 @@ public class AppChat {
 	 * 
 	 * @return El precio actual de la suscripción Premium
 	 */
-	public double obtenerPrecioPremium()
-	{
+	public double obtenerPrecioPremium(){
 		//Se obtendrá de la clase premium
 		return Premium.getPrecioPremium();
 	}

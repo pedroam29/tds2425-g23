@@ -328,8 +328,8 @@ public class VentanaRegister extends JFrame {
 				
 				
 				//TODO: Solución momentánea para comprobar que los campos están llenos
-				registroPosible = !((nombre == "") || (telefono == "") || (contrasena == "") ||
-						(contrasena2 == "")|| (imagenPerfilUrl == "") || (saludo == "") || (email == "") || (fechaNacimiento == null));
+				registroPosible = !((nombre == "") || (telefono == "") || (contrasena == "") || (contrasena2 == "") 
+						|| (imagenPerfilUrl == "") || (saludo == "") || (email == "") || (fechaNacimiento == null));
 				
 				if(!contrasena.equals(contrasena2)) {
 					JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden");

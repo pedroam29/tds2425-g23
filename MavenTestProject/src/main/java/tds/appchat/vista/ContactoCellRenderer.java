@@ -38,7 +38,6 @@ public class ContactoCellRenderer extends JPanel
 			setBackground(list.getSelectionBackground());
 			setForeground(list.getSelectionForeground());
 			 nombreLabel.setForeground(list.getSelectionForeground());
-			
 		} else {
 			setBackground(list.getBackground());
 			setForeground(list.getForeground());

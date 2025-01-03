@@ -34,8 +34,7 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 		// Si la entidad está registrada no la registra de nuevo
 		try {
 			eContact = servPersistencia.recuperarEntidad(contacto.getCodigo());
-		} catch (NullPointerException e) {
-		}
+		} catch (NullPointerException e) { }
 		
 		if (eContact != null)
 			return;
@@ -46,7 +45,7 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 		// Atributos propios del contacto
 
 		eContact = new Entidad();
-		eContact.setNombre("contacto" + AppChat.getUnicaInstancia().getTelefonoUsuarioActual());
+		eContact.setNombre(IAdaptadorContacto.ATRIB_CONTACTO_INDIVIDUAL);
 		eContact.setPropiedades(new ArrayList<Propiedad>(Arrays.asList(new Propiedad("nombre", contacto.getNombre()),
 				new Propiedad("telefono", String.valueOf(contacto.getTelefono())),
 				new Propiedad("usuario", String.valueOf(contacto.getUsuario().getCodigo())))));
@@ -109,7 +108,8 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 		
 
 		// Obtener usuario del contacto
-		System.err.println(servPersistencia.recuperarPropiedadEntidad(eContact, "usuario"));
+		servPersistencia.recuperarPropiedadEntidad(eContact, "usuario");
+		
 		contact.setUsuario(obtenerUsuarioDesdeCodigo(servPersistencia.recuperarPropiedadEntidad(eContact, "usuario")));
 
 		// Devolvemos el objeto contacto
@@ -119,14 +119,13 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 	
 	public List<ContactoIndividual> recuperarTodosContactos() {
 		List<ContactoIndividual> contactos = new LinkedList<>();
-		List<Entidad> eContacts = servPersistencia.recuperarEntidades("contacto"+AppChat.getUnicaInstancia().getTelefonoUsuarioActual());
+		List<Entidad> eContacts = servPersistencia.recuperarEntidades("contacto");
 
-		for (Entidad eContact : eContacts) {
+		for (Entidad eContact : eContacts)
 			contactos.add(recuperarContacto(eContact.getId()));
-		}
-		
 		return contactos;
 	}
+	
 	private void registrarSiNoExisteUser(Usuario admin) {
 		AdaptadorUsuarioTDS adaptadorUsuarios = AdaptadorUsuarioTDS.getUnicaInstancia();
 		adaptadorUsuarios.registrarUsuario(admin);

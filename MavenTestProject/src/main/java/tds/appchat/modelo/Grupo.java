@@ -35,5 +35,8 @@ public class Grupo extends Contacto{
 	public boolean contieneContacto(ContactoIndividual c) {
 		return this.miembros.contains(c);
 	}
-	
+	@Override
+	public String toString() {
+		return super.toString() + "\nMiembros: " + miembros;
+	}
 }

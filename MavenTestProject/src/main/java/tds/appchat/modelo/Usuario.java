@@ -256,10 +256,20 @@ public class Usuario {
 		
 		return total;
 	}
+	public void comprobarDescuentos() {
+		//TODO: Posibilidad de hacer la comprobación de descuentos
+		//En otra clase, aplicando patrón
+		if (DescuentoMensaje.esUsuarioAptoDescuento(this))
+			this.nuevoDescuento(new DescuentoMensaje());
+		if (DescuentoIntervaloFechas.esUsuarioAptoDescuento(this))
+			nuevoDescuento(new DescuentoIntervaloFechas());
+	}
 	
 	public void nuevoDescuento(Descuento descuento){
 		//Se supondrá que un descuento es mejor que otro siempre que
-		//De un precio menor en el momento en el que se 
+		//De un precio menor en el momento en el que se
+		if (this.descuento == null)
+			this.descuento = descuento;
 		if (descuento.calcularDescuento(Premium.getPrecioPremium()) < this.descuento.calcularDescuento(Premium.getPrecioPremium()))
 			this.descuento = descuento;
 	}
@@ -276,5 +286,10 @@ public class Usuario {
 		this.rolUsuario = new Premium(descuento);
 	}
 	
+	@Override
+	public String toString() {
+		
+		return "Nombre: " + nombre + "\nContactos: " + contactos;
+	}
 	
 }

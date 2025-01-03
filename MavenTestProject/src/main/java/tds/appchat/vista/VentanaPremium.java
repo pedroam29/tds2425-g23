@@ -1,34 +1,27 @@
 package tds.appchat.vista;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
 import tds.appchat.controlador.AppChat;
 import tds.appchat.modelo.Descuento;
 
-import java.awt.Panel;
-import java.awt.GridLayout;
-import javax.swing.JButton;
-import javax.swing.BoxLayout;
-
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Font;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import javax.swing.JLabel;
-import java.awt.Insets;
-import java.awt.Color;
-import javax.swing.JTextArea;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
-public class PanelPremium extends JPanel{
-	public PanelPremium() {
-		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		
+public class VentanaPremium extends JFrame {
+	public VentanaPremium() {
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 679, 486);
 		JPanel panel = new JPanel();
-		add(panel);
+		getContentPane().add(panel);
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[]{10, 0, 0, 0, 10, 0};
 		gbl_panel.rowHeights = new int[]{0, 0, 10, 0, 10, 0, 0, 0, 10, 0};
@@ -37,7 +30,7 @@ public class PanelPremium extends JPanel{
 		panel.setLayout(gbl_panel);
 		
 		JLabel lblPremium = new JLabel("PREMIUM");
-		lblPremium.setFont(new Font("Dialog", Font.PLAIN, 50));
+		lblPremium.setFont(new Font("Dialog", Font.PLAIN, 58));
 		GridBagConstraints gbc_lblPremium = new GridBagConstraints();
 		gbc_lblPremium.insets = new Insets(0, 0, 5, 5);
 		gbc_lblPremium.gridx = 2;
@@ -67,7 +60,8 @@ public class PanelPremium extends JPanel{
 		
 		//Obtener descuento
 		
-		Descuento descuento = AppChat.getUnicaInstancia().obtenerDescuentos();
+		Descuento descuento = AppChat.getUnicaInstancia().obtenerDescuento();
+		//Descuento descuento = null;
 		
 		if (descuento != null){
 			lblPrecioOriginal.setText("<html><strike>" + precioOriginal + "</strike></html>");			
@@ -94,7 +88,5 @@ public class PanelPremium extends JPanel{
 		gbc_btnNewButton.gridx = 2;
 		gbc_btnNewButton.gridy = 7;
 		panel.add(btnPagarPremium, gbc_btnNewButton);
-
 	}
-
 }

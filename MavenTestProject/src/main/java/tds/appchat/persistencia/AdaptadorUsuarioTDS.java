@@ -23,6 +23,9 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 	private static AdaptadorUsuarioTDS unicaInstancia = null;
 	private SimpleDateFormat dateFormat;
 
+	private final static String SEPARADOR_CONTACTOS = " ";
+	
+	
 	public static AdaptadorUsuarioTDS getUnicaInstancia() { // patron singleton
 		if (unicaInstancia == null) {
 			return new AdaptadorUsuarioTDS();
@@ -33,10 +36,10 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 	private AdaptadorUsuarioTDS() {
 		try {
 		servPersistencia = FactoriaServicioPersistencia.getInstance().getServicioPersistencia();
-		}catch (Exception e){
-			//TODO: Quitar
-			System.out.println(e.getMessage());
+		} catch (Exception e){
+			
 		}
+		
 		dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	}
 
@@ -60,7 +63,7 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 						new Propiedad("saludo", usuario.getSaludo()),
 						new Propiedad("mensajesRecibidos", obtenerCodigosRecibidos(usuario.getRecibidos())),
 						new Propiedad("mensajesEnviados", obtenerCodigosEnviados(usuario.getEnviados())),
-						new Propiedad("contactos" + usuario.getTelefono(), obtenerCodigosContactos(usuario.getContactos())))));
+						new Propiedad("contactos", obtenerCodigosContactos(usuario.getContactos())))));
 
 		// registrar entidad usuario
 		eUsuario = servPersistencia.registrarEntidad(eUsuario);
@@ -100,7 +103,7 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 				prop.setValor(obtenerCodigosRecibidos(usuario.getRecibidos()));
 			} else if(prop.getNombre().equals("mensajesEnviados")) {
 				prop.setValor(obtenerCodigosEnviados(usuario.getEnviados()));
-			} else if(prop.getNombre().equals("contactos" + usuario.getTelefono())) {
+			} else if(prop.getNombre().equals("contactos")) {
 				prop.setValor(obtenerCodigosContactos(usuario.getContactos()));
 			}
 			servPersistencia.modificarPropiedad(prop);
@@ -108,6 +111,7 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 	}
 
 	public Usuario recuperarUsuario(int codigo) {
+		
 		Entidad eUsuario;
 		String usuario;
 		String email;
@@ -116,9 +120,9 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		String imagenPerfilUrl;
 		String saludo;
 		String telefono;
-	
-		List<Mensaje> recibidos;
-		List<Mensaje> enviados;
+		
+		List<Mensaje> recibidos = null;
+		List<Mensaje> enviados = null;
 		List<Contacto> contactos;
 
 		eUsuario = servPersistencia.recuperarEntidad(codigo);
@@ -134,15 +138,19 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-	/*
-		playlists = obtenerPlayListsDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "playlists"));
-		recientes = obtenerCancionesDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "recientes"));
-
-*/
-		contactos = obtenerContactosDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "contactos" + telefono));
-		//contactos.addAll(obtenerContactosDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "contactos" + telefono)));
+		
+//		playlists = obtenerPlayListsDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "playlists"));
+//		recientes = obtenerCancionesDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "recientes"));
+		
+		String strContactos = servPersistencia.recuperarPropiedadEntidad(eUsuario, "contactos");
+				
+		contactos = obtenerContactosDesdeCodigos(strContactos);
 		
 		Usuario usr = new Usuario(usuario, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo, email);
+		
+//		usr.setEnviados(enviados);
+//		usr.setRecibidos(recibidos);
+		
 		usr.setContactos(contactos);
 		/*
 		usr.setPlayLists(playlists);
@@ -151,6 +159,7 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		usr.setDescuento(descuento);
 		*/
 		usr.setCodigo(codigo);
+		
 		return usr;
 	}
 
@@ -185,20 +194,28 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 	private String obtenerCodigosContactos(List<Contacto> contactos) {
 		String lineas = "";
 		for (Contacto contacto : contactos) {
-			lineas += contacto.getCodigo() + " ";
+			lineas += contacto.getCodigo() + SEPARADOR_CONTACTOS;
 		}
 		return lineas.trim();
 	}
 	
 	private List<Contacto> obtenerContactosDesdeCodigos(String lineas) {
+		
 		List<Contacto> recibidos = new LinkedList<Contacto>();
-		StringTokenizer strTok = new StringTokenizer(lineas, " ");
-		AdaptadorContactoIndividualTDS adaptador = AdaptadorContactoIndividualTDS.getInstancia();
-		while (strTok.hasMoreTokens()) {
-			recibidos.add(adaptador.recuperarContacto(Integer.valueOf((String) strTok.nextElement())));
+		AdaptadorContactoTDS adaptadorContacto = AdaptadorContactoTDS.getInstancia();
+		
+		StringTokenizer strTok = new StringTokenizer(lineas, SEPARADOR_CONTACTOS);
+		
+		//Es el adaptador de contactos el que se encarga de decidir si un contacto es 
+		// 
+		while(strTok.hasMoreTokens()) {
+			String a = strTok.nextToken();			
+			recibidos.add(adaptadorContacto.recuperarContacto(Integer.valueOf(a)));
+		
 		}
 		return recibidos;
 	}
+	
 	/*
 	private Set<PlayList> obtenerPlayListsDesdeCodigos(String lineas) {
 		Set<PlayList> playlists = new HashSet<PlayList>();
