@@ -18,7 +18,7 @@ public class AdaptadorContactoTDS implements IAdaptadorContacto {
 	
 	/**
 	 * Patrón Singleton para la clase AdaptadorContactoTDS,
-	 * esta será la única instancia.
+	 * esta será la única instancia
 	 * 
 	 * @return Unica instancia de AdaptadorControlador
 	 */
@@ -27,6 +27,12 @@ public class AdaptadorContactoTDS implements IAdaptadorContacto {
 			instancia = new AdaptadorContactoTDS();
 		return instancia;
 	}
+	/**
+	 * De esta manera el Usuario no necesitará conocer los detalles
+	 * de implementación de los contacos
+	 * Cuando obtenga el código decidirá, obtendrá el tipo de instancia
+	 * y según sea hará una cosa u otra
+	 */
 	@Override
 	public Contacto recuperarContacto(int codigo) {
 		

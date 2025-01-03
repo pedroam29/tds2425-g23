@@ -139,7 +139,7 @@ public class VentanaRegistrarContacto extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				ContactoIndividual contacto = AppChat.getUnicaInstancia().crearContacto(textField_nombre.getText(), textField_telf.getText());
 				if(contacto!=null) {
-					JOptionPane.showMessageDialog(VentanaRegistrarContacto.this, "Contact added successfully", "Info",
+					JOptionPane.showMessageDialog(VentanaRegistrarContacto.this, "Contacto añadido exitosamente", "Info",
 							JOptionPane.INFORMATION_MESSAGE);
 				}else if(!AppChat.getUnicaInstancia().existeTelefono(textField_telf.getText())){
 					JOptionPane.showMessageDialog(VentanaRegistrarContacto.this, "El contacto no se pudo añadir porque no existe el número de telefono", "Error",

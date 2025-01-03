@@ -84,8 +84,8 @@ public class VentanaContactos extends JFrame {
 		});
 	}
 	/**
-	 * función que se invoca cuando hay un cambio en los contactos,
-	 * por tanto cuando 
+	 * Función que se invoca cuando hay un cambio en los contactos,
+	 * se creará el DefaultListModel para cada actualizacion
 	 */
 	private DefaultListModel<Contacto> actualizarListaContactos()
 	{
@@ -253,6 +253,7 @@ public class VentanaContactos extends JFrame {
 				ventana.setVisible(true);
 				//Una vez se haya añadido un contacto, cuando se cierre la ventana de añadir contactos, se
 				//actualizará la lista de contactos
+				//TODO: Hacer para que también se realize cuando se le da al botón cancelar
 				ventana.addWindowListener(new WindowAdapter() {
                     public void windowClosing(WindowEvent we) {
                     	listaContactos.setModel(actualizarListaContactos());

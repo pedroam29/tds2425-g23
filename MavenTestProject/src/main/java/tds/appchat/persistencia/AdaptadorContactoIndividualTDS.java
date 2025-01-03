@@ -106,7 +106,6 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 		// Metemos al contacto en el pool antes de llamar a otros adaptadores
 		PoolDAO.getInstancia().addObjeto(codigo, contact);
 		
-
 		// Obtener usuario del contacto
 		servPersistencia.recuperarPropiedadEntidad(eContact, "usuario");
 		

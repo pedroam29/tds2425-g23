@@ -1,8 +1,8 @@
 package tds.appchat.persistencia;
 
 import java.util.List;
-
 import tds.appchat.modelo.Grupo;
+
 
 public interface IAdaptadorGrupoDAO extends IAdaptadorContacto {
 	public void registrarGrupo(Grupo grupo);

@@ -152,12 +152,12 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 //		usr.setRecibidos(recibidos);
 		
 		usr.setContactos(contactos);
-		/*
-		usr.setPlayLists(playlists);
-		usr.setRecientes(recientes);
-		usr.setPremium(premium);
-		usr.setDescuento(descuento);
-		*/
+
+//		usr.setPlayLists(playlists);
+//		usr.setRecientes(recientes);
+//		usr.setPremium(premium);
+//		usr.setDescuento(descuento);
+
 		usr.setCodigo(codigo);
 		
 		return usr;

@@ -1,6 +1,7 @@
 package tds.appchat.persistencia;
 
 public abstract class FactoriaDAO {
+	
 	private static FactoriaDAO unicaInstancia;
 	
 	public static final String DAO_TDS = "tds.appchat.persistencia.TDSFactoriaDAO";

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 public class DescuentoIntervaloFechas extends Descuento {
 	
+	//Tener cuidado con las fechas que se ponen, falla en ejecución formato: año-mes-dia
 	private final static LocalDate INICIO_INTERVALO = LocalDate.of(2024,12,1);
 	private final static LocalDate FIN_INTERVALO = LocalDate.of(2025, 1, 18);
 	

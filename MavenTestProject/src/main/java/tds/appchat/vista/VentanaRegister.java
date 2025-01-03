@@ -256,9 +256,10 @@ public class VentanaRegister extends JFrame {
 		botonCancelar.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// Cuando se presione cancelar se cierra la ventana y se abre la de login
+				// Cuando se presione cancelar se cierra la ventana
 				VentanaLogin v = new VentanaLogin();
 				v.setVisible(true);
+				//Se vuelve a la ventana de login
 				dispose();
 			}
 		});

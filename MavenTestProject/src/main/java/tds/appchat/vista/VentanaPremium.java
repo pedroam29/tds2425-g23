@@ -47,6 +47,7 @@ public class VentanaPremium extends JFrame {
 		
 		
 		//Obtención del precio a pagar:
+		
 		//La label mostrará el precio original
 		String precioOriginal = new String(Double.toString(AppChat.getUnicaInstancia().obtenerPrecioPremium()) + "€");
 		
@@ -62,7 +63,9 @@ public class VentanaPremium extends JFrame {
 		
 		Descuento descuento = AppChat.getUnicaInstancia().obtenerDescuento();
 		//Descuento descuento = null;
-		
+		//En caso de que exista un descuento
+		//El precio actual se tachará y se pondrá el precio rebajado debajo
+		//TODO: Ajustar tamaño de los precios
 		if (descuento != null){
 			lblPrecioOriginal.setText("<html><strike>" + precioOriginal + "</strike></html>");			
 			String precioDescontado = new String(Double.toString(descuento.calcularDescuento(AppChat.getUnicaInstancia().obtenerPrecioPremium())) + "€");

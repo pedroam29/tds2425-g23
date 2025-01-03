@@ -45,7 +45,7 @@ public class AppChat {
 		//Haciendo el constructor privado solo habrá una única instancia.
 		return unicaInstancia;
 	}
-	//Para que no se pueda crear fuera de esta clase;
+	//Para que no se pueda crear fuera de esta clase
 	private AppChat(){
 		inicializarAdaptadores();
 		inicializarRepositorios();

@@ -25,7 +25,7 @@ public class Premium implements RolUsuario {
 	public Premium(Descuento tipoDescuentoAplicado) {
 		//El objeto descuento que se aplica:
 		this.descuentoAplicado = tipoDescuentoAplicado;
-		//El precio final
+		//El precio final tras el descuento
 		precio = tipoDescuentoAplicado.calcularDescuento(PRECIO_PREMIUM);
 		//Fecha expiración
 		fechaExpiracion = LocalDate.now().plus(DURACION_SUSCRIPCION);

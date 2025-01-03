@@ -23,5 +23,4 @@ public class TDSFactoriaDAO extends FactoriaDAO{
 		return AdaptadorGrupoTDS.getUnicaInstancia();
 	}
 	
-
 }

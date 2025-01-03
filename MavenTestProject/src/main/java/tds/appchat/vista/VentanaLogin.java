@@ -132,7 +132,7 @@ public class VentanaLogin {
 		JButton botonAceptar = new JButton("Aceptar");
 		botonAceptar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// recuperar datos de pantalla
+				//Recuperar datos de pantalla
 				String telefono= new String(textfieldTelefono.getText()); //textfieldtelefono.getText()
 				String clave= new String(textfieldPassword.getPassword());
 				//ejecutar negocio a traves de controlador

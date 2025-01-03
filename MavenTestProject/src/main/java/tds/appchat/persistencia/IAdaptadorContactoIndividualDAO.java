@@ -4,7 +4,6 @@ import java.util.List;
 
 import tds.appchat.modelo.ContactoIndividual;
 
-
 public interface IAdaptadorContactoIndividualDAO extends IAdaptadorContacto {
 	public void registrarContacto(ContactoIndividual contact);
 	public void borrarContacto(ContactoIndividual contact);

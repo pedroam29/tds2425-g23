@@ -22,11 +22,12 @@ public class AdaptadorGrupoTDS implements IAdaptadorGrupoDAO {
 	private static ServicioPersistencia servPersistencia;
 	private static AdaptadorGrupoTDS unicaInstancia = null;
 	
-	//private final static String NOMBRE_GRUPO = "grupo";
+	//Etiquetas para persistencia
 	private final static String ATRIB_NOMBRE = "nombre";
 	private final static String ATRIB_MIEMBROS = "miembros";
 	private final static String ATRIB_IMAGEN = "imagen";
 	
+	//Separador de códigos de los contactos de los miembros
 	private final static String SEP_CODIGOS = "-";
 	
 	private AdaptadorGrupoTDS() {

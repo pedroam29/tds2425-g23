@@ -129,6 +129,7 @@ public class VentanaBuscar extends JFrame {
 		lista.setCellRenderer(new MensajeCellRenderer2());
 		DefaultListModel<Mensaje> modelo = new DefaultListModel<Mensaje>();
 		
+		//TODO: Obtener los datos
 		Usuario Juan = new Usuario("Juan");
 		Usuario Maria = new Usuario("Maria");
 		Mensaje m1 = new Mensaje("Hola", Juan, Maria);

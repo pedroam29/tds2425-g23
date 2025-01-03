@@ -37,6 +37,6 @@ public class Grupo extends Contacto{
 	}
 	@Override
 	public String toString() {
-		return super.toString() + "\nMiembros: " + miembros;
+		return super.toString() + "\nMiembros " + miembros;
 	}
 }

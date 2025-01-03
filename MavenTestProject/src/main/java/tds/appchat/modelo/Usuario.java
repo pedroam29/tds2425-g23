@@ -258,7 +258,9 @@ public class Usuario {
 	}
 	public void comprobarDescuentos() {
 		//TODO: Posibilidad de hacer la comprobación de descuentos
-		//En otra clase, aplicando patrón
+		//En otra clase, aplicando patrón para que la clase usuario
+		//No tenga que conocer el número de clases que hay, solamente reciba su contacto
+		
 		if (DescuentoMensaje.esUsuarioAptoDescuento(this))
 			this.nuevoDescuento(new DescuentoMensaje());
 		if (DescuentoIntervaloFechas.esUsuarioAptoDescuento(this))

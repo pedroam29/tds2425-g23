@@ -110,7 +110,7 @@ public class VentanaRegistrarGrupo extends JFrame {
 		textField_imagen.setColumns(10);
 		
 		/**
-		 * Botón aceptar: 
+		 * Botón aceptar
 		 */
 		JButton btnNewButton = new JButton("Aceptar");
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();

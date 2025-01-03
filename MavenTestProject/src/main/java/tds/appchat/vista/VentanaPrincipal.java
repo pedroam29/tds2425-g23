@@ -139,7 +139,7 @@ public class VentanaPrincipal extends JFrame {
 		panelNorte.add(lblNewLabel);
 		
 		//TODO: Hacer que en la esquina salga la foto de perfil
-		//AppChat.getUnicaInstancia.getFotoPerfilUsuarioActual()
+		//Crear una funcion que devuelva una Image y sea AppChat.getUnicaInstancia.getFotoPerfilUsuarioActual()
 		JLabel lblNewLabel_1 = new JLabel("IconoUsuario");
 		panelNorte.add(lblNewLabel_1);
 		
