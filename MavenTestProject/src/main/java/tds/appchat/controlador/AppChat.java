@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import tds.appchat.modelo.Contacto;
 import tds.appchat.modelo.ContactoIndividual;
@@ -19,11 +20,14 @@ import tds.appchat.persistencia.DAOException;
 import tds.appchat.persistencia.FactoriaDAO;
 import tds.appchat.persistencia.IAdaptadorContactoIndividualDAO;
 import tds.appchat.persistencia.IAdaptadorGrupoDAO;
+import tds.appchat.persistencia.IAdaptadorMensajeDAO;
 import tds.appchat.persistencia.IAdaptadorUsuarioDAO;
 import tds.appchat.vista.VentanaLogin;
 
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.time.LocalDateTime;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -38,6 +42,7 @@ public class AppChat {
 	private IAdaptadorUsuarioDAO adaptadorUsuario;
 	private IAdaptadorContactoIndividualDAO adaptadorContactoIndividual;
 	private IAdaptadorGrupoDAO adaptadorGrupo;
+	private IAdaptadorMensajeDAO adaptadorMensaje;
 
 	public static AppChat getUnicaInstancia() {
 		if (unicaInstancia == null)
@@ -216,7 +221,33 @@ public class AppChat {
 		return false;	
 	}
 	
-	public void enviarMensajePorTelefono(String telefonoReceptor, String texto) {
+	public void enviarMensaje(Contacto contacto, String texto) {
+		Mensaje mensaje = new Mensaje(texto, LocalDateTime.now(), usuarioActual, contacto);
+		contacto.sendMessage(mensaje);
+
+		adaptadorMensaje.registrarMensaje(mensaje);
+
+		if (contacto instanceof ContactoIndividual) {
+			adaptadorContactoIndividual.modificarContacto((ContactoIndividual) contacto);
+		} else {
+			adaptadorGrupo.modificarGrupo((Grupo) contacto);
+		}
+	}
+	
+	public void enviarMensaje(Contacto contacto, int emoji) {
+		Mensaje mensaje = new Mensaje(emoji, LocalDateTime.now(), usuarioActual, contacto);
+		contacto.sendMessage(mensaje);
+		adaptadorMensaje.registrarMensaje(mensaje);
+
+		if (contacto instanceof ContactoIndividual) {
+			adaptadorContactoIndividual.modificarContacto((ContactoIndividual) contacto);
+		} else {
+			adaptadorGrupo.modificarGrupo((Grupo) contacto);
+		}
+	}
+	/*
+	 public void enviarMensajePorTelefono(String telefonoReceptor, String texto) {
+	 
         Usuario receptor = repoUsuarios.obtenerUsuarioPorTelefono(telefonoReceptor);
         usuarioActual.enviarMensaje(receptor, texto);
 
@@ -250,6 +281,7 @@ public class AppChat {
         // Enviar el mensaje de forma individual a cada miembro del grupo
         usuarioActual.enviarMensajeAGrupo(grupo, texto);    
 	}
+	*/
 	/**
 	 * Se obtiene el mejor descuento posible para el usuario
 	 * @return Descuento con mayor reducción de precio

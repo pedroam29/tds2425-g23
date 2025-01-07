@@ -2,6 +2,7 @@ package tds.appchat.modelo;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class Grupo extends Contacto{
 
@@ -38,5 +39,11 @@ public class Grupo extends Contacto{
 	@Override
 	public String toString() {
 		return super.toString() + "\nMiembros " + miembros;
+	}
+
+	@Override
+	public List<Mensaje> getMensajesRecibidos(Optional<Usuario> usuario) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

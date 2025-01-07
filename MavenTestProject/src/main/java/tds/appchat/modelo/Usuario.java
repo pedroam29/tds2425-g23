@@ -225,7 +225,8 @@ public class Usuario {
 		}
 		return false; 
 	}
-	public void enviarMensaje(Usuario receptor, String contenido) {
+	/*
+	public void enviarMensaje(Contacto receptor, String contenido) {
         // Crear mensaje y agregarlo a las listas de mensajes
         Mensaje mensaje = new Mensaje(contenido, this, receptor);
         this.mensajesEnviados.add(mensaje);
@@ -245,7 +246,7 @@ public class Usuario {
 			receptor.recibirMensaje(mensaje);
 		}
 	}
-	
+	*/
 	public long getTotalMensajesEnviadosUltimoMes()
 	{
 		//TODO: ¿Debería comprobarse si está en el mismo mes para el descuento la clase
