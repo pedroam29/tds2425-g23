@@ -4,14 +4,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import beans.Entidad;
 import beans.Propiedad;
-import tds.appchat.controlador.AppChat;
+
 import tds.appchat.modelo.ContactoIndividual;
+import tds.appchat.modelo.Mensaje;
 import tds.appchat.modelo.Usuario;
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;
+
 
 public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndividualDAO{
 	private static ServicioPersistencia servPersistencia;
@@ -40,13 +43,15 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 
 		// Registramos al usuario correspondiente al contacto si no existe.
 		registrarSiNoExisteUser(contacto.getUsuario());
-
+		// Registrar los mensajes del contacto
+		registrarSiNoExistenMensajes(contacto.getMensajesEnviados());
 		// Atributos propios del contacto
 
 		eContact = new Entidad();
 		eContact.setNombre(IAdaptadorContacto.ATRIB_CONTACTO_INDIVIDUAL);
 		eContact.setPropiedades(new ArrayList<Propiedad>(Arrays.asList(new Propiedad("nombre", contacto.getNombre()),
 				new Propiedad("telefono", String.valueOf(contacto.getTelefono())),
+				new Propiedad("mensajesRecibidos", obtenerCodigosMensajesRecibidos(contacto.getMensajesEnviados())),
 				new Propiedad("usuario", String.valueOf(contacto.getUsuario().getCodigo())))));
 		
 		// Registrar entidad usuario
@@ -64,6 +69,11 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 		// Borramos los elementos de las tablas que lo componen (En este caso borramos
 		// los mensajes del contacto a eliminar)
 		Entidad eContact;
+		AdaptadorMensajeTDS adaptadorMensaje = AdaptadorMensajeTDS.getUnicaInstancia();
+
+		for (Mensaje mensaje : contact.getMensajesEnviados()) {
+			adaptadorMensaje.borrarMensaje(mensaje);
+		}
 		
 		eContact = servPersistencia.recuperarEntidad(contact.getCodigo());
 		servPersistencia.borrarEntidad(eContact);
@@ -81,6 +91,9 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 		servPersistencia.anadirPropiedadEntidad(eContact, "nombre", contact.getNombre());
 		servPersistencia.eliminarPropiedadEntidad(eContact, "telefono");
 		servPersistencia.anadirPropiedadEntidad(eContact, "telefono", String.valueOf(contact.getTelefono()));
+		servPersistencia.eliminarPropiedadEntidad(eContact, "mensajesRecibidos");
+		servPersistencia.anadirPropiedadEntidad(eContact, "mensajesRecibidos",
+				obtenerCodigosMensajesRecibidos(contact.getMensajesEnviados()));
 		servPersistencia.eliminarPropiedadEntidad(eContact, "usuario");
 		servPersistencia.anadirPropiedadEntidad(eContact, "usuario", String.valueOf(contact.getUsuario().getCodigo()));
 	}
@@ -108,6 +121,11 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 		// Obtener usuario del contacto
 		servPersistencia.recuperarPropiedadEntidad(eContact, "usuario");
 		
+		// Mensajes que el contacto tiene
+		List<Mensaje> mensajes = obtenerMensajesDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eContact, "mensajesRecibidos"));
+		for (Mensaje m : mensajes)
+			contact.sendMessage(m);
+		
 		contact.setUsuario(obtenerUsuarioDesdeCodigo(servPersistencia.recuperarPropiedadEntidad(eContact, "usuario")));
 
 		// Devolvemos el objeto contacto
@@ -127,6 +145,27 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 	private void registrarSiNoExisteUser(Usuario admin) {
 		AdaptadorUsuarioTDS adaptadorUsuarios = AdaptadorUsuarioTDS.getUnicaInstancia();
 		adaptadorUsuarios.registrarUsuario(admin);
+	}
+	
+	private String obtenerCodigosMensajesRecibidos(List<Mensaje> mensajesRecibidos) {
+		return mensajesRecibidos.stream().map(m -> String.valueOf(m.getCodigo())).reduce("", (l, m) -> l + m + " ")
+				.trim();
+	}
+
+	private List<Mensaje> obtenerMensajesDesdeCodigos(String codigos) {
+		List<Mensaje> mensajes = new LinkedList<>();
+		StringTokenizer strTok = new StringTokenizer(codigos, " ");
+		AdaptadorMensajeTDS adaptadorMensajes = AdaptadorMensajeTDS.getUnicaInstancia();
+		while (strTok.hasMoreTokens()) {
+			String code = (String) strTok.nextElement();
+			mensajes.add(adaptadorMensajes.recuperarMensaje(Integer.valueOf(code)));
+		}
+		return mensajes;
+	}
+	
+	private void registrarSiNoExistenMensajes(List<Mensaje> messages) {
+		AdaptadorMensajeTDS adaptadorMensajes = AdaptadorMensajeTDS.getUnicaInstancia();
+		messages.stream().forEach(m -> adaptadorMensajes.registrarMensaje(m));
 	}
 	
 	private Usuario obtenerUsuarioDesdeCodigo(String codigo) {

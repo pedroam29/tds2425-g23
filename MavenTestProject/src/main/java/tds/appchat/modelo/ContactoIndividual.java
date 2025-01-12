@@ -1,5 +1,7 @@
 package tds.appchat.modelo;
 
+import java.util.List;
+import java.util.Optional;
 
 public class ContactoIndividual extends Contacto{
 
@@ -35,5 +37,11 @@ public class ContactoIndividual extends Contacto{
 	@Override
 	public String toString() {
 		return super.toString();
+	}
+
+	@Override
+	public List<Mensaje> getMensajesRecibidos(Optional<Usuario> usuario) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

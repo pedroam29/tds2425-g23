@@ -6,18 +6,30 @@ public class Mensaje {
 	private int codigo;
 	private String texto;
 	private Usuario emisor;
-	private Usuario receptor;
+	private Contacto receptor;
 	private LocalDateTime fechaHora;
 	private int emoticono;
 	
-	public Mensaje (String texto, Usuario emisor, Usuario receptor) {
-		this.codigo = 0;
+	public Mensaje (String texto, LocalDateTime hora, Usuario emisor, Contacto receptor) {
 		this.texto = texto;
-        this.fechaHora = LocalDateTime.now();
+        this.fechaHora = hora;
+        this.emisor = emisor;
+        this.receptor = receptor;
+	}
+	
+	public Mensaje (int emoticono, LocalDateTime hora, Usuario emisor, Contacto receptor) {
+		this.emoticono = emoticono;
+        this.fechaHora = hora;
         this.emisor = emisor;
         this.receptor = receptor;
 	}
 
+	public Mensaje(String texto, int emoticono, LocalDateTime hora) {
+		this.texto = texto;
+		this.emoticono = emoticono;
+		this.fechaHora = hora;
+	}
+	
 	public int getCodigo() {
 		return codigo;
 	}
@@ -52,7 +64,7 @@ public class Mensaje {
 		this.emisor = emisor;
 	}
 
-	public void setReceptor(Usuario receptor) {
+	public void setReceptor(Contacto receptor) {
 		this.receptor = receptor;
 	}
 
@@ -72,7 +84,7 @@ public class Mensaje {
 	public String getNombreReceptor() {
 		return this.receptor.getNombre();
 	}
-	public Usuario getReceptor() {
+	public Contacto getReceptor() {
 		return receptor;
 	}
 	
