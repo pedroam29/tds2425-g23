@@ -78,7 +78,7 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		eUsuario = servPersistencia.recuperarEntidad(usuario.getCodigo());
 		servPersistencia.borrarEntidad(eUsuario);
 	}
-
+	
 	public void modificarUsuario(Usuario usuario) {
 		Entidad eUsuario = servPersistencia.recuperarEntidad(usuario.getCodigo());
 

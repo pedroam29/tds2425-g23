@@ -121,6 +121,12 @@ public class AppChat {
 				.anyMatch(u->u.getTelefono().equals(telefono));
 		return existe;
 	}
+	/**
+	 * 
+	 * @param nombre
+	 * @param numTelefono
+	 * @return
+	 */
 	public ContactoIndividual crearContacto(String nombre, String numTelefono) {
 		// Si no tiene el contacto guardado lo guarda
 		if (!usuarioActual.existeContacto(numTelefono)) {

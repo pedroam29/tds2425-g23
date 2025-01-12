@@ -151,7 +151,11 @@ public class AdaptadorGrupoTDS implements IAdaptadorGrupoDAO {
 			codigos = Integer.toString(c.getCodigo()) + SEP_CODIGOS;
 		return codigos;
 	}
-	
+	/**
+	 * 
+	 * @param codigos
+	 * @return
+	 */
 	private List<ContactoIndividual> obtenerMiembros(String codigos){
 		AdaptadorContactoIndividualTDS adaptadorContactoIndividual = AdaptadorContactoIndividualTDS.getInstancia();
 		List<ContactoIndividual> contactos = new LinkedList<ContactoIndividual>();

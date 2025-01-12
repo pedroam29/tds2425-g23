@@ -29,7 +29,6 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 	
 	public void registrarContacto(ContactoIndividual contacto) {
 		Entidad eContact = new Entidad();
-		boolean existe = true;
 
 		// Si la entidad está registrada no la registra de nuevo
 		try {
