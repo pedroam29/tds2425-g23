@@ -164,6 +164,12 @@ public class Usuario {
 	public boolean isPremium(){
 		return premium;
 	}
+	public void setPremium(boolean p) {
+		this.premium = p;
+	}
+	public void setDescuento(Descuento d) {
+		this.descuento = d;
+	}
 	
 	public void addContacto(ContactoIndividual c) {
 		this.contactos.add(c);

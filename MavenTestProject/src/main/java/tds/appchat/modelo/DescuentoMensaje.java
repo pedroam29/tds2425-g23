@@ -4,7 +4,11 @@ package tds.appchat.modelo;
  * Clase de descuentos aplicados a un numero total de mensajes. 
  */
 public class DescuentoMensaje extends Descuento{
-	public static int NUM_MENSAJES = 2000;
+	
+	public final static String ID = "DM";
+	
+	private static int NUM_MENSAJES = 2000;
+	
 	private double totalDescuento = 0.7;
 	@Override
 	public double calcularDescuento(double precio){
@@ -13,5 +17,10 @@ public class DescuentoMensaje extends Descuento{
 	
 	public static boolean esUsuarioAptoDescuento(Usuario usuario) {
 		return usuario.getTotalMensajesEnviadosUltimoMes() >  NUM_MENSAJES;
+	}
+	
+	@Override
+	public String toString() {
+		return ID;
 	}
 }

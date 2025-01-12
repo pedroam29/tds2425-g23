@@ -12,6 +12,7 @@ import java.util.StringTokenizer;
 import beans.Entidad;
 import beans.Propiedad;
 import tds.appchat.modelo.Contacto;
+import tds.appchat.modelo.Descuento;
 import tds.appchat.modelo.Mensaje;
 import tds.appchat.modelo.Usuario;
 import tds.driver.FactoriaServicioPersistencia;
@@ -61,6 +62,8 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 						new Propiedad("contrasena", usuario.getContrasena()),
 						new Propiedad("imagenPerfil", usuario.getImagenPerfilUrl()),
 						new Propiedad("saludo", usuario.getSaludo()),
+						new Propiedad("premium", Boolean.toString(usuario.isPremium())),
+						new Propiedad("descuento", usuario.getDescuento().toString()),
 						new Propiedad("mensajesRecibidos", obtenerCodigosRecibidos(usuario.getRecibidos())),
 						new Propiedad("mensajesEnviados", obtenerCodigosEnviados(usuario.getEnviados())),
 						new Propiedad("contactos", obtenerCodigosContactos(usuario.getContactos())))));
@@ -101,6 +104,10 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 				prop.setValor(usuario.getImagenPerfilUrl());
 			} else if (prop.getNombre().equals("mensajesRecibidos")) {
 				prop.setValor(obtenerCodigosRecibidos(usuario.getRecibidos()));
+			} else if (prop.getNombre().equals("descuento")) {
+				prop.setValor(usuario.getDescuento().toString());
+			} else if (prop.getNombre().equals("premium")) {
+				prop.setValor(Boolean.toString(usuario.isPremium()));
 			} else if(prop.getNombre().equals("mensajesEnviados")) {
 				prop.setValor(obtenerCodigosEnviados(usuario.getEnviados()));
 			} else if(prop.getNombre().equals("contactos")) {
@@ -152,6 +159,9 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 //		usr.setRecibidos(recibidos);
 		
 		usr.setContactos(contactos);
+		Descuento descuento = Descuento.fromString(servPersistencia.recuperarPropiedadEntidad(eUsuario, "descuento"));
+		usr.setDescuento(descuento);
+		usr.setPremium(Boolean.parseBoolean(servPersistencia.recuperarPropiedadEntidad(eUsuario, "premium")));
 
 //		usr.setPlayLists(playlists);
 //		usr.setRecientes(recientes);
