@@ -52,7 +52,7 @@ public class AdaptadorGrupoTDS implements IAdaptadorGrupoDAO {
 		eGrupo.setNombre(IAdaptadorContacto.ATRIB_GRUPO);
 		
 		Propiedad nombre = new Propiedad(ATRIB_NOMBRE, grupo.getNombre());
-		Propiedad imagen = new Propiedad(ATRIB_IMAGEN, grupo.getImagen());
+		Propiedad imagen = new Propiedad(ATRIB_IMAGEN, grupo.getUrlImagen());
 		Propiedad miembros = new Propiedad(ATRIB_MIEMBROS,obtenerCodigosMiembros(grupo.getMiembros()));
 		
 		eGrupo.setPropiedades(new ArrayList<Propiedad>(Arrays.asList(nombre, imagen, miembros)));
@@ -87,7 +87,7 @@ public class AdaptadorGrupoTDS implements IAdaptadorGrupoDAO {
 			if(prop.getNombre().equals(ATRIB_NOMBRE)) {
 					prop.setValor(grupo.getNombre());
 			} else if(prop.getNombre().equals(ATRIB_IMAGEN)){
-				prop.setValor(grupo.getImagen());
+				prop.setValor(grupo.getUrlImagen());
 			} else if (prop.getNombre().equals(ATRIB_MIEMBROS)) {
 				prop.setValor(obtenerCodigosMiembros(grupo.getMiembros()));
 			} else {

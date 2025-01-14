@@ -131,19 +131,19 @@ public class VentanaBuscar extends JFrame {
 		DefaultListModel<Mensaje> modelo = new DefaultListModel<Mensaje>();
 		
 		//TODO: Obtener los datos
-		Usuario Juan = new Usuario("Juan");
-		Usuario Maria = new Usuario("Maria");
-		Mensaje m1 = new Mensaje("Hola", Juan, Maria);
-		Mensaje m2 = new Mensaje("Adios", Maria, Juan);
-		List<Mensaje> mensajes = new LinkedList<>();	
-		mensajes.add(m1);
-		mensajes.add(m2);			
-		//Conversión manual de List<Mensaje> a DefaultListModel<Mensaje> 
-		for(Mensaje mensaje: mensajes) {
-			modelo.addElement(mensaje);
-		}
-		lista.setModel(modelo);
-		
+//		Usuario Juan = new Usuario("Juan");
+//		Usuario Maria = new Usuario("Maria");
+//		Mensaje m1 = new Mensaje("Hola", Juan, Maria);
+//		Mensaje m2 = new Mensaje("Adios", Maria, Juan);
+//		List<Mensaje> mensajes = new LinkedList<>();	
+//		mensajes.add(m1);
+//		mensajes.add(m2);			
+//		//Conversión manual de List<Mensaje> a DefaultListModel<Mensaje> 
+//		for(Mensaje mensaje: mensajes) {
+//			modelo.addElement(mensaje);
+//		}
+//		lista.setModel(modelo);
+//		
 		panelMensajes.add(new JScrollPane(lista), BorderLayout.CENTER);
 		
 	}

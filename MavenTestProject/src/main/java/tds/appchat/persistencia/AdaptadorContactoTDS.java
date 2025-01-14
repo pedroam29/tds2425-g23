@@ -2,6 +2,8 @@ package tds.appchat.persistencia;
 
 import beans.Entidad;
 import tds.appchat.modelo.Contacto;
+import tds.appchat.modelo.ContactoIndividual;
+import tds.appchat.modelo.Grupo;
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;
 /**
@@ -13,8 +15,8 @@ public class AdaptadorContactoTDS implements IAdaptadorContacto {
 	private static ServicioPersistencia servPersistencia = FactoriaServicioPersistencia.getInstance().getServicioPersistencia();
 	
 	//Tiene que implementar la funcion IAdaptadorContacto y tener la funcion por tanto de recuperarContacto
-	private static IAdaptadorContacto adaptadorGrupo = AdaptadorGrupoTDS.getUnicaInstancia();
-	private static IAdaptadorContacto adaptadorContactoIndividual = AdaptadorContactoIndividualTDS.getInstancia();
+	private static IAdaptadorGrupoDAO adaptadorGrupo = AdaptadorGrupoTDS.getUnicaInstancia();
+	private static IAdaptadorContactoIndividualDAO adaptadorContactoIndividual = AdaptadorContactoIndividualTDS.getInstancia();
 	
 	/**
 	 * Patrón Singleton para la clase AdaptadorContactoTDS,
@@ -45,6 +47,14 @@ public class AdaptadorContactoTDS implements IAdaptadorContacto {
 				return adaptadorContactoIndividual.recuperarContacto(codigo);
 		}
 		return null;
+	}
+	
+	public void modificarContacto(Contacto contacto) {
+		if (contacto instanceof ContactoIndividual) {
+			adaptadorContactoIndividual.modificarContacto( (ContactoIndividual) contacto);
+		} else if (contacto instanceof Grupo){
+			adaptadorGrupo.modificarGrupo((Grupo) contacto);
+		}
 	}
 //TODO:
 }

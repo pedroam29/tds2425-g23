@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import beans.Entidad;
 import beans.Propiedad;
@@ -25,6 +26,7 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 	private SimpleDateFormat dateFormat;
 
 	private final static String SEPARADOR_CONTACTOS = " ";
+	private final static String SEPARADOR_MENSAJES = " ";
 	
 	
 	public static AdaptadorUsuarioTDS getUnicaInstancia() { // patron singleton
@@ -63,9 +65,9 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 						new Propiedad("imagenPerfil", usuario.getImagenPerfilUrl()),
 						new Propiedad("saludo", usuario.getSaludo()),
 						new Propiedad("premium", Boolean.toString(usuario.isPremium())),
-						new Propiedad("descuento", usuario.getDescuento().toString()),
-						new Propiedad("mensajesRecibidos", obtenerCodigosRecibidos(usuario.getRecibidos())),
-						new Propiedad("mensajesEnviados", obtenerCodigosEnviados(usuario.getEnviados())),
+						new Propiedad("descuento", usuario.getDescuentoID()),
+						new Propiedad("mensajesRecibidos", obtenerCodigosMensajes(usuario.getRecibidos())),
+						new Propiedad("mensajesEnviados", obtenerCodigosMensajes(usuario.getEnviados())),
 						new Propiedad("contactos", obtenerCodigosContactos(usuario.getContactos())))));
 
 		// registrar entidad usuario
@@ -103,13 +105,13 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 			} else if (prop.getNombre().equals("imagenPerfil")) {
 				prop.setValor(usuario.getImagenPerfilUrl());
 			} else if (prop.getNombre().equals("mensajesRecibidos")) {
-				prop.setValor(obtenerCodigosRecibidos(usuario.getRecibidos()));
+				prop.setValor(obtenerCodigosMensajes(usuario.getRecibidos()));
 			} else if (prop.getNombre().equals("descuento")) {
-				prop.setValor(usuario.getDescuento().toString());
+				prop.setValor(usuario.getDescuentoID());
 			} else if (prop.getNombre().equals("premium")) {
 				prop.setValor(Boolean.toString(usuario.isPremium()));
 			} else if(prop.getNombre().equals("mensajesEnviados")) {
-				prop.setValor(obtenerCodigosEnviados(usuario.getEnviados()));
+				prop.setValor(obtenerCodigosMensajes(usuario.getEnviados()));
 			} else if(prop.getNombre().equals("contactos")) {
 				prop.setValor(obtenerCodigosContactos(usuario.getContactos()));
 			}
@@ -127,6 +129,8 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		String imagenPerfilUrl;
 		String saludo;
 		String telefono;
+		Descuento descuento;
+		Boolean premium;
 		
 		List<Mensaje> recibidos = null;
 		List<Mensaje> enviados = null;
@@ -136,39 +140,31 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		usuario = servPersistencia.recuperarPropiedadEntidad(eUsuario, "usuario");
 		email = servPersistencia.recuperarPropiedadEntidad(eUsuario, "email");
 		contrasena = servPersistencia.recuperarPropiedadEntidad(eUsuario, "contrasena");
-		imagenPerfilUrl = servPersistencia.recuperarPropiedadEntidad(eUsuario, "imagenPerfilUrl");
+		imagenPerfilUrl = servPersistencia.recuperarPropiedadEntidad(eUsuario, "imagenPerfil");
 		saludo = servPersistencia.recuperarPropiedadEntidad(eUsuario, "saludo");
 		telefono = servPersistencia.recuperarPropiedadEntidad(eUsuario, "telefono");
+		descuento = Descuento.fromString(servPersistencia.recuperarPropiedadEntidad(eUsuario, "descuento"));
+		premium = Boolean.parseBoolean(servPersistencia.recuperarPropiedadEntidad(eUsuario, "premium"));
+		
+		recibidos = obtenerMensajesCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "mensajesRecibidos"));
+		enviados = obtenerMensajesCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "mensajesEnviados"));
 		
 		try {
 			fechaNacimiento = dateFormat.parse(servPersistencia.recuperarPropiedadEntidad(eUsuario, "fechaNacimiento"));
 		} catch (ParseException e) {
-			e.printStackTrace();
+			//Si falla a la hora de convertir un string a fecha
 		}
-		
-//		playlists = obtenerPlayListsDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "playlists"));
-//		recientes = obtenerCancionesDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "recientes"));
-		
-		String strContactos = servPersistencia.recuperarPropiedadEntidad(eUsuario, "contactos");
-				
-		contactos = obtenerContactosDesdeCodigos(strContactos);
+		contactos = obtenerContactosDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "contactos"));
 		
 		Usuario usr = new Usuario(usuario, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo, email);
 		
-//		usr.setEnviados(enviados);
-//		usr.setRecibidos(recibidos);
-		
-		usr.setContactos(contactos);
-		Descuento descuento = Descuento.fromString(servPersistencia.recuperarPropiedadEntidad(eUsuario, "descuento"));
+
 		usr.setDescuento(descuento);
-		usr.setPremium(Boolean.parseBoolean(servPersistencia.recuperarPropiedadEntidad(eUsuario, "premium")));
-
-//		usr.setPlayLists(playlists);
-//		usr.setRecientes(recientes);
-//		usr.setPremium(premium);
-//		usr.setDescuento(descuento);
-
+		usr.setContactos(contactos);
+		usr.setPremium(premium);
 		usr.setCodigo(codigo);
+		usr.setEnviados(enviados);
+		usr.setRecibidos(recibidos);
 		
 		return usr;
 	}
@@ -184,23 +180,46 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		return usuarios;
 	}
 	
-	
-	private String obtenerCodigosRecibidos(List<Mensaje> recibidos) {
-		String lineas = "";
-		for (Mensaje mensaje : recibidos) {
-			lineas += mensaje.getCodigo() + " ";
-		}
-		return lineas.trim();
+	/**
+	 * A partir de una lista de mensajes se obtiene un string con
+	 * sus códigos separados por SEPARADOR_MENSAJES
+	 * 
+	 * @param mensajes
+	 * @return
+	 */
+	private String obtenerCodigosMensajes(List<Mensaje> mensajes) {
+		
+	    return mensajes.stream()
+                .map(mensaje -> String.valueOf(mensaje.getCodigo()))  // Convierte el código int a String
+                .collect(Collectors.joining(SEPARADOR_MENSAJES));
 	}
-	
-	private String obtenerCodigosEnviados(List<Mensaje> enviados) {
-		String lineas = "";
-		for (Mensaje mensaje : enviados) {
-			lineas += mensaje.getCodigo() + " ";
+	/**
+	 * Dadao un String de códigos de mensajes devuelve
+	 * una lista con mensajes.
+	 * 
+	 * @param mensajes
+	 * @return
+	 */
+	private List<Mensaje> obtenerMensajesCodigos(String mensajes) {
+		List<Mensaje> listaMensajes = new LinkedList<Mensaje>();
+		
+		AdaptadorMensajeTDS adaptadorMensaje = AdaptadorMensajeTDS.getUnicaInstancia();
+		
+		StringTokenizer strTok = new StringTokenizer(mensajes, SEPARADOR_MENSAJES);
+		while(strTok.hasMoreTokens()) {
+			String s = strTok.nextToken();			
+			listaMensajes.add(adaptadorMensaje.recuperarMensaje(Integer.valueOf(s)));	
 		}
-		return lineas.trim();
+		
+		return listaMensajes;
 	}
-	
+	/**
+	 * A partir de una lista de conctactos se obtiene
+	 * un String con sus códigos separados por SEPARADOR_CONTACTOS
+	 * 
+	 * @param contactos
+	 * @return
+	 */
 	private String obtenerCodigosContactos(List<Contacto> contactos) {
 		String lineas = "";
 		for (Contacto contacto : contactos) {
@@ -208,7 +227,13 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		}
 		return lineas.trim();
 	}
-	
+	/**
+	 * A partir de un string de códigos de contactos mediante adaptador
+	 * contacto. Es 
+	 * 
+	 * @param lineas
+	 * @return
+	 */
 	private List<Contacto> obtenerContactosDesdeCodigos(String lineas) {
 		
 		List<Contacto> recibidos = new LinkedList<Contacto>();

@@ -122,9 +122,9 @@ public class AdaptadorContactoIndividualTDS implements IAdaptadorContactoIndivid
 		servPersistencia.recuperarPropiedadEntidad(eContact, "usuario");
 		
 		// Mensajes que el contacto tiene
-		List<Mensaje> mensajes = obtenerMensajesDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eContact, "mensajesRecibidos"));
-		for (Mensaje m : mensajes)
-			contact.sendMessage(m);
+//		List<Mensaje> mensajes = obtenerMensajesDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eContact, "mensajesRecibidos"));
+//		for (Mensaje m : mensajes)
+//			contact.sendMessage(m);
 		
 		contact.setUsuario(obtenerUsuarioDesdeCodigo(servPersistencia.recuperarPropiedadEntidad(eContact, "usuario")));
 

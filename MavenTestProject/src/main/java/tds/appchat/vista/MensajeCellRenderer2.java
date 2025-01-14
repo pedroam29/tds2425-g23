@@ -34,8 +34,8 @@ implements ListCellRenderer<Mensaje>{
 	@Override
 	public Component getListCellRendererComponent(JList<? extends Mensaje> list, Mensaje mensaje, int index,
 			boolean isSelected, boolean cellHasFocus) {
-		emisorLabel.setText(mensaje.getNombreEmisor());
-		receptorLabel.setText(mensaje.getNombreReceptor());
+		emisorLabel.setText(mensaje.getTlfEmisor());
+		receptorLabel.setText(mensaje.getTlfReceptor());
 		textLabel.setText(mensaje.getTexto());
 
 		if (isSelected) {

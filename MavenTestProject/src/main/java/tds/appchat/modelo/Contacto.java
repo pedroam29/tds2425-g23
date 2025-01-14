@@ -30,9 +30,12 @@ public abstract class Contacto {
 		this.codigo = codigo;
 	}
 
-
 	public String getNombre() {
 		return nombre;
+	}
+	
+	public boolean isNombre(String nombre) {
+		return nombre.equals(nombre);
 	}
 	
 	public void setNombre(String nombre) {
@@ -44,14 +47,14 @@ public abstract class Contacto {
 	}
 	
 	public abstract List<Mensaje> getMensajesRecibidos(Optional<Usuario> usuario);
+	//public abstract void enviarMensaje(Mensaje message);
 
 	public void addMensajes(List<Mensaje> mensajes) {
 		this.mensajes.addAll(mensajes);
 	}
 	
-	public void sendMessage(Mensaje message) {
-		mensajes.add(message);
-	}
+	
+	
 	@Override
 	public String toString() {
 		return this.nombre + this.codigo;

@@ -40,25 +40,11 @@ public class MensajeCellRenderer extends JPanel
 	@Override
 	public Component getListCellRendererComponent(JList<? extends Mensaje> list, Mensaje mensaje, int index,
 			boolean isSelected, boolean cellHasFocus) {
-		//COMPLETAR
-		if(mensaje.getEmisor().getNombre().equals(AppChat.getUnicaInstancia().getNombreUsuarioActual())){
-			
-		} else {
-			
-		}
-		nameLabel.setText(mensaje.getNombreEmisor());
+		
+		//Necesario: Obtener 
+	
+		nameLabel.setText(mensaje.getTlfEmisor());
 		messageLabel.setText(mensaje.getTexto());
-
-		// Load the image from a random URL (for example, using "https://robohash.org")
-		try {
-			URL imageUrl = new URL("https://robohash.org/" + mensaje.getNombreEmisor() + "?size=50x50");
-			Image image = ImageIO.read(imageUrl);
-			ImageIcon imageIcon = new ImageIcon(image.getScaledInstance(50, 50, Image.SCALE_SMOOTH));
-			imageLabel.setIcon(imageIcon);
-		} catch (IOException e) {
-			e.printStackTrace();
-			imageLabel.setIcon(null); // Default to no image if there was an issue
-		}
 
 		// Set background and foreground based on selection
 		if (isSelected) {

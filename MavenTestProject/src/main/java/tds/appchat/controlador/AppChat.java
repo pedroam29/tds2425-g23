@@ -4,7 +4,12 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 import tds.appchat.modelo.Contacto;
 import tds.appchat.modelo.ContactoIndividual;
@@ -22,11 +27,15 @@ import tds.appchat.persistencia.IAdaptadorContactoIndividualDAO;
 import tds.appchat.persistencia.IAdaptadorGrupoDAO;
 import tds.appchat.persistencia.IAdaptadorMensajeDAO;
 import tds.appchat.persistencia.IAdaptadorUsuarioDAO;
+import tds.appchat.vista.ContactoCellRenderer;
 import tds.appchat.vista.VentanaLogin;
 
-
+import java.awt.Image;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
 
 import com.itextpdf.text.Document;
@@ -47,7 +56,7 @@ public class AppChat {
 	public static AppChat getUnicaInstancia() {
 		if (unicaInstancia == null)
 			unicaInstancia = new AppChat();
-		//Haciendo el constructor privado solo habrá una única instancia.
+		//Haciendo el constructor privado solo habrá una única instancia. Patrón Singleton
 		return unicaInstancia;
 	}
 	//Para que no se pueda crear fuera de esta clase
@@ -65,6 +74,7 @@ public class AppChat {
 		adaptadorUsuario = factoria.getUsuarioDAO();
 		adaptadorContactoIndividual = factoria.getContactoDAO();
 		adaptadorGrupo = factoria.getGrupoDAO();
+		adaptadorMensaje = factoria.getMensajeDAO();
 	}
 	
 	private void inicializarRepositorios() {
@@ -72,26 +82,119 @@ public class AppChat {
 	}
 	
 	////
+	//Utils
+	////
+	/**
+	 * 
+	 * @param URL mediante una string
+	 * @return
+	 */
+	public static Image obtenerImagenPerfilUrl(int altura, int anchura, String url) {
+		//Si la imagen falla, será esta
+		Image imagen = null;
+		try {
+			imagen = ImageIO.read(AppChat.class.getResource("/imagenes/usuario.png"));
+		} catch (IOException e) { }
+		
+		try {
+			URL urlImagen = new URL(url);
+			imagen = ImageIO.read(urlImagen);
+			imagen = imagen.getScaledInstance(altura, anchura, Image.SCALE_SMOOTH);
+		} catch (MalformedURLException e) {
+			//Que no haga nada
+		} catch (IOException e) {
+			//Que no haga nada
+			e.printStackTrace();
+		} catch (Exception e){
+			//Que no haga nada, la imagen será guardada
+		}
+		return imagen;
+	}
+	
+	////
 	//Operaciones intermedias de acceso a atributos del usuario actual
 	///
-	
+	/**
+	 * @return devuelve el nombre del usuario actual
+	 */
 	public String getNombreUsuarioActual() {
 		return usuarioActual.getNombre();
 	}
+	/**
+	 * @return devuelve el número de teléfono del usuario actual
+	 */
 	public String getTelefonoUsuarioActual() {
 		return usuarioActual.getTelefono();
 	}
+	/**
+	 * @return devuelve los chats recientes del usuario actual
+	 */
 	public List<Mensaje> obtenerChatsRecientesUsuario(){
-		return usuarioActual.getRecibidos();
+		return usuarioActual.obtenerUltimosChats();
 	}
+	
+	/**
+	 * Se obtiene una lista con los últimos mensajes que obtiene de cada contacto
+	 * 
+	 * @return LinkedList<Mensaje> de los últimos mensajes recibidos por cada contacto
+	 */
+	public List<Mensaje> obtenerUltimosChatsUsuario(){
+		return usuarioActual.obtenerUltimosChats();
+	}
+	
+	/**
+	 * @return devuelve la lista con todos los contactos del usuario actual
+	 */
 	public List<Contacto> contactosUsuarioActual(){
 		return usuarioActual.getContactos();
+	}
+	public String [] contactosUsuarioActualString() {
+		String[] nombres = AppChat.getUnicaInstancia().contactosUsuarioActual().stream()
+		.map(a -> a.getNombre()).toArray(String[]::new);
+		return nombres;
+	}
+	public Contacto [] contactosUsuarioActualArray() {
+		return contactosUsuarioActual().stream().toArray(Contacto[]::new);
+	}
+	/**
+	 * Se obtienen todos los mensajes a partir del mensaje del cell renderer
+	 * @param m
+	 * @return
+	 */
+	public List<Mensaje> obtenerConversacionDesdeMensaje(Mensaje m){
+		//Si el emisor es el usuario actual entonces se devolverá el contacto actual
+		return usuarioActual.getConversacionFromMensaje(m);
+	}
+	
+	public List<Mensaje> obtenerConversacionDesdeContacto(Contacto c){
+		//c.getMensajesRecibidos(null)
+		return usuarioActual.getConversacionFromContacto(c);
+	}
+	
+	public List<Mensaje> obtenerConversacionDesdeTelefono(String t){
+		//c.getMensajesRecibidos(null)
+		return usuarioActual.getConversacionFromTelefono(t);
+	}
+	
+	public Contacto obtenerContactoDesdeTelefono(String t) {
+		return usuarioActual.getContactoDesdeTelefono(t);
+	}
+	////
+	////
+	////
+	
+	
+	/**
+	 * Se obtiene una imagen obtiene de la url de los atributos de usuario actual
+	 * @return Image de la foto de perfil del usuario.
+	 */
+	public Image getImagenUsuarioActual() {
+		return obtenerImagenPerfilUrl(35,35,usuarioActual.getImagenPerfilUrl());
 	}
 	
 	////
 	// Lógica del programa
 	////
-	
 	public boolean registrarUsuario(String nombre, String telefono, String contrasena, Date fechaNacimiento, String imagenPerfilUrl, String saludo, String email) {
 		Usuario usr = new Usuario(nombre, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo, email);
 		if(repoUsuarios.agregarUsuario(usr)) {
@@ -169,7 +272,7 @@ public class AppChat {
 		if(nombreGrupo.isEmpty()) {
 			throw new IllegalArgumentException("El nombre del grupo no puede estar vacío.");
 		}
-		
+
 		if(usuarioActual.hasGrupo(nombreGrupo)){
 			throw new IllegalArgumentException("Ya existe un grupo con este nombre.");
 		}
@@ -227,30 +330,52 @@ public class AppChat {
 		return false;	
 	}
 	
-	public void enviarMensaje(Contacto contacto, String texto) {
-		Mensaje mensaje = new Mensaje(texto, LocalDateTime.now(), usuarioActual, contacto);
-		contacto.sendMessage(mensaje);
-
-		adaptadorMensaje.registrarMensaje(mensaje);
-
-		if (contacto instanceof ContactoIndividual) {
-			adaptadorContactoIndividual.modificarContacto((ContactoIndividual) contacto);
-		} else {
-			adaptadorGrupo.modificarGrupo((Grupo) contacto);
-		}
+	public Contacto obtenerContactoMensaje(Mensaje m) {
+		return usuarioActual.getContactoDesdeTelefono(getTelefonoUsuarioActual());
+		
+	}
+	////////////////////////
+	// Envío de mensajes: //
+	////////////////////////
+	public boolean esMensajeEmisor(Mensaje m) {
+		return usuarioActual.esEmisor(m);
+	}
+	public Mensaje enviarMensajeGrupo(Grupo grupo, String texto) {
+		return usuarioActual.enviarMensajeGrupo(grupo, texto);
 	}
 	
-	public void enviarMensaje(Contacto contacto, int emoji) {
-		Mensaje mensaje = new Mensaje(emoji, LocalDateTime.now(), usuarioActual, contacto);
-		contacto.sendMessage(mensaje);
+	public Mensaje enviarMensaje(Contacto contacto, String texto) {
+		Mensaje mensaje = usuarioActual.enviarMensaje(contacto, texto);
 		adaptadorMensaje.registrarMensaje(mensaje);
-
-		if (contacto instanceof ContactoIndividual) {
-			adaptadorContactoIndividual.modificarContacto((ContactoIndividual) contacto);
-		} else {
-			adaptadorGrupo.modificarGrupo((Grupo) contacto);
-		}
+		
+		//Si se quisiera guardar también en contactos se podría meter aquí también.
+		return mensaje;
 	}
+	public Mensaje enviarMensaje(String telefono, String texto) {
+		Mensaje m = usuarioActual.enviarMensajeTelefono(telefono, texto);
+		adaptadorMensaje.registrarMensaje(m);
+		adaptadorUsuario.modificarUsuario(usuarioActual);
+		return m;
+	}
+	public Mensaje enviarMensajeContactoDesconocido(Mensaje m) {
+		Optional<Usuario> usr = repoUsuarios.getUsuarioNumTelf(getTelefonoUsuarioActual());
+		if (usr.isPresent()) {
+			usr.get().recibirMensaje(m);
+			return m;
+		}
+		return null;
+	}
+//	public void enviarMensaje(Contacto contacto, int emoji) {
+//		Mensaje mensaje = new Mensaje(emoji, LocalDateTime.now(), usuarioActual, contacto);
+//		contacto.sendMessage(mensaje);
+//		adaptadorMensaje.registrarMensaje(mensaje);
+//
+//		if (contacto instanceof ContactoIndividual) {
+//			adaptadorContactoIndividual.modificarContacto((ContactoIndividual) contacto);
+//		} else {
+//			adaptadorGrupo.modificarGrupo((Grupo) contacto);
+//		}
+//	}
 	/*
 	 public void enviarMensajePorTelefono(String telefonoReceptor, String texto) {
 	 
@@ -314,7 +439,7 @@ public class AppChat {
 		}
 	}
 	
-	//TODO: Mejorar. Versión simple que solo 
+	//TODO: Mejorar. Versión simple que solo pone los mensajes así
 	public void convertirPDF(String ruta, List<Mensaje> conversacion) throws DocumentException {
 		FileOutputStream archivo = null;
 		try {

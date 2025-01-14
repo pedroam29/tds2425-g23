@@ -2,28 +2,42 @@ package tds.appchat.modelo;
 
 import java.time.LocalDateTime;
 
+import tds.appchat.controlador.AppChat;
+
 public class Mensaje {
 	private int codigo;
 	private String texto;
-	private Usuario emisor;
-	private Contacto receptor;
+	
+	private String tlfEmisor;
+	private String tlfReceptor; //Que pasa si el grupo es 
+	
+	private boolean grupo; //Este booleano indicará si el mensaje enviado es para un grupo o no
+	
+	//private Usuario emisor;
+	//private Contacto receptor;
+	
 	private LocalDateTime fechaHora;
 	private int emoticono;
 	
-	public Mensaje (String texto, LocalDateTime hora, Usuario emisor, Contacto receptor) {
+	public Mensaje (String texto, LocalDateTime hora, String tlfEmisor, String tlfReceptor) {
 		this.texto = texto;
         this.fechaHora = hora;
-        this.emisor = emisor;
-        this.receptor = receptor;
+        this.tlfEmisor = tlfEmisor;
+        this.tlfReceptor = tlfReceptor;
+        emoticono = -1;
+        grupo = false;
 	}
 	
-	public Mensaje (int emoticono, LocalDateTime hora, Usuario emisor, Contacto receptor) {
+	public Mensaje (int emoticono, LocalDateTime hora, String tlfEmisor, String tlfReceptor) {
 		this.emoticono = emoticono;
         this.fechaHora = hora;
-        this.emisor = emisor;
-        this.receptor = receptor;
+        this.tlfEmisor = tlfEmisor;
+        this.tlfReceptor = tlfReceptor;
+        this.texto = "";
+        grupo = false;
 	}
-
+	
+	
 	public Mensaje(String texto, int emoticono, LocalDateTime hora) {
 		this.texto = texto;
 		this.emoticono = emoticono;
@@ -34,7 +48,9 @@ public class Mensaje {
 		return codigo;
 	}
 
-
+	public void setGrupo(boolean a) {
+		this.grupo = a;
+	}
 
 	public void setCodigo(int codigo) {
 		this.codigo = codigo;
@@ -45,7 +61,6 @@ public class Mensaje {
 	public int getEmoticono() {
 		return emoticono;
 	}
-
 
 
 	public void setFechaHora(LocalDateTime fechaHora) {
@@ -60,40 +75,62 @@ public class Mensaje {
 		this.texto = texto;
 	}
 
-	public void setEmisor(Usuario emisor) {
-		this.emisor = emisor;
+	public void setEmisor(String emisor) {
+		this.tlfEmisor = emisor;
+	}
+	public boolean esNombreGrupo(String emisor) {
+		return grupo && tlfReceptor.equals(emisor);
+	}
+	public boolean isGrupo() {
+		return grupo;
+	}
+	
+	public void setReceptor(String receptor) {
+		this.tlfReceptor = receptor;
 	}
 
-	public void setReceptor(Contacto receptor) {
-		this.receptor = receptor;
-	}
-
+	//Getters
 	public String getTexto() {
 		return texto;
 	}
 	public LocalDateTime getFechaHora() {
 		return fechaHora;
 	}
-	public Usuario getEmisor() {
-		return emisor;
+	
+	public boolean esEmisor(String telefono) {
+		return this.tlfEmisor.equals(telefono);
 	}
 	
-	public String getNombreEmisor() {
-		return this.emisor.getNombre();
+	public String getTlfEmisor() {
+		return tlfEmisor;
 	}
-	public String getNombreReceptor() {
-		return this.receptor.getNombre();
+	
+	public boolean esReceptor(String telefono) {
+		return this.tlfReceptor.equals(telefono);
 	}
-	public Contacto getReceptor() {
-		return receptor;
+	
+	public String getTlfReceptor() {
+		return tlfReceptor;
 	}
+	public String getNombreGrupo() {
+		return tlfReceptor;
+	}
+	
+//	public String getNombreEmisor() {
+//		return this.emisor.getNombre();
+//	}
+//	public String getNombreReceptor() {
+//		return this.receptor.getNombre();
+//	}
+//	public Contacto getReceptor() {
+//		return receptor;
+//	}
 	
 	//TODO: 
 	@Override
 	public String toString()
 	{
-		return "";
-		
+		return fechaHora.toString() + tlfEmisor + tlfReceptor;
 	}
 
 }
