@@ -156,6 +156,7 @@ public class VentanaContactos extends JFrame {
 		gbc_scrollPanellGrupos.gridy = 2;
 		gridBagLayoutVentana.add(scrollPaneGrupos, gbc_scrollPanellGrupos);
 		
+		scrollPaneGrupos.setViewportView(new JList<ContactoIndividual>());
 		/**
 		 * En esta función, cuando se seleccione un elemento de la jlist
 		 * de contactos, si es un grupo, se abrirá en el otro jpanel la 
@@ -189,8 +190,16 @@ public class VentanaContactos extends JFrame {
 //		final Grupo grupoFinal = grupoSeleccionado;
 //		final JList<ContactoIndividual> listaContactosGrupoActionListener = listaContactosGrupo;
 		
-		JButton botonAdd = new JButton(">>");
+		JButton botonAdd = new JButton("");
+		botonAdd.setIcon(new ImageIcon(VentanaContactos.class.getResource("/imagenes/flecha-inv.png")));
+		botonAdd.setPressedIcon(new ImageIcon(VentanaContactos.class.getResource("/imagenes/flecha-inv-pulsada.png")));
+        botonAdd.setContentAreaFilled(false);  // Eliminar el fondo
+        botonAdd.setBorderPainted(false); 
+		botonAdd.setFocusable(false);
+        //botonAdd.setPreferredSize(new Dimension(200, 200));
+        
 		GridBagConstraints gbc_button = new GridBagConstraints();
+		gbc_button.fill = GridBagConstraints.HORIZONTAL;
 		gbc_button.insets = new Insets(0, 0, 5, 5);
 		gbc_button.gridx = 2;
 		gbc_button.gridy = 2;
@@ -199,7 +208,6 @@ public class VentanaContactos extends JFrame {
 		botonAdd.addActionListener(new ActionListener() {
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		    	
 		    	//Es necesario que haya un grupo abierto
 		        if (grupoSeleccionado != null && listaContactos.getSelectedValue() != null 
 		        	&& listaContactos.getSelectedValue() instanceof ContactoIndividual) {
@@ -208,14 +216,23 @@ public class VentanaContactos extends JFrame {
 	                // Se utiliza la devolución de la función addMiembro
 		        	if(!AppChat.getUnicaInstancia().addContactoGrupo(grupoSeleccionado, contactoSeleccionado))
 		        		JOptionPane.showMessageDialog(VentanaContactos.this, "No se ha podido añadir el contacto al grupo");
-	            	modelContactosGrupo.addElement(contactoSeleccionado);
+		        	else
+		        		modelContactosGrupo.addElement(contactoSeleccionado);
 		        }
 		    }
 		});
 		
 		
-		JButton botonEliminar = new JButton("<<");
+		JButton botonEliminar = new JButton("");
+		botonEliminar.setIcon(new ImageIcon(VentanaContactos.class.getResource("/imagenes/flecha.png")));
+		botonEliminar.setPressedIcon(new ImageIcon(VentanaContactos.class.getResource("/imagenes/flecha-pulsada.png")));
+		
+        botonEliminar.setContentAreaFilled(false);  // Eliminar el fondo
+        botonEliminar.setBorderPainted(false); 
+		botonEliminar.setFocusable(false);
+        
 		GridBagConstraints gbc_botonEliminar = new GridBagConstraints();
+		gbc_botonEliminar.fill = GridBagConstraints.HORIZONTAL;
 		gbc_botonEliminar.insets = new Insets(0, 0, 5, 5);
 		gbc_botonEliminar.gridx = 2;
 		gbc_botonEliminar.gridy = 3;
@@ -224,18 +241,19 @@ public class VentanaContactos extends JFrame {
 		botonEliminar.addActionListener(new ActionListener() {
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		    	
 		    	//Es necesario que haya un grupo abierto
 		        if (grupoSeleccionado != null && listaContactosGrupo.getSelectedValue() != null 
 		        		&& listaContactosGrupo.getSelectedValue() instanceof ContactoIndividual) {
 		        	
 		        	ContactoIndividual contactoSeleccionado = (ContactoIndividual) listaContactosGrupo.getSelectedValue();
 	                
+		        	//
 		        	if(!AppChat.getUnicaInstancia().eliminarContactoGrupo(grupoSeleccionado, contactoSeleccionado))
 		        		JOptionPane.showMessageDialog(VentanaContactos.this, "No se ha podido eliminar el contacto del grupo");
-            		modelContactosGrupo.removeElement(contactoSeleccionado);	            		
+		        	else
+		        		modelContactosGrupo.removeElement(contactoSeleccionado);	            		
 		        }
-		    }
+		    } 
 		});
 		
 		JPanel panelBotonInsertarContacto = new JPanel();
@@ -278,6 +296,7 @@ public class VentanaContactos extends JFrame {
 		btnInsertarGrupo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				VentanaRegistrarGrupo ventana = new VentanaRegistrarGrupo();
+				
 				ventana.setVisible(true);
 				//Una vez se haya añadido un grupo, cuando se cierre la ventana de añadir contactos, se
 				//actualizará la lista de contactos.

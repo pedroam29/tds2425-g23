@@ -49,7 +49,7 @@ public class VentanaRegistrarContacto extends JFrame {
 	 * Create the frame.
 	 */
 	public VentanaRegistrarContacto() {
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setResizable(false);
 		
 		setBounds(100, 100, 450, 300);

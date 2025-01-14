@@ -21,6 +21,7 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 
 public class VentanaRegistrarGrupo extends JFrame {
@@ -145,7 +146,9 @@ public class VentanaRegistrarGrupo extends JFrame {
 		
 		btnCancelar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dispose();
+				//dispose();
+				//Se hace así para que cuando se le de al botón cancelar también se tome como cerrado y se actualize automáticamente la lista
+				 dispatchEvent(new WindowEvent(VentanaRegistrarGrupo.this, WindowEvent.WINDOW_CLOSING));
 			}
 		});
 	}
