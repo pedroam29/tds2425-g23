@@ -51,7 +51,7 @@ public class ContactoIndividual extends Contacto{
 	
 	
 	@Override
-	public List<Mensaje> getMensajesRecibidos(Optional<Usuario> usuario) {
+	public List<Mensaje3> getMensajesRecibidos(Optional<Usuario> usuario) {
 		// TODO Auto-generated method stub
 		return null;
 	}

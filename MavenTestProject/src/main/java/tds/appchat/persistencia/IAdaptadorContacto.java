@@ -7,4 +7,5 @@ public interface IAdaptadorContacto {
 	public static final String ATRIB_CONTACTO_INDIVIDUAL = "contacto";
 
 	public Contacto recuperarContacto(int codigo);
+	//public Contacto registrarContacto(Contacto c);
 }

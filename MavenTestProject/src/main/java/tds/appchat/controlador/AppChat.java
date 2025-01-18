@@ -18,11 +18,14 @@ import tds.appchat.modelo.DescuentoIntervaloFechas;
 import tds.appchat.modelo.DescuentoMensaje;
 import tds.appchat.modelo.Grupo;
 import tds.appchat.modelo.Mensaje;
+import tds.appchat.modelo.Mensaje3;
 import tds.appchat.modelo.Premium;
 import tds.appchat.modelo.RepositorioUsuarios;
 import tds.appchat.modelo.Usuario;
+import tds.appchat.persistencia.AdaptadorMensajeTDS;
 import tds.appchat.persistencia.DAOException;
 import tds.appchat.persistencia.FactoriaDAO;
+import tds.appchat.persistencia.IAdaptadorContacto;
 import tds.appchat.persistencia.IAdaptadorContactoIndividualDAO;
 import tds.appchat.persistencia.IAdaptadorGrupoDAO;
 import tds.appchat.persistencia.IAdaptadorMensajeDAO;
@@ -50,6 +53,7 @@ public class AppChat {
 	
 	private IAdaptadorUsuarioDAO adaptadorUsuario;
 	private IAdaptadorContactoIndividualDAO adaptadorContactoIndividual;
+	private IAdaptadorContacto adaptadorContacto;
 	private IAdaptadorGrupoDAO adaptadorGrupo;
 	private IAdaptadorMensajeDAO adaptadorMensaje;
 
@@ -65,6 +69,9 @@ public class AppChat {
 		inicializarRepositorios();
 	}
 	
+	/**
+	 * Funcion que inicializa los adaptadores para persistencia
+	 */
 	private void inicializarAdaptadores() {
 		FactoriaDAO factoria = null;
 		try {
@@ -74,6 +81,7 @@ public class AppChat {
 		adaptadorUsuario = factoria.getUsuarioDAO();
 		adaptadorContactoIndividual = factoria.getContactoDAO();
 		adaptadorGrupo = factoria.getGrupoDAO();
+		//adaptadorContacto = factoria.getContactoDAO();
 		adaptadorMensaje = factoria.getMensajeDAO();
 	}
 	
@@ -81,11 +89,8 @@ public class AppChat {
 		repoUsuarios = RepositorioUsuarios.getUnicaInstancia();
 	}
 	
-	////
-	//Utils
-	////
 	/**
-	 * 
+	 * Se obtoeme un objeto Imagen a partir de un string.
 	 * @param URL mediante una string
 	 * @return
 	 */
@@ -126,21 +131,21 @@ public class AppChat {
 	public String getTelefonoUsuarioActual() {
 		return usuarioActual.getTelefono();
 	}
-	/**
-	 * @return devuelve los chats recientes del usuario actual
-	 */
-	public List<Mensaje> obtenerChatsRecientesUsuario(){
-		return usuarioActual.obtenerUltimosChats();
-	}
+//	/**
+//	 * @return devuelve los chats recientes del usuario actual
+//	 */
+//	public List<Mensaje3> obtenerChatsRecientesUsuario(){
+//		return usuarioActual.obtenerUltimosChats();
+//	}
 	
-	/**
-	 * Se obtiene una lista con los últimos mensajes que obtiene de cada contacto
-	 * 
-	 * @return LinkedList<Mensaje> de los últimos mensajes recibidos por cada contacto
-	 */
-	public List<Mensaje> obtenerUltimosChatsUsuario(){
-		return usuarioActual.obtenerUltimosChats();
-	}
+//	/**
+//	 * Se obtiene una lista con los últimos mensajes que obtiene de cada contacto
+//	 * 
+//	 * @return LinkedList<Mensaje> de los últimos mensajes recibidos por cada contacto
+//	 */
+//	public List<Mensaje3> obtenerUltimosChatsUsuario(){
+//		return usuarioActual.obtenerUltimosChats();
+//	}
 	
 	/**
 	 * @return devuelve la lista con todos los contactos del usuario actual
@@ -156,29 +161,31 @@ public class AppChat {
 	public Contacto [] contactosUsuarioActualArray() {
 		return contactosUsuarioActual().stream().toArray(Contacto[]::new);
 	}
-	/**
-	 * Se obtienen todos los mensajes a partir del mensaje del cell renderer
-	 * @param m
-	 * @return
-	 */
-	public List<Mensaje> obtenerConversacionDesdeMensaje(Mensaje m){
-		//Si el emisor es el usuario actual entonces se devolverá el contacto actual
-		return usuarioActual.getConversacionFromMensaje(m);
-	}
-	
-	public List<Mensaje> obtenerConversacionDesdeContacto(Contacto c){
-		//c.getMensajesRecibidos(null)
-		return usuarioActual.getConversacionFromContacto(c);
-	}
-	
-	public List<Mensaje> obtenerConversacionDesdeTelefono(String t){
-		//c.getMensajesRecibidos(null)
-		return usuarioActual.getConversacionFromTelefono(t);
-	}
+//	/**
+//	 * Se obtienen todos los mensajes a partir del mensaje del cell renderer
+//	 * @param m
+//	 * @return
+//	 */
+//	public List<Mensaje3> obtenerConversacionDesdeMensaje(Mensaje3 m){
+//		//Si el emisor es el usuario actual entonces se devolverá el contacto actual
+//		return usuarioActual.getConversacionFromMensaje(m);
+//	}
+//	
+//	public List<Mensaje3> obtenerConversacionDesdeContacto(Contacto c){
+//		//c.getMensajesRecibidos(null)
+//		return usuarioActual.getConversacionFromContacto(c);
+//	}
+//	
+//	public List<Mensaje3> obtenerConversacionDesdeTelefono(String t){
+//		//c.getMensajesRecibidos(null)
+//		return usuarioActual.getConversacionFromTelefono(t);
+//	}
 	
 	public Contacto obtenerContactoDesdeTelefono(String t) {
 		return usuarioActual.getContactoDesdeTelefono(t);
 	}
+	
+	
 	////
 	////
 	////
@@ -204,6 +211,13 @@ public class AppChat {
 		}
 		return false;
 	}
+	/**
+	 * Hace login de un usuario
+	 * 
+	 * @param telefono
+	 * @param contrasena
+	 * @return
+	 */
 	public boolean loginUsuario(String telefono, String contrasena) {	
 		//TODO: Cambiar equals para favorecer patrón experto.
 		Optional<Usuario> optUsr = repoUsuarios.getAllUsuarios().stream()
@@ -329,42 +343,100 @@ public class AppChat {
 		}
 		return false;	
 	}
-	
-	public Contacto obtenerContactoMensaje(Mensaje m) {
-		return usuarioActual.getContactoDesdeTelefono(getTelefonoUsuarioActual());
-		
+	public boolean esTelefonoContacto(String telefono) {
+		return usuarioActual.hasTelefono(telefono);
 	}
+	public Usuario obtenerUsuarioDesdeTelefono(String telefono) {
+		return repoUsuarios.getUsuarioNumTelf(telefono).get();
+	}
+//	public String obtenerTelefonoDesdeMensaje(Mensaje3 m) {
+//		return usuarioActual.getTelefonoDesdeMensaje(m);
+//	}
+	
+	public Contacto obtenerContactoMensaje(Mensaje3 m) {
+		return usuarioActual.getContactoDesdeTelefono(getTelefonoUsuarioActual());
+	}
+	/**
+	 * 
+	 * @return
+	 */
+	public String obtenerNombreContactoDesdeTelefono(String telefono) {
+		Contacto contacto = usuarioActual.getContactoDesdeTelefono(telefono); 
+		if (contacto == null)
+			return telefono;
+		return contacto.getNombre();
+	}
+	
 	////////////////////////
 	// Envío de mensajes: //
 	////////////////////////
-	public boolean esMensajeEmisor(Mensaje m) {
-		return usuarioActual.esEmisor(m);
-	}
-	public Mensaje enviarMensajeGrupo(Grupo grupo, String texto) {
-		return usuarioActual.enviarMensajeGrupo(grupo, texto);
-	}
 	
-	public Mensaje enviarMensaje(Contacto contacto, String texto) {
-		Mensaje mensaje = usuarioActual.enviarMensaje(contacto, texto);
-		adaptadorMensaje.registrarMensaje(mensaje);
-		
-		//Si se quisiera guardar también en contactos se podría meter aquí también.
-		return mensaje;
-	}
-	public Mensaje enviarMensaje(String telefono, String texto) {
-		Mensaje m = usuarioActual.enviarMensajeTelefono(telefono, texto);
-		adaptadorMensaje.registrarMensaje(m);
-		adaptadorUsuario.modificarUsuario(usuarioActual);
-		return m;
-	}
-	public Mensaje enviarMensajeContactoDesconocido(Mensaje m) {
-		Optional<Usuario> usr = repoUsuarios.getUsuarioNumTelf(getTelefonoUsuarioActual());
-		if (usr.isPresent()) {
-			usr.get().recibirMensaje(m);
-			return m;
-		}
-		return null;
-	}
+//	public boolean esMensajeEmisor(Mensaje3 m) {
+//		return usuarioActual.esEmisor(m);
+//	}
+//	public Mensaje3 enviarMensajeGrupo(Grupo grupo, String texto) {
+//		Mensaje3 m = usuarioActual.enviarMensajeGrupo(grupo, texto);
+//		adaptadorMensaje.registrarMensaje(m);
+//		adaptadorUsuario.modificarUsuario(usuarioActual);
+//		return m;
+//	}
+//	
+//	public Mensaje3 enviarMensajeContactoIndividual(ContactoIndividual contacto, String texto) {
+//		Mensaje3 m = usuarioActual.enviarMensajeContacto(contacto, texto);
+//		adaptadorMensaje.registrarMensaje(m);
+//		adaptadorUsuario.modificarUsuario(usuarioActual);
+//		adaptadorUsuario.modificarUsuario(contacto.getUsuario());
+//		return m;
+//	}
+	
+//	/**
+//	 * Se envia un mensaje a un contacto:
+//	 * 
+//	 * @param contacto
+//	 * @param texto
+//	 * @return
+//	 */
+//	public Mensaje3 enviarMensaje(Contacto contacto, String texto) {
+//		Mensaje3 mensaje = null;
+//		//adaptadorMensaje.registrarMensaje(mensaje);
+//		//adaptadorUsuario.modificarUsuario(usuarioActual);
+//		
+//		if (contacto instanceof ContactoIndividual)
+//			mensaje = enviarMensajeContactoIndividual((ContactoIndividual) contacto, texto);
+//		else if (contacto instanceof Grupo)
+//			mensaje = enviarMensajeGrupo((Grupo) contacto, texto);
+//		return mensaje;
+//		//Si se quisiera guardar también en contactos se podría meter aquí también.
+//	}
+//	
+//	/**
+//	 * Se envia un mensaje a un usuario desconocido.
+//	 * 
+//	 * @param telefono
+//	 * @param texto
+//	 * @return Mensaje enviado
+//	 */
+//	public Mensaje3 enviarMensaje(String telefono, String texto) {
+//		//No tendrá e
+//		System.out.println("Se quiere enviar un mensaje al teléfono: " + telefono);
+//		Mensaje3 m = usuarioActual.enviarMensajeTelefono(telefono, texto);
+//		adaptadorMensaje.registrarMensaje(m);
+//		adaptadorUsuario.modificarUsuario(usuarioActual);
+//		adaptadorUsuario.modificarUsuario(repoUsuarios.getUsuarioNumTelf(telefono).get());
+//		return m;
+//	}
+//	
+//	public Mensaje3 enviarMensajeContactoDesconocido(String telefono, Mensaje3 m) {
+//		Optional<Usuario> usr = repoUsuarios.getUsuarioNumTelf(telefono);
+//		if (usr.isPresent()) {
+//			usr.get().recibirMensaje(m);
+////			adaptadorMensaje.registrarMensaje(m);
+////			adaptadorUsuario.modificarUsuario(usuarioActual);
+////			adaptadorUsuario.modificarUsuario(usr.get());
+//			return m;
+//		}
+//		return null;
+//	}
 //	public void enviarMensaje(Contacto contacto, int emoji) {
 //		Mensaje mensaje = new Mensaje(emoji, LocalDateTime.now(), usuarioActual, contacto);
 //		contacto.sendMessage(mensaje);
@@ -413,6 +485,83 @@ public class AppChat {
         usuarioActual.enviarMensajeAGrupo(grupo, texto);    
 	}
 	*/
+	
+	/**
+	 * Funcion para conocer si Usuario es emisor del mensaje de parámetro
+	 * 
+	 * @param Mensaje
+	 * @return True si el usuario actual es el emisor del mensaje
+	 */
+	public boolean esUsuarioEmisor(Mensaje m) {
+		return usuarioActual.esEmisor(m);
+	}
+	
+	public Usuario obtenerUsuarioDesdeMensaje(Mensaje m) {
+		return esUsuarioEmisor(m) ? m.getReceptor() : m.getEmisor();
+	}
+	public boolean esUsuarioContacto(Usuario u) {
+		return usuarioActual.esUsuarioContacto(u);
+	}
+	public Contacto obtenerContactoUsuario(Usuario u) {
+		return usuarioActual.obtenerContactoUsuario(u);
+	}
+	/**
+	 * Se envia el texto como mensaje a un usuairo
+	 * @param usuario
+	 * @param texto
+	 * @return mensaje enviado
+	 */
+	public Mensaje enviarMensaje(Usuario u, String texto) {
+		Mensaje m = usuarioActual.enviarMensaje(u, texto);
+		
+		//Persistencia del nuevo mensaje para emisor receptor y mensaje
+		adaptadorMensaje.registrarMensaje(m);
+		adaptadorUsuario.modificarUsuario(usuarioActual);
+		adaptadorUsuario.modificarUsuario(u);
+		return m;
+	}
+	
+	/**
+	 * Se envia un mensaje a un grupo
+	 * @param g
+	 * @param texto
+	 * @return Mensaje que almacena el emisor como enviado al grupo
+	 */
+	public Mensaje enviarMensajeGrupo(Grupo g, String texto) {
+		Mensaje mensajeEmisor = new Mensaje(texto, LocalDateTime.now(), usuarioActual, g);
+		//Cada mensaje
+		List<Mensaje> mensajesEnviados = usuarioActual.enviarMensajeGrupo(mensajeEmisor,g,texto);
+		mensajesEnviados.stream().forEach(m -> {
+			adaptadorMensaje.registrarMensaje(m);
+			//Por cada mensaje se modifica su receptor
+			adaptadorUsuario.modificarUsuario(m.getReceptor());
+		});
+		return mensajeEmisor;
+	}
+	
+	public List<Mensaje> obtenerChatsRecientes(){
+		return usuarioActual.obtenerConversacionesRecientes();
+	}
+	/**
+	 * Devuelve la conversacion que se tiene con un usuario
+	 * @param u
+	 * @return
+	 */
+	public List<Mensaje> obtenerConversacion(Usuario u){
+		return usuarioActual.obtenerConversacionUsuario(u);
+	}
+	
+	/**
+	 * 
+	 */
+	public List<Mensaje> obtenerConversacionGrupo(Grupo g){
+		return usuarioActual.obtenerConversacionGrupo(g);
+	}
+	
+	//////////////////
+	/// Descuentos 	//
+	//////////////////
+	
 	/**
 	 * Se obtiene el mejor descuento posible para el usuario
 	 * @return Descuento con mayor reducción de precio
@@ -440,7 +589,7 @@ public class AppChat {
 	}
 	
 	//TODO: Mejorar. Versión simple que solo pone los mensajes así
-	public void convertirPDF(String ruta, List<Mensaje> conversacion) throws DocumentException {
+	public void convertirPDF(String ruta, List<Mensaje3> conversacion) throws DocumentException {
 		FileOutputStream archivo = null;
 		try {
 			archivo = new FileOutputStream(ruta);
@@ -449,8 +598,7 @@ public class AppChat {
 	    Document documento = new Document();
 		PdfWriter.getInstance(documento, archivo);
 		documento.open();
-		for (Mensaje m : conversacion)
-		{
+		for (Mensaje3 m : conversacion) {
 			documento.add(new Paragraph(m.toString()));
 		}
 

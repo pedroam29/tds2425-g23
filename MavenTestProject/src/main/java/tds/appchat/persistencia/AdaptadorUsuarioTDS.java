@@ -1,12 +1,16 @@
 package tds.appchat.persistencia;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
@@ -15,6 +19,7 @@ import beans.Propiedad;
 import tds.appchat.modelo.Contacto;
 import tds.appchat.modelo.Descuento;
 import tds.appchat.modelo.Mensaje;
+import tds.appchat.modelo.Mensaje3;
 import tds.appchat.modelo.Usuario;
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;
@@ -27,7 +32,8 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 
 	private final static String SEPARADOR_CONTACTOS = " ";
 	private final static String SEPARADOR_MENSAJES = " ";
-	
+	private final static String SEPARADOR_USUARIO_MENSAJES = ":";
+	private final static String SEPARADOR_USUARIOS = ",";
 	
 	public static AdaptadorUsuarioTDS getUnicaInstancia() { // patron singleton
 		if (unicaInstancia == null) {
@@ -66,8 +72,9 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 						new Propiedad("saludo", usuario.getSaludo()),
 						new Propiedad("premium", Boolean.toString(usuario.isPremium())),
 						new Propiedad("descuento", usuario.getDescuentoID()),
-						new Propiedad("mensajesRecibidos", obtenerCodigosMensajes(usuario.getRecibidos())),
-						new Propiedad("mensajesEnviados", obtenerCodigosMensajes(usuario.getEnviados())),
+						//new Propiedad("mensajesRecibidos", obtenerCodigosMensajes(usuario.getRecibidos())),
+						//new Propiedad("mensajesEnviados", obtenerCodigosMensajes(usuario.getEnviados())),
+						new Propiedad("mensajes", obtenerCodigosMensajes(usuario.getMensajesPorUsuario())),
 						new Propiedad("contactos", obtenerCodigosContactos(usuario.getContactos())))));
 
 		// registrar entidad usuario
@@ -104,14 +111,16 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 				prop.setValor(usuario.getSaludo());
 			} else if (prop.getNombre().equals("imagenPerfil")) {
 				prop.setValor(usuario.getImagenPerfilUrl());
-			} else if (prop.getNombre().equals("mensajesRecibidos")) {
-				prop.setValor(obtenerCodigosMensajes(usuario.getRecibidos()));
+			//} else if (prop.getNombre().equals("mensajesRecibidos")) {
+			//	prop.setValor(obtenerCodigosMensajes(usuario.getRecibidos()));
 			} else if (prop.getNombre().equals("descuento")) {
 				prop.setValor(usuario.getDescuentoID());
 			} else if (prop.getNombre().equals("premium")) {
 				prop.setValor(Boolean.toString(usuario.isPremium()));
-			} else if(prop.getNombre().equals("mensajesEnviados")) {
-				prop.setValor(obtenerCodigosMensajes(usuario.getEnviados()));
+			//} else if(prop.getNombre().equals("mensajesEnviados")) {
+			//  prop.setValor(obtenerCodigosMensajes(usuario.getEnviados()));
+			} else if(prop.getNombre().equals("mensajes")) {
+				prop.setValor(obtenerCodigosMensajes(usuario.getMensajesPorUsuario()));
 			} else if(prop.getNombre().equals("contactos")) {
 				prop.setValor(obtenerCodigosContactos(usuario.getContactos()));
 			}
@@ -120,6 +129,9 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 	}
 
 	public Usuario recuperarUsuario(int codigo) {
+		
+		if (PoolDAO.getInstancia().contiene(codigo))
+			return (Usuario) PoolDAO.getInstancia().getObjeto(codigo);
 		
 		Entidad eUsuario;
 		String usuario;
@@ -132,8 +144,10 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		Descuento descuento;
 		Boolean premium;
 		
-		List<Mensaje> recibidos = null;
-		List<Mensaje> enviados = null;
+		List<Mensaje3> recibidos = null;
+		List<Mensaje3> enviados = null;
+		
+		HashMap<String, List<Mensaje>> mensajes;
 		List<Contacto> contactos;
 
 		eUsuario = servPersistencia.recuperarEntidad(codigo);
@@ -145,9 +159,8 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		telefono = servPersistencia.recuperarPropiedadEntidad(eUsuario, "telefono");
 		descuento = Descuento.fromString(servPersistencia.recuperarPropiedadEntidad(eUsuario, "descuento"));
 		premium = Boolean.parseBoolean(servPersistencia.recuperarPropiedadEntidad(eUsuario, "premium"));
-		
-		recibidos = obtenerMensajesCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "mensajesRecibidos"));
-		enviados = obtenerMensajesCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "mensajesEnviados"));
+		//recibidos = obtenerMensajesCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "mensajesRecibidos"));
+		//enviados = obtenerMensajesCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "mensajesEnviados"));
 		
 		try {
 			fechaNacimiento = dateFormat.parse(servPersistencia.recuperarPropiedadEntidad(eUsuario, "fechaNacimiento"));
@@ -157,15 +170,18 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		contactos = obtenerContactosDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "contactos"));
 		
 		Usuario usr = new Usuario(usuario, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo, email);
+		//Se inserta en el PoolDao
+		PoolDAO.getInstancia().addObjeto(codigo, usr);
 		
-
+		mensajes = obtenerMensajesCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "mensajes"));
+		
 		usr.setDescuento(descuento);
 		usr.setContactos(contactos);
 		usr.setPremium(premium);
 		usr.setCodigo(codigo);
-		usr.setEnviados(enviados);
-		usr.setRecibidos(recibidos);
-		
+		//usr.setEnviados(enviados);
+		//usr.setRecibidos(recibidos);
+		usr.setMensajesPorUsuario(mensajes);
 		return usr;
 	}
 
@@ -187,11 +203,38 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 	 * @param mensajes
 	 * @return
 	 */
-	private String obtenerCodigosMensajes(List<Mensaje> mensajes) {
+	private String obtenerCodigosMensajes(HashMap<String,List<Mensaje>> mensajes) {
 		
-	    return mensajes.stream()
-                .map(mensaje -> String.valueOf(mensaje.getCodigo()))  // Convierte el código int a String
-                .collect(Collectors.joining(SEPARADOR_MENSAJES));
+		String stringMensajes = mensajes.entrySet().stream()
+			.map(e ->
+			e.getKey()
+			+ SEPARADOR_USUARIO_MENSAJES +
+				e.getValue().stream()
+				.map(m -> Integer.toString(m.getCodigo()))
+				.collect(Collectors.joining(SEPARADOR_MENSAJES))			
+			).collect(Collectors.joining(SEPARADOR_USUARIOS));
+		
+	    return stringMensajes;
+	}
+	
+	private HashMap<String,List<Mensaje>> obtenerMensajesCodigos(String mensajes) {
+		
+		AdaptadorMensajeTDS adaptadorMensaje = AdaptadorMensajeTDS.getUnicaInstancia();
+		//AdaptadorUsuarioTDS adaptadorUsuario = AdaptadorUsuarioTDS.getUnicaInstancia();
+		
+		HashMap<String,List<Mensaje>> mapaMensajes = new HashMap<String, List<Mensaje>>();
+		if (!mensajes.isEmpty()) {
+			for (String mensaje : mensajes.split(SEPARADOR_USUARIOS)) {
+				String[] mensajesPorUsuario = mensaje.split(SEPARADOR_USUARIO_MENSAJES);
+				System.out.println("Falla por: " + mensajesPorUsuario[0]);
+				//Usuario u = adaptadorUsuario.recuperarUsuario(Integer.parseInt(mensajesPorUsuario[0]));
+				String tlf = mensajesPorUsuario[0];
+				List<Mensaje> msg = Arrays.stream(mensajesPorUsuario[1].split(SEPARADOR_MENSAJES))
+						.map(m -> adaptadorMensaje.recuperarMensaje(Integer.parseInt(m))).collect(Collectors.toList());
+				mapaMensajes.put(tlf, msg);
+			}
+		}
+	    return mapaMensajes;
 	}
 	/**
 	 * Dadao un String de códigos de mensajes devuelve
@@ -200,19 +243,35 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 	 * @param mensajes
 	 * @return
 	 */
-	private List<Mensaje> obtenerMensajesCodigos(String mensajes) {
-		List<Mensaje> listaMensajes = new LinkedList<Mensaje>();
-		
-		AdaptadorMensajeTDS adaptadorMensaje = AdaptadorMensajeTDS.getUnicaInstancia();
-		
-		StringTokenizer strTok = new StringTokenizer(mensajes, SEPARADOR_MENSAJES);
-		while(strTok.hasMoreTokens()) {
-			String s = strTok.nextToken();			
-			listaMensajes.add(adaptadorMensaje.recuperarMensaje(Integer.valueOf(s)));	
-		}
-		
-		return listaMensajes;
-	}
+//	private List<Mensaje3> obtenerMensajesCodigos(String mensajes) {
+//		
+//		List<Mensaje3> listaMensajes = new LinkedList<Mensaje3>();
+//		
+//		AdaptadorMensajeTDS adaptadorMensaje = AdaptadorMensajeTDS.getUnicaInstancia();
+//		
+//		StringTokenizer strTok = new StringTokenizer(mensajes, SEPARADOR_MENSAJES);
+//		while(strTok.hasMoreTokens()) {
+//			String s = strTok.nextToken();			
+//			listaMensajes.add(adaptadorMensaje.recuperarMensaje(Integer.valueOf(s)));	
+//		}
+//		
+//		return listaMensajes;
+//	}
+	
+//	private List<Mensaje> obtenerMensajesDesdeCodigos(String mensajes) {
+//		HashMap<Usuario,List<Mensaje>> mensaje = new HashMap<Usuario, List<Mensaje>>();
+//		AdaptadorMensajeTDS adaptadorMensaje = AdaptadorMensajeTDS.getUnicaInstancia();
+//		AdaptadorUsuarioTDS adaptadorUsuario = AdaptadorUsuarioTDS.getUnicaInstancia();
+//		
+//		StringTokenizer strTok = new StringTokenizer(mensajes, SEPARADOR_MENSAJES);
+//		while(strTok.hasMoreTokens()) {
+//			String s = strTok.nextToken();			
+//			listaMensajes.add(adaptadorMensaje.recuperarMensaje(Integer.valueOf(s)));	
+//		}
+//		
+//		return listaMensajes;
+//	}
+	
 	/**
 	 * A partir de una lista de conctactos se obtiene
 	 * un String con sus códigos separados por SEPARADOR_CONTACTOS
@@ -242,11 +301,10 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		StringTokenizer strTok = new StringTokenizer(lineas, SEPARADOR_CONTACTOS);
 		
 		//Es el adaptador de contactos el que se encarga de decidir si un contacto es 
-		// 
+
 		while(strTok.hasMoreTokens()) {
 			String a = strTok.nextToken();			
 			recibidos.add(adaptadorContacto.recuperarContacto(Integer.valueOf(a)));
-		
 		}
 		return recibidos;
 	}

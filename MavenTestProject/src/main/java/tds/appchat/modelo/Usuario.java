@@ -7,6 +7,8 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -36,8 +38,12 @@ public class Usuario {
 	private boolean premium;
 	private RolUsuario rolUsuario;
 	
-	private List<Mensaje> mensajesRecibidos;
-	private List<Mensaje> mensajesEnviados;
+	//Una opción para facilitar la usabilidad es utilizar, cada vez que se quiera enviar un mensaje
+	private HashMap<String, List<Mensaje>> mensajesPorUsuario;
+	private HashMap<String, List<Mensaje>> mensajesGrupos;
+	
+	private List<Mensaje3> mensajesRecibidos;
+	private List<Mensaje3> mensajesEnviados;
 	private List<Contacto> contactos;
 	
 	public Usuario(String nombre, String telefono, String contrasena,Date fechaNacimiento, String imagenPerfilUrl, String saludo, String email) {
@@ -49,12 +55,14 @@ public class Usuario {
 		this.fechaNacimiento = fechaNacimiento;
 		this.imagenPerfilUrl = imagenPerfilUrl;
 		this.saludo = saludo;
-		this.mensajesRecibidos=new LinkedList<>();
-		this.mensajesEnviados=new LinkedList<>();
+		this.mensajesRecibidos=new LinkedList<Mensaje3>();
+		this.mensajesEnviados=new LinkedList<Mensaje3>();
 		this.contactos=new LinkedList<Contacto>();
 		this.descuento = null;
 		this.fechaRegistro = LocalDate.now();
 		this.premium = false;
+		this.mensajesPorUsuario = new HashMap<String, List<Mensaje>>();
+		this.mensajesGrupos = new HashMap<String, List<Mensaje>>();
 	}
 	
 	public Usuario(String nombre) {
@@ -88,20 +96,20 @@ public class Usuario {
 	public String getImagenPerfilUrl() {
 		return imagenPerfilUrl;
 	}
-	public List<Mensaje> getEnviados() {
-		return new LinkedList<Mensaje>(mensajesEnviados);
+	public List<Mensaje3> getEnviados() {
+		return new LinkedList<Mensaje3>(mensajesEnviados);
 	}
 	
-	public void setEnviados(List<Mensaje> enviados) {
-		this.mensajesEnviados = new LinkedList<Mensaje>(enviados);
+	public void setEnviados(List<Mensaje3> enviados) {
+		this.mensajesEnviados = new LinkedList<Mensaje3>(enviados);
 	}
 	
-	public List<Mensaje> getRecibidos() {
-		return new LinkedList<Mensaje>(mensajesRecibidos);
+	public List<Mensaje3> getRecibidos() {
+		return new LinkedList<Mensaje3>(mensajesRecibidos);
 	}
 	
-	public void setRecibidos(List<Mensaje> recibidos) {
-		this.mensajesEnviados = new LinkedList<Mensaje>(recibidos);
+	public void setRecibidos(List<Mensaje3> recibidos) {
+		this.mensajesEnviados = new LinkedList<Mensaje3>(recibidos);
 	}
 	
 	public List<Contacto> getContactos() {
@@ -112,6 +120,13 @@ public class Usuario {
 		this.contactos = new LinkedList<Contacto>(contactos);
 	}
 
+	public HashMap<String,List<Mensaje>> getMensajesPorUsuario(){
+		return mensajesPorUsuario;
+	}
+	
+	public void setMensajesPorUsuario(HashMap<String,List<Mensaje>> mensajesPorUsuario ){
+		this.mensajesPorUsuario = mensajesPorUsuario;
+	}
 	public String getNombre() {
 		return nombre;
 	}
@@ -126,7 +141,7 @@ public class Usuario {
 	public String getContrasena() {
 		return contrasena;
 	}
-
+	
 	public Date getFechaNacimiento() {
 		return fechaNacimiento;
 	}
@@ -203,185 +218,354 @@ public class Usuario {
 		return contactos.stream().anyMatch(c -> c instanceof ContactoIndividual && c.equals(cont));
 	}
 	
+	public boolean hasTelefono(String telefono) {
+		return contactos.stream()
+				.anyMatch(c -> c instanceof ContactoIndividual && ((ContactoIndividual) c).isTelefono(telefono));
+	}
+	
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/// PROVISIONAL TODO: BORRAR ANTES DE MANDAR
+	////////////////////////////////////////////////////
+	/**
+	 * Se envia un mensaje a partir de un usuario
+	 * @param Usuario usuario receptor
+	 * @param Texto cuerpo del mensaje
+	 * @return
+	 */
+	public Mensaje enviarMensaje(Usuario u, String texto) {
+		Mensaje m = new Mensaje(texto, LocalDateTime.now() , this, u);
+		u.recibirMensaje(m);
+		if (mensajesPorUsuario.containsKey(u.getTelefono()))
+			mensajesPorUsuario.get(u.getTelefono()).add(m);
+		else {
+			List<Mensaje> mensajes = new LinkedList<Mensaje>();
+			mensajes.add(m);
+			mensajesPorUsuario.put(u.getTelefono(), mensajes);
+		}
+		return m;
+	}
+	
+	public List<Mensaje> enviarMensajeGrupo(Mensaje m, Grupo g, String texto){
+		return null;
+	}
+	
+	/**
+	 * Se recibe un mensaje, que irá añadido a la lista de recibidos
+	 * 
+	 * @param mensaje
+	 */
+	public void recibirMensaje(Mensaje mensaje) {
+		
+		if (!mensajesPorUsuario.containsKey(mensaje.getEmisor().getTelefono())) {
+			List<Mensaje> mensajes = new LinkedList<Mensaje>();
+			mensajes.add(mensaje);
+			mensajesPorUsuario.put(mensaje.getEmisor().getTelefono(), mensajes);
+			return;
+		}
+		mensajesPorUsuario.get(mensaje.getEmisor().getTelefono()).add(mensaje);
+	}
+	
+	/**
+	 * Se obtiene las conversaciones recientes
+	 * @return
+	 */
+	public List<Mensaje> obtenerConversacionesRecientes(){
+		
+		//Se supone que los mensajes en estas listas está insertado en orden
+		return mensajesPorUsuario.values().stream()
+			    .map(t -> t.get(t.size() - 1)) // Obtenemos el último valor sin hacer cast
+			    .collect(Collectors.toList());		  //Se almacena en una lista
+	}
+	
+	/**
+	 * Se obtiene una conversacion con un usuario solamente obteniendo
+	 * el valor de la calve usuario en el mapa de 
+	 * 
+	 * @param Usuario
+	 * @return Lista de mensajes de la conversacion con el usuario
+	 */
+	public List<Mensaje> obtenerConversacionUsuario(Usuario u){
+		//Se supondrá que la lista está en orden, ya que se insertan
+		if (mensajesPorUsuario.containsKey(u.getTelefono()))
+			return mensajesPorUsuario.get(u.getTelefono());
+		//En caso de que no esté el usuario en el mensaje se pasará una lista vacia
+		return new LinkedList<Mensaje>();
+	}
+	/**
+	 * Se obtiene la conversacion con un grupo
+	 * 
+	 * @param grupo
+	 * @return Lista de mensajes de la conversacion
+	 */
+	public List<Mensaje> obtenerConversacionGrupo(Grupo g){
+		//TODO: Por implementar
+		return null;
+	}
+	/**
+	 * Se obtiene un contacto a partir de un usuario
+	 * @param usuario
+	 * @return Contacto
+	 */
+	public Contacto obtenerContactoUsuario(Usuario u) {
+		return contactos.stream()
+				.filter(c -> c instanceof ContactoIndividual
+						&& ((ContactoIndividual) c).isTelefono(u.getTelefono())) //Contacto que sea ContactoIndividual y qye 
+				.findFirst().get();
+	}
+	
+	public boolean esUsuarioContacto(Usuario u) {
+		return contactos.stream().anyMatch(c -> c instanceof ContactoIndividual
+				&& ((ContactoIndividual) c).isTelefono(u.getTelefono()));
+	}
+	public boolean esEmisor(Mensaje m) {
+		return m.esEmisor(this);
+	}
+	
 	//////////////
 	// MENSAJES //
 	//////////////
+//
+//	/**
+//	 * Se obtiene un teléfono desde Mensaje
+//	 * @param m
+//	 * @return
+//	 */
+//	public String getTelefonoDesdeMensaje(Mensaje3 m) {
+//		//Se devuelve el que no sea 
+//		String tlf = isTelefono(m.getTlfEmisor()) ? m.getTlfReceptor() : m.getTlfEmisor(); 
+//		
+//		if (isTelefono(m.getTlfEmisor()))
+//			return m.getTlfReceptor();
+//		else
+//			return m.getTlfEmisor();
+//	}
+//	/**
+//	 * Devuelve si para un mensaje, es este Usuario el emisor
+//	 * 
+//	 * @param m
+//	 * @return
+//	 */
+//	public boolean esEmisor(Mensaje3 m) {
+//		return m.esEmisor(telefono);
+//	}
+//	
+//	
+//	public ContactoIndividual getContactoDesdeMensaje(Mensaje3 m) {
+//		return getContactoDesdeTelefono(getTelefonoDesdeMensaje(m));
+//	}
+//	
+//	
+//	/**
+//	 * 
+//	 * 
+//	 * @return
+//	 */
+//	public List<Mensaje3> getConversacionGrupo(String nombre){
+//		//Grupo grupo = (Grupo) contactos.stream().filter(g -> g instanceof Grupo && g.isNombre(nombre)).findFirst().get();
+//		//Se toman todos los mensajes de este grupo que 
+//		List<Mensaje3> mensajesGrupo = mensajesEnviados.stream()
+//				.filter(m -> m.esNombreGrupo(nombre))
+//				.sorted((m1, m2) -> m2.getFechaHora().compareTo(m1.getFechaHora()))
+//				.collect(Collectors.toList());
+//		return mensajesGrupo;
+//	}
+//	
+//	public List<Mensaje3> getConversacionFromTelefono(String telefono){
+//		List<Mensaje3> conversacion = new LinkedList<Mensaje3>();
+//		//Se supone que el teléfono está registrado en el
+//		//Todos los mensajes enviados cuyo receptor sea el buscado
+//		List<Mensaje3> enviadosConversacion = mensajesEnviados.stream().filter(m -> m.esReceptor(telefono)).collect(Collectors.toList());
+//		//Todos los mensajes recibidos cuyo emiser sea el buscado
+//		List<Mensaje3> recibidosConversacion = mensajesRecibidos.stream().filter(m -> m.esEmisor(telefono)).collect(Collectors.toList());
+//		
+//		conversacion.addAll(recibidosConversacion);
+//		conversacion.addAll(enviadosConversacion);
+//		
+//		conversacion.stream().sorted((m1, m2) -> m2.getFechaHora().compareTo(m1.getFechaHora())).collect(Collectors.toList());
+//		return conversacion;
+//	}
+//	
+//	public List<Mensaje3> getConversacionFromContacto(Contacto c){
+//		if (c instanceof Grupo)
+//			return getConversacionGrupo(c.getNombre());
+//		return getConversacionFromTelefono(((ContactoIndividual) c).getTelefono());
+//	}
+//	/**
+//	 * Dado un mensaje se obtendrá su 
+//	 * @param mensaje
+//	 * @return
+//	 */
+//	public List<Mensaje3> getConversacionFromMensaje(Mensaje3 mensaje) {
+//		if (mensaje.isGrupo())
+//			return getConversacionGrupo(mensaje.getTlfReceptor());
+//		return getConversacionFromTelefono(getTelefonoDesdeMensaje(mensaje));
+//	}
+//	
+//	/**
+//	 * Se devuelve una lista con el último mensaje por
+//	 * cada conversación.
+//	 * 
+//	 * @return
+//	 */
+//	public List<Mensaje3> obtenerUltimosChats(){
+//		//Se tendrá un conjunto para ir almacenando
+//		Set<String> telefonos = new HashSet<String>();
+//		Set<String> grupos = new HashSet<String>();
+//		
+//		//Se van a recorrer todos los teléfonos e insertando en un set
+//		List<Mensaje3> mensajes = new LinkedList<Mensaje3>(mensajesEnviados);
+//		mensajes.addAll(mensajesRecibidos);
+//		
+//		List<Mensaje3> mensajesDevolver = mensajes.stream().filter(m -> {
+//			if (m.isGrupo()) {
+//				if(grupos.contains(m.getNombreGrupo()))
+//					return false;
+//				else {
+//					grupos.add(m.getNombreGrupo());
+//					return true;
+//				}
+//			} else {
+//				if (telefonos.contains(getTelefonoDesdeMensaje(m)))
+//					return false;
+//				else {
+//					telefonos.add(getTelefonoDesdeMensaje(m));
+//					return true;
+//				}
+//			}
+//		})
+//		.collect(Collectors.toList());
+//		
+//		return mensajesDevolver;
+//	}
+//	
+//	/////////////////////////
+//	/// ENVÍO DE MENSAJES ///
+//	/////////////////////////
+//	
+//	/**
+//	 * Se llama cuando se quiere añadir un mensaje a la
+//	 * lista de enviados
+//	 * 
+//	 * @param mensaje
+//	 */
+//	public void addMensajeEnviados(Mensaje3 mensaje) {
+//		mensajesEnviados.add(mensaje);
+//	}
+//	
+//	
+//	/**
+//	 * Envía un mensaje a un grupo
+//	 * 
+//	 * @param grupo
+//	 * @param texto
+//	 * @return mensaje enviado
+//	 */
+//	public Mensaje3 enviarMensajeGrupo(Grupo grupo, String texto) {
+//		Mensaje3 mensaje = new Mensaje3(texto, LocalDateTime.now(), telefono, grupo.getNombre());
+//		mensaje.setGrupo(true); //Es un mensaje a grupos
+//		addMensajeEnviados(mensaje);
+//		
+//		//Ahora por cada miembro del grupo se le enviará el mensaje individualmente
+//		//TODO: Manera para que sea el grupo el que se encargue de enviar el mensaje a los contactos
+//			for (ContactoIndividual c : grupo.getMiembros()) {
+//				enviarMensajeContacto(c, texto);
+//			}
+//		return mensaje;
+//		}
+//	
+//	/**
+//	 * Envía un mensaje a un ContactoIndividual
+//	 * 
+//	 * @param grupo
+//	 * @param texto
+//	 * @return mensaje enviado
+//	 */
+//	public Mensaje3 enviarMensajeContacto(ContactoIndividual contacto, String texto) {
+//		Mensaje3 mensaje = new Mensaje3(texto, LocalDateTime.now(), telefono, contacto.getTelefono());
+//		contacto.enviarMensaje(mensaje);
+//		addMensajeEnviados(mensaje);
+//		return mensaje;
+//	}
+//	
+//	/**
+//	 * Se envía un mensaje a un contacto
+//	 * 
+//	 * @param contacto
+//	 * @param texto
+//	 * @return mensaje enviado
+//	 */
+//	public Mensaje3 enviarMensaje(Contacto contacto, String texto) {
+//		if (contacto instanceof ContactoIndividual)
+//			return enviarMensajeContacto((ContactoIndividual) contacto, texto);
+//		else //if (contacto instanceof Grupo)
+//			return enviarMensajeGrupo((Grupo) contacto, texto);
+//		
+//		//Caso imposible de que se haya pasado un Objeto contacto que no sea ni individual ni grupo.
+//	}
+//	
+//	/**
+//	 * Se envía el mensaje desde un teléfono
+//	 * 
+//	 * @param telefono
+//	 * @param texto
+//	 * @return Mensaje enviado
+//	 */
+//	public Mensaje3 enviarMensajeTelefono(String telefono, String texto){
+//		if(existeContacto(telefono))
+//			return enviarMensaje(getContactoDesdeTelefono(telefono), texto);
+//		//Se crea el mensaje en caso de que no esté el teléfono registrado en contactos
+//		Mensaje3 m = new Mensaje3(texto, LocalDateTime.now(), this.telefono, telefono);
+//		addMensajeEnviados(m);
+//		return AppChat.getUnicaInstancia().enviarMensajeContactoDesconocido(telefono, m);
+//	}
+//	
+//	///////
+//	// Gestión de contactos
+//	///////
 	
 	/**
-	 * Dado un contacto se obtiene su contacto
+	 * 
+	 * @param telefono
+	 * @return true si el telefono tiene un contacto asociado en este 
+	 */
+	public boolean existeContacto(String telefono) {
+		return contactos.stream().anyMatch(c -> c instanceof ContactoIndividual && ((ContactoIndividual) c).isTelefono(telefono));
+	}
+
+	/**
+	 * Dado un telefono se obtiene su contacto
 	 * 
 	 * @param telefono
 	 * @return
 	 */
 	public ContactoIndividual getContactoDesdeTelefono(String telefono) {
+		if (!existeContacto(telefono))
+			return null;
 		ContactoIndividual contacto = (ContactoIndividual) contactos.stream()
 				.filter(c -> (c instanceof ContactoIndividual) & ((ContactoIndividual) c).isTelefono(telefono))
 				.findFirst().get();
 		return contacto;
 	}
 	
-	public ContactoIndividual getContactoDesdeMensaje(Mensaje m) {
-		return getContactoDesdeTelefono(telefonoDeMensaje(m));
-	}
-	
 	/**
+	 * Se crea un contacto y se añade a la lista de contactos del usuario
 	 * 
-	 * 
-	 * @return
+	 * @param nombre
+	 * @param usuarioActual
+	 * @return devuelve el contacto creado
 	 */
-	public List<Mensaje> getConversacionGrupo(String nombre){
-		//Grupo grupo = (Grupo) contactos.stream().filter(g -> g instanceof Grupo && g.isNombre(nombre)).findFirst().get();
-		//Se toman todos los mensajes de este grupo que 
-		List<Mensaje> mensajesGrupo = mensajesEnviados.stream()
-				.filter(m -> m.esNombreGrupo(nombre))
-				.sorted((m1, m2) -> m2.getFechaHora().compareTo(m1.getFechaHora()))
-				.collect(Collectors.toList());
-		return mensajesGrupo;
-	}
-	
-	public List<Mensaje> getConversacionFromTelefono(String telefono){
-		List<Mensaje> conversacion = new LinkedList<Mensaje>();
-		//Se supone que el teléfono está registrado en el
-		//Todos los mensajes enviados cuyo receptor sea el buscado
-		List<Mensaje> enviadosConversacion = mensajesEnviados.stream().filter(m -> m.esReceptor(telefono)).collect(Collectors.toList());
-		//Todos los mensajes recibidos cuyo emiser sea el buscado
-		List<Mensaje> recibidosConversacion = mensajesRecibidos.stream().filter(m -> m.esEmisor(telefono)).collect(Collectors.toList());
-		
-		conversacion.addAll(recibidosConversacion);
-		conversacion.addAll(enviadosConversacion);
-		
-		conversacion.stream().sorted((m1, m2) -> m2.getFechaHora().compareTo(m1.getFechaHora())).collect(Collectors.toList());
-		return conversacion;
-	}
-	public List<Mensaje> getConversacionFromContacto(Contacto c){
-		if (c instanceof Grupo)
-			return getConversacionGrupo(c.getNombre());
-		return getConversacionFromTelefono(((ContactoIndividual) c).getTelefono());
-	}
-	/**
-	 * Dado un mensaje se obtendrá su 
-	 * @param mensaje
-	 * @return
-	 */
-	public List<Mensaje> getConversacionFromMensaje(Mensaje mensaje) {
-		if (mensaje.isGrupo())
-			return getConversacionGrupo(mensaje.getTlfReceptor());
-		return getConversacionFromTelefono(telefonoDeMensaje(mensaje));
-	}
-
-	private String telefonoDeMensaje(Mensaje m) {
-		//Se devuelve el que no sea 
-		return isTelefono(m.getTlfEmisor()) ? m.getTlfReceptor() : m.getTlfEmisor();
-	}
-	
-	public boolean esEmisor(Mensaje m) {
-		return m.esEmisor(telefono);
-	}
-	public List<Mensaje> obtenerUltimosChats(){
-		//Se tendrá un conjunto para ir almacenando
-		Set<String> telefonos = new HashSet<String>();
-		Set<String> grupos = new HashSet<String>();
-		
-		//Se van a recorrer todos los teléfonos e insertando en un set
-		List<Mensaje> mensajes = new LinkedList<Mensaje>(mensajesEnviados);
-		mensajes.addAll(mensajesRecibidos);
-		
-		List<Mensaje> mensajesDevolver = mensajes.stream().filter(m -> {
-			if (m.isGrupo())
-				if(grupos.contains(m.getNombreGrupo()))
-					return false;
-				else {
-					grupos.add(m.getNombreGrupo());
-					return true;
-				}
-			
-			if (telefonos.contains(m))
-				return false;
-			else {
-				telefonos.add(telefonoDeMensaje(m));
-				return true;
-			}
-		})
-		.collect(Collectors.toList());
-		
-		return mensajesDevolver;
-	}
-	
-	/////////////////////////
-	/// ENVÍO DE MENSAJES ///
-	/////////////////////////
-	
-	public void addMensajeEnviados(Mensaje mensaje) {
-		mensajesEnviados.add(mensaje);
-	}
-	public void recibirMensaje(Mensaje mensaje) {
-		mensajesRecibidos.add(mensaje);
-	}
-	public Mensaje enviarMensajeGrupo(Grupo grupo, String texto) {
-		Mensaje mensaje = new Mensaje(texto, LocalDateTime.now(), telefono, grupo.getNombre());
-		mensaje.setGrupo(true); //Es un mensaje a grupos
-		addMensajeEnviados(mensaje);
-		
-		//Ahora por cada miembro del grupo se le enviará el mensaje individualmente
-		//TODO: Manera para que sea el grupo el que se encargue de enviar el mensaje a los contactos
-		for (ContactoIndividual c : grupo.getMiembros()) {
-			enviarMensajeContacto(c, texto);
-		}
-		return mensaje;}
-	
-	public Mensaje enviarMensajeContacto(ContactoIndividual contacto, String texto) {
-		Mensaje mensaje = new Mensaje(texto, LocalDateTime.now(), telefono, contacto.getTelefono());
-		contacto.enviarMensaje(mensaje);
-		addMensajeEnviados(mensaje);
-		return mensaje;
-	}
-	
-	public Mensaje enviarMensaje(Contacto contacto, String texto) {
-		if (contacto instanceof ContactoIndividual)
-			return enviarMensajeContacto((ContactoIndividual) contacto, texto);
-		else //if (contacto instanceof Grupo)
-			return enviarMensajeGrupo((Grupo) contacto, texto);
-		
-		//Caso imposible de que se haya pasado un Objeto contacto que no sea ni individual ni grupo.
-	}
-//	public Contacto getContactoFromTelefono(String telefono){
-//		ContactoIndividual contacto = (ContactoIndividual) contactos.stream().filter(c -> (c instanceof ContactoIndividual))
-//				.findFirst().get();
-//	}
-	public Mensaje enviarMensajeTelefono(String telefono, String texto){
-		//Se crea el mensaje
-		Mensaje m = new Mensaje(texto, LocalDateTime.now(), this.telefono, telefono);
-		if(existeContacto(telefono))
-			return enviarMensaje(getContactoDesdeTelefono(telefono), texto);
-		//Puede ser que devuelva null
-		return AppChat.getUnicaInstancia().enviarMensajeContactoDesconocido(m);
-	}
-	
-	public Grupo getGrupoFromNombre(String nombre) {
-		//
-		Grupo grupo = (Grupo) contactos.stream().filter(g -> (g instanceof Grupo && g.getNombre().equals(nombre)))
-				.findFirst().get();
-		return grupo;
-	}
-	
-	public boolean hasGrupo(String nombreGrupo) {
-		return contactos.stream().anyMatch(g -> g instanceof Grupo && g.getNombre().equals(nombreGrupo));
-	}
-	
-	public void addGrupo(Grupo g) {
-		contactos.add(g);
-	}
-	
-	public boolean existeContacto(String telefono) {
-		return contactos.stream().anyMatch(c -> c instanceof ContactoIndividual && ((ContactoIndividual) c).isTelefono(telefono));
-	}
-	
 	public ContactoIndividual crearContacto(String nombre, Usuario usuarioActual) {
 
 		ContactoIndividual nuevoContacto = new ContactoIndividual(nombre, usuarioActual.getTelefono(), usuarioActual);
 		addContacto(nuevoContacto);
 		return nuevoContacto;
 	}
+	
+	
+	///////////////////////
+	// Gestión de grupos //
+	///////////////////////
 	
 	public Grupo crearGrupo(String nombreGrupo, String imagen) {
 
@@ -413,6 +597,22 @@ public class Usuario {
 		}
 		return false; 
 	}
+	
+	public Grupo getGrupoFromNombre(String nombre) {
+		//
+		Grupo grupo = (Grupo) contactos.stream().filter(g -> (g instanceof Grupo && g.getNombre().equals(nombre)))
+				.findFirst().get();
+		return grupo;
+	}
+	
+	public boolean hasGrupo(String nombreGrupo) {
+		return contactos.stream().anyMatch(g -> g instanceof Grupo && g.getNombre().equals(nombreGrupo));
+	}
+	
+	public void addGrupo(Grupo g) {
+		contactos.add(g);
+	}
+	
 	/*
 	public void enviarMensaje(Contacto receptor, String contenido) {
         // Crear mensaje y agregarlo a las listas de mensajes
@@ -435,6 +635,11 @@ public class Usuario {
 		}
 	}
 	*/
+	
+	//////////////////////////
+	// Descuentos y premium //
+	//////////////////////////
+	
 	public long getTotalMensajesEnviadosUltimoMes()
 	{
 		//TODO: ¿Debería comprobarse si está en el mismo mes para el descuento la clase
@@ -445,6 +650,7 @@ public class Usuario {
 		
 		return total;
 	}
+	
 	public void comprobarDescuentos() {
 		//TODO: Posibilidad de hacer la comprobación de descuentos
 		//En otra clase, aplicando patrón para que la clase usuario
@@ -467,8 +673,7 @@ public class Usuario {
 	
 	//La realización del pago queda fuera del dominio de esta aplicación
 	//Se supondrá pago correcto para todos los casos.
-	public boolean realizarPago()
-	{
+	public boolean realizarPago() {
 		return true;
 	}
 	

@@ -49,6 +49,13 @@ public class AdaptadorContactoTDS implements IAdaptadorContacto {
 		return null;
 	}
 	
+	/**
+	 * Se modifica un contacto, aquí se utilizará el tipo de
+	 * contacto que existe
+	 * 
+	 * 
+	 * @param contacto
+	 */
 	public void modificarContacto(Contacto contacto) {
 		if (contacto instanceof ContactoIndividual) {
 			adaptadorContactoIndividual.modificarContacto( (ContactoIndividual) contacto);
@@ -56,5 +63,5 @@ public class AdaptadorContactoTDS implements IAdaptadorContacto {
 			adaptadorGrupo.modificarGrupo((Grupo) contacto);
 		}
 	}
-//TODO:
+	//TODO:
 }

@@ -9,7 +9,10 @@ import java.util.List;
 
 import beans.Entidad;
 import beans.Propiedad;
+import tds.appchat.modelo.Grupo;
 import tds.appchat.modelo.Mensaje;
+import tds.appchat.modelo.Mensaje3;
+import tds.appchat.modelo.Usuario;
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;
 
@@ -18,14 +21,17 @@ public class AdaptadorMensajeTDS implements IAdaptadorMensajeDAO {
 	private static ServicioPersistencia servPersistencia;
 	private static AdaptadorMensajeTDS unicaInstancia = null;
 	
+	private static IAdaptadorUsuarioDAO adaptadorUsuario = AdaptadorUsuarioTDS.getUnicaInstancia();
+	private static IAdaptadorGrupoDAO adaptadorGrupo = AdaptadorGrupoTDS.getUnicaInstancia();
 	//Constantes
 	private final static String MENSAJE = "mensaje";
 	
 	private final static String HORA = "hora";
 	private final static String EMOTICONO = "emoticono";
+	private final static String MENSAJE_GRUPO = "mensaje_grupo";
 	private final static String GRUPO = "grupo";
-	private final static String TLF_RECEPTOR = "tlfReceptor";
-	private final static String TLF_EMISOR = "tlfEmisor";
+	private final static String RECEPTOR = "tlfReceptor";
+	private final static String EMISOR = "tlfEmisor";
 	private final static String TEXTO = "texto";
 	
 	public static AdaptadorMensajeTDS getUnicaInstancia() { // patron singleton
@@ -51,14 +57,22 @@ public class AdaptadorMensajeTDS implements IAdaptadorMensajeDAO {
 
 		Propiedad texto = new Propiedad(TEXTO, mensaje.getTexto());
 		Propiedad hora = new Propiedad(HORA, mensaje.getFechaHora().toString());
-		Propiedad emisor = new Propiedad(TLF_EMISOR, mensaje.getTlfEmisor());
-		Propiedad receptor = new Propiedad(TLF_RECEPTOR, mensaje.getTlfReceptor());
-		Propiedad grupo = new Propiedad(GRUPO, Boolean.toString(mensaje.isGrupo()));
 		
-		eMensaje.setPropiedades(new ArrayList<Propiedad>(Arrays.asList(texto, hora, emisor, receptor, grupo)));
+		Propiedad emisor = new Propiedad(EMISOR, Integer.toString(mensaje.getEmisor().getCodigo()));
+		Propiedad receptor = new Propiedad(RECEPTOR, Integer.toString(mensaje.getReceptor().getCodigo()));
+
+		Propiedad mensajeGrupo = new Propiedad(GRUPO, Boolean.toString(mensaje.isMensajeGrupo()));
+		Propiedad grupo;
+		if (mensaje.isMensajeGrupo())
+			 grupo = new Propiedad(MENSAJE_GRUPO, Integer.toString(mensaje.getGrupo().getCodigo()));
+		else
+			//Si no es un mensaje a un grupo, se almacenará como un string vacío
+			grupo = new Propiedad(MENSAJE_GRUPO, "");
+		eMensaje.setPropiedades(new ArrayList<Propiedad>(Arrays.asList(texto, hora, emisor, receptor, grupo, mensajeGrupo)));
 		
 		//Una vez tiene las prioridades escritas
 		eMensaje = servPersistencia.registrarEntidad(eMensaje);
+		
 		mensaje.setCodigo(eMensaje.getId());
 		
 		// Se guarda en el pool
@@ -83,14 +97,16 @@ public class AdaptadorMensajeTDS implements IAdaptadorMensajeDAO {
             // Usamos if-else para cada uno de los atributos
             if (prop.getNombre().equals(HORA)) {
                 prop.setValor(mensaje.getFechaHora().toString());
-            } else if (prop.getNombre().equals(EMOTICONO)) {
-                prop.setValor(Integer.toString(mensaje.getEmoticono()));
+            //} else if (prop.getNombre().equals(EMOTICONO)) {
+            //    prop.setValor(Integer.toString(mensaje.getEmoticono()));
             } else if (prop.getNombre().equals(GRUPO)) {
-                prop.setValor(Boolean.toString(mensaje.isGrupo()));
-            } else if (prop.getNombre().equals(TLF_RECEPTOR)) {
-                prop.setValor(mensaje.getTlfReceptor());
-            } else if (prop.getNombre().equals(TLF_EMISOR)) {
-                prop.setValor(mensaje.getTlfEmisor());
+                prop.setValor(Integer.toString(mensaje.getGrupo().getCodigo()));
+            } else if (prop.getNombre().equals(MENSAJE_GRUPO)) {
+                prop.setValor(Boolean.toString(mensaje.isMensajeGrupo()));
+            } else if (prop.getNombre().equals(RECEPTOR)) {
+                prop.setValor(Integer.toString(mensaje.getReceptor().getCodigo()));
+            } else if (prop.getNombre().equals(EMISOR)) {
+                prop.setValor(Integer.toString(mensaje.getEmisor().getCodigo()));
             } else if (prop.getNombre().equals(TEXTO)) {
                 prop.setValor(mensaje.getTexto());
             }
@@ -107,19 +123,32 @@ public class AdaptadorMensajeTDS implements IAdaptadorMensajeDAO {
 		
 		String texto = servPersistencia.recuperarPropiedadEntidad(eMensaje, TEXTO);
 		LocalDateTime hora = LocalDateTime.parse(servPersistencia.recuperarPropiedadEntidad(eMensaje, HORA));
-		int emoticon = Integer.parseInt(servPersistencia.recuperarPropiedadEntidad(eMensaje, EMOTICONO));
-		String receptor = servPersistencia.recuperarPropiedadEntidad(eMensaje, TLF_RECEPTOR);
-		String emisor = servPersistencia.recuperarPropiedadEntidad(eMensaje, TLF_EMISOR);
-		Boolean grupo = Boolean.parseBoolean(servPersistencia.recuperarPropiedadEntidad(eMensaje, GRUPO));
+		//int emoticon = Integer.parseInt(servPersistencia.recuperarPropiedadEntidad(eMensaje, EMOTICONO));
 
 		
-		Mensaje mensaje = new Mensaje(texto, hora, emisor, receptor);
+		Boolean mensajeGrupo = Boolean.parseBoolean(servPersistencia.recuperarPropiedadEntidad(eMensaje, MENSAJE_GRUPO));
+		
+		//Grupo grupo = adaptadorGrupo.recuperarGrupo(Integer.parseInt(servPersistencia.recuperarPropiedadEntidad(eMensaje, GRUPO)));
+		Grupo grupo = null;
+		
+		Mensaje mensaje = new Mensaje(texto, hora);
+		
 		mensaje.setCodigo(codigo);
 		mensaje.setGrupo(grupo);
-		mensaje.setEmoticono(emoticon);
+		mensaje.setMensajeGrupo(mensajeGrupo);
+		
+		PoolDAO.getInstancia().addObjeto(codigo, mensaje);
+		
+		Usuario receptor = adaptadorUsuario.recuperarUsuario(Integer.parseInt(servPersistencia.recuperarPropiedadEntidad(eMensaje, RECEPTOR)));
+		Usuario emisor = adaptadorUsuario.recuperarUsuario(Integer.parseInt(servPersistencia.recuperarPropiedadEntidad(eMensaje, EMISOR)));
+		
+		mensaje.setEmisor(emisor);
+		mensaje.setReceptor(receptor);
+		
+		//mensaje.setEmoticono(emoticon);
 
 		//Se inserta en el PoolDAO
-		PoolDAO.getInstancia().addObjeto(codigo, mensaje);
+		
 		
 		return mensaje;
 	}

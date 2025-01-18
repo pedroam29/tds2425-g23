@@ -25,7 +25,7 @@ import javax.swing.JButton;
 import javax.swing.border.TitledBorder;
 
 import tds.appchat.controlador.AppChat;
-import tds.appchat.modelo.Mensaje;
+import tds.appchat.modelo.Mensaje3;
 import tds.appchat.modelo.Usuario;
 
 public class VentanaBuscar extends JFrame {
@@ -126,9 +126,9 @@ public class VentanaBuscar extends JFrame {
 		contentPane.add(panelMensajes, BorderLayout.CENTER);
 		panelMensajes.setLayout(new BorderLayout(20, 20));
 		
-		JList<Mensaje> lista = new JList<Mensaje>();
+		JList<Mensaje3> lista = new JList<Mensaje3>();
 		lista.setCellRenderer(new MensajeCellRenderer2());
-		DefaultListModel<Mensaje> modelo = new DefaultListModel<Mensaje>();
+		DefaultListModel<Mensaje3> modelo = new DefaultListModel<Mensaje3>();
 		
 		//TODO: Obtener los datos
 //		Usuario Juan = new Usuario("Juan");
