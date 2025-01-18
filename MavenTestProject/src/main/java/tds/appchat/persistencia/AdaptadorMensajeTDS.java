@@ -1,7 +1,9 @@
 package tds.appchat.persistencia;
 
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -21,8 +23,11 @@ public class AdaptadorMensajeTDS implements IAdaptadorMensajeDAO {
 	private static ServicioPersistencia servPersistencia;
 	private static AdaptadorMensajeTDS unicaInstancia = null;
 	
-	private static IAdaptadorUsuarioDAO adaptadorUsuario = AdaptadorUsuarioTDS.getUnicaInstancia();
-	private static IAdaptadorGrupoDAO adaptadorGrupo = AdaptadorGrupoTDS.getUnicaInstancia();
+	private static IAdaptadorUsuarioDAO adaptadorUsuario;
+	private static IAdaptadorGrupoDAO adaptadorGrupo;
+	
+	private SimpleDateFormat dateFormat; 
+	
 	//Constantes
 	private final static String MENSAJE = "mensaje";
 	
@@ -43,38 +48,38 @@ public class AdaptadorMensajeTDS implements IAdaptadorMensajeDAO {
 
 	private AdaptadorMensajeTDS() {
 		servPersistencia = FactoriaServicioPersistencia.getInstance().getServicioPersistencia();
+		adaptadorUsuario = AdaptadorUsuarioTDS.getUnicaInstancia();
+		adaptadorGrupo = AdaptadorGrupoTDS.getUnicaInstancia();
+		DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	}
-
+	
 	public void registrarMensaje(Mensaje mensaje) {
-		
+		//if (servPersistencia.recuperarEntidad(mensaje.getCodigo()) != null)
+		//	return;
+		//Si no está registrada:
 		Entidad eMensaje = new Entidad();
-
-		// Si la entidad está registrada no la registra de nuevo
-		if (servPersistencia.recuperarEntidad(mensaje.getCodigo()) != null)
-			return;
-		
 		eMensaje.setNombre(MENSAJE);
 
+		//Los atributos del mensaje
 		Propiedad texto = new Propiedad(TEXTO, mensaje.getTexto());
 		Propiedad hora = new Propiedad(HORA, mensaje.getFechaHora().toString());
+		System.out.println("Se inserta: " + mensaje.getFechaHora().toString());
+		Propiedad mensajeGrupo = new Propiedad(MENSAJE_GRUPO, Boolean.toString(mensaje.isMensajeGrupo()));
 		
+		//Si es grupo
+		Propiedad receptor = new Propiedad(RECEPTOR, !mensaje.isMensajeGrupo() ? Integer.toString(mensaje.getReceptor().getCodigo()) : "NA");
 		Propiedad emisor = new Propiedad(EMISOR, Integer.toString(mensaje.getEmisor().getCodigo()));
-		Propiedad receptor = new Propiedad(RECEPTOR, Integer.toString(mensaje.getReceptor().getCodigo()));
-
-		Propiedad mensajeGrupo = new Propiedad(GRUPO, Boolean.toString(mensaje.isMensajeGrupo()));
-		Propiedad grupo;
-		if (mensaje.isMensajeGrupo())
-			 grupo = new Propiedad(MENSAJE_GRUPO, Integer.toString(mensaje.getGrupo().getCodigo()));
-		else
-			//Si no es un mensaje a un grupo, se almacenará como un string vacío
-			grupo = new Propiedad(MENSAJE_GRUPO, "");
-		eMensaje.setPropiedades(new ArrayList<Propiedad>(Arrays.asList(texto, hora, emisor, receptor, grupo, mensajeGrupo)));
 		
-		//Una vez tiene las prioridades escritas
+		Propiedad grupo = new Propiedad(GRUPO, mensaje.isMensajeGrupo() ? Integer.toString(mensaje.getGrupo().getCodigo()) : "NA");
+		
+		eMensaje.setPropiedades(new ArrayList<Propiedad>(Arrays.asList(texto, hora,  receptor, emisor, grupo, mensajeGrupo)));
 		eMensaje = servPersistencia.registrarEntidad(eMensaje);
 		
 		mensaje.setCodigo(eMensaje.getId());
+		System.out.println("SE INSERTA COMO CóDIGO: " + mensaje.getCodigo());
+		//Se inserta le objeto
 		
+
 		// Se guarda en el pool
 		PoolDAO.getInstancia().addObjeto(mensaje.getCodigo(), mensaje);
 	}
@@ -115,40 +120,33 @@ public class AdaptadorMensajeTDS implements IAdaptadorMensajeDAO {
 	
 	public Mensaje recuperarMensaje(int codigo) {
 		
-		//Comprobar si se encuentra en el PoolDAO
+		//Comprobar si se encuentra en el PoolDAO se devuelve
 		if (PoolDAO.getInstancia().contiene(codigo))
 			return (Mensaje) PoolDAO.getInstancia().getObjeto(codigo);
-
+		System.out.println("Codigo: " + Integer.toString(codigo));
 		Entidad eMensaje = servPersistencia.recuperarEntidad(codigo);
-		
 		String texto = servPersistencia.recuperarPropiedadEntidad(eMensaje, TEXTO);
+		//TODO: quitar
+		System.out.println(servPersistencia.recuperarPropiedadEntidad(eMensaje, HORA) + servPersistencia.recuperarPropiedadEntidad(eMensaje, TEXTO));
 		LocalDateTime hora = LocalDateTime.parse(servPersistencia.recuperarPropiedadEntidad(eMensaje, HORA));
-		//int emoticon = Integer.parseInt(servPersistencia.recuperarPropiedadEntidad(eMensaje, EMOTICONO));
-
+		
+		Mensaje mensaje = new Mensaje(texto, hora);
+		mensaje.setCodigo(codigo);
+		PoolDAO.getInstancia().addObjeto(codigo, mensaje);
+		
+		//Una vez insertado en el PoolDao ya se pueden obtener el resto de atributos
 		
 		Boolean mensajeGrupo = Boolean.parseBoolean(servPersistencia.recuperarPropiedadEntidad(eMensaje, MENSAJE_GRUPO));
 		
-		//Grupo grupo = adaptadorGrupo.recuperarGrupo(Integer.parseInt(servPersistencia.recuperarPropiedadEntidad(eMensaje, GRUPO)));
-		Grupo grupo = null;
+		Grupo grupo = mensajeGrupo ? adaptadorGrupo.recuperarGrupo(Integer.parseInt(servPersistencia.recuperarPropiedadEntidad(eMensaje, GRUPO))) : null; 
+		Usuario receptor = !mensajeGrupo ? adaptadorUsuario.recuperarUsuario(Integer.parseInt(servPersistencia.recuperarPropiedadEntidad(eMensaje, RECEPTOR))) : null;
 		
-		Mensaje mensaje = new Mensaje(texto, hora);
-		
-		mensaje.setCodigo(codigo);
-		mensaje.setGrupo(grupo);
-		mensaje.setMensajeGrupo(mensajeGrupo);
-		
-		PoolDAO.getInstancia().addObjeto(codigo, mensaje);
-		
-		Usuario receptor = adaptadorUsuario.recuperarUsuario(Integer.parseInt(servPersistencia.recuperarPropiedadEntidad(eMensaje, RECEPTOR)));
 		Usuario emisor = adaptadorUsuario.recuperarUsuario(Integer.parseInt(servPersistencia.recuperarPropiedadEntidad(eMensaje, EMISOR)));
 		
+		mensaje.setGrupo(grupo);
+		mensaje.setMensajeGrupo(mensajeGrupo);
 		mensaje.setEmisor(emisor);
 		mensaje.setReceptor(receptor);
-		
-		//mensaje.setEmoticono(emoticon);
-
-		//Se inserta en el PoolDAO
-		
 		
 		return mensaje;
 	}

@@ -49,12 +49,7 @@ public class ContactoIndividual extends Contacto{
 		return super.toString();
 	}
 	
-	
-	@Override
-	public List<Mensaje3> getMensajesRecibidos(Optional<Usuario> usuario) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 	//Es el otro usuario el que recibe el mensaje.
 	public void enviarMensaje(Mensaje mensaje) {
 		usuario.recibirMensaje(mensaje);

@@ -118,8 +118,10 @@ public class VentanaPrincipal extends JFrame {
 	 * En el panel central aparecerán los mensajes de la conversación
 	 */
 	private void abrirChat(Mensaje m){
-		//Se obtiene el teléfono del otro participante de la conexión.
-		abrirChat(AppChat.getUnicaInstancia().obtenerUsuarioDesdeMensaje(m));
+		if (m.isMensajeGrupo())
+			abrirChat(m.getGrupo());
+		else
+			abrirChat(AppChat.getUnicaInstancia().obtenerUsuarioDesdeMensaje(m));
 	}
 	
 	private void abrirChat(Usuario u) {
@@ -179,7 +181,6 @@ public class VentanaPrincipal extends JFrame {
 		//Se borra el chat que está actual
 		chat.removeAll();
 		for (Mensaje m : mensajes) {
-			
 			//Se comprueba si se es emisor o receptor, en ese casos se pondrá de un color u otro
 			int tipo = AppChat.getUnicaInstancia().esUsuarioEmisor(m) ? BubbleText.SENT : BubbleText.RECEIVED;
 			Color color = AppChat.getUnicaInstancia().esUsuarioEmisor(m) ? Color.GREEN: Color.GRAY;
@@ -415,34 +416,15 @@ public class VentanaPrincipal extends JFrame {
 				//Que haya una conversacion abierta, de esta manera 
 				String texto = textFieldEnviar.getText();
 				if (!texto.isEmpty()) {
-					//Se comprueba que hay algo en la línea de texto
-					//En este caso hay que hacer un envío, si es a un teléfono
-					//o a un grupo.
-					//Una forma es saber si es conocido el contacto actual, de no serlo:
-					//TODO: Que se borre el textfield
 					BubbleText b;
 					//Si es un grupo lo que está abierto
-					if(esGrupo) {
+					if(esGrupo)
 						AppChat.getUnicaInstancia().enviarMensajeGrupo(grupoSeleccionado, texto);
-					} else {
+					else 
 						AppChat.getUnicaInstancia().enviarMensaje(usuarioSeleccionado, texto);
-					}
-//					
-//					if (!contactoActualConocido) {
-//						//Se envía por teléfono
-//						//TODO: eliminar sysout
-//						System.out.println("El telefono seleccionado es: " + telefonoSeleccionado);
-//						AppChat.getUnicaInstancia().enviarMensaje(telefonoSeleccionado, texto);
-//					} else {
-//						//De otra manera se enviará por contacto
-//						AppChat.getUnicaInstancia().enviarMensaje(contactoSeleccionado.get, texto);
-//					}
-					//AppChat.getUnicaInstancia().enviarMensaje(contactoSeleccionado, getName());
-					//Se añadirá el mensaje a los contactos
+					
 					b = new BubbleText(chat, texto , Color.GREEN, AppChat.getUnicaInstancia().getNombreUsuarioActual() , BubbleText.SENT); 
 					chat.add(b);
-					//Se debería sustituir el mensaje actual para este
-					//Si esta no es el primero de la lista, que se cambie.
 					actualizarListaMensajes();
 				}
 			}

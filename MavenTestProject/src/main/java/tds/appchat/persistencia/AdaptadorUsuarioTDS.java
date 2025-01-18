@@ -18,6 +18,7 @@ import beans.Entidad;
 import beans.Propiedad;
 import tds.appchat.modelo.Contacto;
 import tds.appchat.modelo.Descuento;
+import tds.appchat.modelo.Grupo;
 import tds.appchat.modelo.Mensaje;
 import tds.appchat.modelo.Mensaje3;
 import tds.appchat.modelo.Usuario;
@@ -75,6 +76,7 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 						//new Propiedad("mensajesRecibidos", obtenerCodigosMensajes(usuario.getRecibidos())),
 						//new Propiedad("mensajesEnviados", obtenerCodigosMensajes(usuario.getEnviados())),
 						new Propiedad("mensajes", obtenerCodigosMensajes(usuario.getMensajesPorUsuario())),
+						new Propiedad("mensajesGrupos", obtenerCodigosMensajesGrupos(usuario.getMensajesGrupos())),
 						new Propiedad("contactos", obtenerCodigosContactos(usuario.getContactos())))));
 
 		// registrar entidad usuario
@@ -121,6 +123,8 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 			//  prop.setValor(obtenerCodigosMensajes(usuario.getEnviados()));
 			} else if(prop.getNombre().equals("mensajes")) {
 				prop.setValor(obtenerCodigosMensajes(usuario.getMensajesPorUsuario()));
+			} else if(prop.getNombre().equals("mensajesGrupos")) {
+				prop.setValor(obtenerCodigosMensajesGrupos(usuario.getMensajesGrupos()));
 			} else if(prop.getNombre().equals("contactos")) {
 				prop.setValor(obtenerCodigosContactos(usuario.getContactos()));
 			}
@@ -144,10 +148,9 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		Descuento descuento;
 		Boolean premium;
 		
-		List<Mensaje3> recibidos = null;
-		List<Mensaje3> enviados = null;
-		
 		HashMap<String, List<Mensaje>> mensajes;
+		HashMap<Grupo, List<Mensaje>> mensajesGrupo;
+		
 		List<Contacto> contactos;
 
 		eUsuario = servPersistencia.recuperarEntidad(codigo);
@@ -174,11 +177,13 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		PoolDAO.getInstancia().addObjeto(codigo, usr);
 		
 		mensajes = obtenerMensajesCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "mensajes"));
+		mensajesGrupo = obtenerMensajesGruposCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "mensajesGrupos"));
 		
 		usr.setDescuento(descuento);
 		usr.setContactos(contactos);
 		usr.setPremium(premium);
 		usr.setCodigo(codigo);
+		usr.setMensajesGrupos(mensajesGrupo);
 		//usr.setEnviados(enviados);
 		//usr.setRecibidos(recibidos);
 		usr.setMensajesPorUsuario(mensajes);
@@ -226,9 +231,11 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		if (!mensajes.isEmpty()) {
 			for (String mensaje : mensajes.split(SEPARADOR_USUARIOS)) {
 				String[] mensajesPorUsuario = mensaje.split(SEPARADOR_USUARIO_MENSAJES);
-				System.out.println("Falla por: " + mensajesPorUsuario[0]);
+				System.out.println("Falla por: " + mensajesPorUsuario[0] + " Mensajes: " + mensajesPorUsuario[1].split(SEPARADOR_MENSAJES));
 				//Usuario u = adaptadorUsuario.recuperarUsuario(Integer.parseInt(mensajesPorUsuario[0]));
 				String tlf = mensajesPorUsuario[0];
+				System.out.println("Primer mensaje: " + mensajesPorUsuario[1].split(SEPARADOR_MENSAJES)[0]);
+				System.out.println("Resultado mensaje: " + adaptadorMensaje.recuperarMensaje(Integer.parseInt(mensajesPorUsuario[1].split(SEPARADOR_MENSAJES)[0])));
 				List<Mensaje> msg = Arrays.stream(mensajesPorUsuario[1].split(SEPARADOR_MENSAJES))
 						.map(m -> adaptadorMensaje.recuperarMensaje(Integer.parseInt(m))).collect(Collectors.toList());
 				mapaMensajes.put(tlf, msg);
@@ -236,6 +243,46 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		}
 	    return mapaMensajes;
 	}
+	
+	/**
+	 * A partir de una lista de mensajes se obtiene un string con
+	 * sus códigos separados por SEPARADOR_MENSAJES
+	 * 
+	 * @param mensajes
+	 * @return
+	 */
+	private String obtenerCodigosMensajesGrupos(HashMap<Grupo,List<Mensaje>> mensajes) {
+		String stringMensajes = mensajes.entrySet().stream()
+			.map(e ->
+			Integer.toString(e.getKey().getCodigo())
+			+ SEPARADOR_USUARIO_MENSAJES +
+				e.getValue().stream()
+				.map(m -> Integer.toString(m.getCodigo()))
+				.collect(Collectors.joining(SEPARADOR_MENSAJES))			
+			).collect(Collectors.joining(SEPARADOR_USUARIOS));
+		
+	    return stringMensajes;
+	}
+	
+	private HashMap<Grupo,List<Mensaje>> obtenerMensajesGruposCodigos(String mensajes) {
+		AdaptadorMensajeTDS adaptadorMensaje = AdaptadorMensajeTDS.getUnicaInstancia();
+		AdaptadorGrupoTDS adaptadorGrupo = AdaptadorGrupoTDS.getUnicaInstancia();
+		
+		HashMap<Grupo,List<Mensaje>> mapaMensajes = new HashMap<Grupo, List<Mensaje>>();
+		if (!mensajes.isEmpty()) {
+			for (String mensaje : mensajes.split(SEPARADOR_USUARIOS)) {
+				String[] mensajesPorGrupo = mensaje.split(SEPARADOR_USUARIO_MENSAJES);
+				//Usuario u = adaptadorUsuario.recuperarUsuario(Integer.parseInt(mensajesPorUsuario[0]));
+				Grupo g = adaptadorGrupo.recuperarGrupo(Integer.parseInt(mensajesPorGrupo[0]));
+				List<Mensaje> msg = Arrays.stream(mensajesPorGrupo[1].split(SEPARADOR_MENSAJES))
+						.map(m -> adaptadorMensaje.recuperarMensaje(Integer.parseInt(m))).collect(Collectors.toList());
+				mapaMensajes.put(g, msg);
+			}
+		}
+	    return mapaMensajes;
+	}
+	
+	
 	/**
 	 * Dadao un String de códigos de mensajes devuelve
 	 * una lista con mensajes.

@@ -49,13 +49,7 @@ public class Grupo extends Contacto{
 
 	@Override
 	public String toString() {
-		return super.toString() + "\nMiembros " + miembros;
-	}
-
-	@Override
-	public List<Mensaje3> getMensajesRecibidos(Optional<Usuario> usuario) {
-		// TODO Auto-generated method stub
-		return null;
+		return super.toString();
 	}
 
 	

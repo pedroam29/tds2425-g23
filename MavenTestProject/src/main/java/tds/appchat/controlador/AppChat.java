@@ -314,7 +314,6 @@ public class AppChat {
 		//usuarioActual.hasContactoIndividual(contacto) && !grupo.contieneContacto(contacto)
 		if(usuarioActual.addIntegranteGrupo(grupo, contacto)){
 			adaptadorGrupo.modificarGrupo(grupo);
-		
 			//Valor de retorno para que sea más facil a la hora de hacer la vista
 			return true;
 		}
@@ -353,7 +352,7 @@ public class AppChat {
 //		return usuarioActual.getTelefonoDesdeMensaje(m);
 //	}
 	
-	public Contacto obtenerContactoMensaje(Mensaje3 m) {
+	public Contacto obtenerContactoMensaje(Mensaje m) {
 		return usuarioActual.getContactoDesdeTelefono(getTelefonoUsuarioActual());
 	}
 	/**
@@ -529,13 +528,16 @@ public class AppChat {
 	 */
 	public Mensaje enviarMensajeGrupo(Grupo g, String texto) {
 		Mensaje mensajeEmisor = new Mensaje(texto, LocalDateTime.now(), usuarioActual, g);
-		//Cada mensaje
+		//Cada mensaje que se envia a cada integrante del grupo
 		List<Mensaje> mensajesEnviados = usuarioActual.enviarMensajeGrupo(mensajeEmisor,g,texto);
+		adaptadorMensaje.registrarMensaje(mensajeEmisor);
+		//Se obtiene una lista para facilitar la persistencia de mensajes
 		mensajesEnviados.stream().forEach(m -> {
 			adaptadorMensaje.registrarMensaje(m);
 			//Por cada mensaje se modifica su receptor
 			adaptadorUsuario.modificarUsuario(m.getReceptor());
 		});
+		adaptadorUsuario.modificarUsuario(usuarioActual);
 		return mensajeEmisor;
 	}
 	

@@ -33,95 +33,74 @@ import tds.appchat.modelo.Usuario;
 
 public class MensajeCellRenderer extends JPanel
 		implements ListCellRenderer<Mensaje>{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	private JLabel nameLabel;
-	private JLabel imageLabel;
-	private JLabel messageLabel;
-	private JButton botonAgregarContacto;
 
-	private JPanel panelBoton;
-	
-	public MensajeCellRenderer() {
-		setLayout(new BorderLayout(5, 5));
+		private static final long serialVersionUID = 1L;
+		
+		private JLabel imageLabel = new JLabel();
+	    private JLabel nameLabel = new JLabel();
+	    private JLabel messageLabel = new JLabel();
+	    private JButton botonAgregarContacto = new JButton("Add");
 
-		nameLabel = new JLabel();
-		imageLabel = new JLabel();
-		messageLabel = new JLabel();
+	    public MensajeCellRenderer() {
+	        setLayout(new BorderLayout(5, 5));
+	        JPanel panelCentral = new JPanel(new BorderLayout());
+	        panelCentral.add(nameLabel, BorderLayout.NORTH);
+	        panelCentral.add(messageLabel, BorderLayout.CENTER);
+	        add(imageLabel, BorderLayout.WEST);
+	        add(panelCentral, BorderLayout.CENTER);
+	        add(botonAgregarContacto, BorderLayout.EAST);
 
-		JPanel panelTexto = new JPanel(new BorderLayout());
-		panelBoton = new JPanel(new BorderLayout());
-		
-		panelTexto.add(nameLabel, BorderLayout.NORTH);
-		panelTexto.add(messageLabel, BorderLayout.SOUTH);
-		
-		
-		
-		
-		add(panelBoton, BorderLayout.EAST);
-		add(panelTexto, BorderLayout.CENTER);
+	        botonAgregarContacto.addActionListener(new ActionListener() {
+	            @Override
+	            public void actionPerformed(ActionEvent e) {
+	                String telefono = (String) botonAgregarContacto.getClientProperty("telefono");
+	                if (telefono != null) {
+	                    VentanaRegistrarContactoDeMensaje ventana = new VentanaRegistrarContactoDeMensaje(telefono);
+	                    ventana.setVisible(true);
+	                }
+	            }
+	        });
+	    }
 
-		
-	}
-	
-	@Override
-	public Component getListCellRendererComponent(JList<? extends Mensaje> list, Mensaje mensaje, int index,
-			boolean isSelected, boolean cellHasFocus) {
-		
-		//Si es un mensaje a un grupo es que es un grupo, por tanto se pondrá una imagen de un grupo
-		if (mensaje.isMensajeGrupo()) {
-			//TODO: Cambiar la funcion del reescalado de fotos
-			imageLabel.setIcon(new ImageIcon(AppChat.obtenerImagenPerfilUrl(40, 40,  mensaje.getGrupo().getUrlImagen())));
-			messageLabel.setText(mensaje.getTexto());
-			nameLabel.setText(mensaje.getGrupo().getNombre());
-		} else {
-			Usuario usr = AppChat.getUnicaInstancia().obtenerUsuarioDesdeMensaje(mensaje);
-			//En caso de que no sea un grupo se realizará por el usuario del otro extremo.
-			imageLabel.setIcon(new ImageIcon(AppChat.getUnicaInstancia().obtenerUsuarioDesdeMensaje(mensaje).getImagen()));
-			add(imageLabel, BorderLayout.WEST);
-			messageLabel.setText(mensaje.getTexto());
-			
-			if (AppChat.getUnicaInstancia().esUsuarioContacto(usr)){			{
-				nameLabel.setText(usr.getTelefono());
-				panelBoton.add(botonAgregarContacto, BorderLayout.CENTER);
-				botonAgregarContacto.setText("Add");
-				botonAgregarContacto.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						VentanaRegistrarContactoDeMensaje v = new VentanaRegistrarContactoDeMensaje(usr.getTelefono());
-						v.setVisible(true);
-					}
-				});
-			}
-		}
-		
-			
-		
+	    @Override
+	    public Component getListCellRendererComponent(JList<? extends Mensaje> list, Mensaje mensaje, int index,
+	                                                  boolean isSelected, boolean cellHasFocus) {
+	        if (mensaje.isMensajeGrupo()) {
+	            imageLabel.setIcon(new ImageIcon(AppChat.obtenerImagenPerfilUrl(40, 40, mensaje.getGrupo().getUrlImagen())));
+	            nameLabel.setText(mensaje.getGrupo().getNombre());
+	            messageLabel.setText(mensaje.getTexto());
+	            botonAgregarContacto.setVisible(false);
+	        } else {
+	            Usuario usr = AppChat.getUnicaInstancia().obtenerUsuarioDesdeMensaje(mensaje);
+	            imageLabel.setIcon(new ImageIcon(usr.getImagen().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
+	            nameLabel.setText(usr.getTelefono());
+	            messageLabel.setText(mensaje.getTexto());
 
-		}
-		new ImageIcon(MensajeCellRenderer.class.getResource("/"));	
-		// Set background and foreground based on selection
-		if (isSelected) {
-			setBackground(list.getSelectionBackground());
-			setForeground(list.getSelectionForeground());
-			//panelTexto.setBackground
-			
-		} else {
-			setBackground(list.getBackground());
-			setForeground(list.getForeground());
-		}
+	            if (!AppChat.getUnicaInstancia().esUsuarioContacto(usr)) {
+	                botonAgregarContacto.setVisible(true);
+	                botonAgregarContacto.putClientProperty("telefono", usr.getTelefono());
+	            } else {
+	                botonAgregarContacto.setVisible(false);
+	                ContactoIndividual c = (ContactoIndividual) AppChat.getUnicaInstancia().obtenerContactoUsuario(usr);
+	                nameLabel.setText(c.getNombre());
+	            }
+	        }
 
-		return this;
-	}
-	
+	        if (isSelected) {
+	            setBackground(list.getSelectionBackground());
+	            setForeground(list.getSelectionForeground());
+	        } else {
+	            setBackground(list.getBackground());
+	            setForeground(list.getForeground());
+	        }
+
+	        return this;
+	    }
+
 	protected class VentanaRegistrarContactoDeMensaje extends JFrame {
 		private static final long serialVersionUID = 1L;
 		private JPanel contentPane;
 		private JTextField textField_nombre;
-		private JTextField textField_telf;
 
 		/**
 		 * Create the frame.
@@ -186,7 +165,6 @@ public class MensajeCellRenderer extends JPanel
 			gbc_textField_telf.gridx = 2;
 			gbc_textField_telf.gridy = 3;
 			panel_1.add(lblTelefonoEscrito, gbc_textField_telf);
-			textField_telf.setColumns(10);
 			
 			/**
 			 * Botón aeceptar: 
@@ -215,13 +193,11 @@ public class MensajeCellRenderer extends JPanel
 			
 			btnAceptar.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					ContactoIndividual contacto = AppChat.getUnicaInstancia().crearContacto(textField_nombre.getText(), textField_telf.getText());
+					ContactoIndividual contacto = AppChat.getUnicaInstancia().crearContacto(textField_nombre.getText(), telefono);
+					
 					if(contacto!=null) {
 						JOptionPane.showMessageDialog(VentanaRegistrarContactoDeMensaje.this, "Contacto añadido exitosamente", "Info",
 								JOptionPane.INFORMATION_MESSAGE);
-					}else if(!AppChat.getUnicaInstancia().existeTelefono(textField_telf.getText())){
-						JOptionPane.showMessageDialog(VentanaRegistrarContactoDeMensaje.this, "El contacto no se pudo añadir porque no existe el número de telefono", "Error",
-								JOptionPane.ERROR_MESSAGE);
 					} else {
 						JOptionPane.showMessageDialog(VentanaRegistrarContactoDeMensaje.this, "Este teléfono ya existe en el sistema", "Info",
 								JOptionPane.ERROR_MESSAGE);

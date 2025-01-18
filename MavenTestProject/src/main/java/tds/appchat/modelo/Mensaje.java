@@ -20,7 +20,7 @@ public class Mensaje {
 	
 	
 	//En caso de que sea mensaje a grupo
-	//Se utilizarán estos atributos
+	//Se utilizarán estos atributosadaptadorMensaje
 	private boolean mensajeGrupo;
 	private Grupo grupo;
 	
