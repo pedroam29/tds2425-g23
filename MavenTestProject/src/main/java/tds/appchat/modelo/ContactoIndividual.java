@@ -4,6 +4,8 @@ import java.awt.Image;
 import java.util.List;
 import java.util.Optional;
 
+
+
 public class ContactoIndividual extends Contacto{
 
 	private String telefono;
@@ -59,5 +61,9 @@ public class ContactoIndividual extends Contacto{
 	public void enviarMensaje(Mensaje mensaje) {
 		usuario.recibirMensaje(mensaje);
 		
+	}
+
+	public boolean isUser(Usuario otroUsuario) {
+		return usuario.equals(otroUsuario);
 	}
 }

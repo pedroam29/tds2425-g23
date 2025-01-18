@@ -27,6 +27,8 @@ import javax.swing.border.TitledBorder;
 import tds.appchat.controlador.AppChat;
 import tds.appchat.modelo.Mensaje3;
 import tds.appchat.modelo.Usuario;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class VentanaBuscar extends JFrame {
 
@@ -117,6 +119,25 @@ public class VentanaBuscar extends JFrame {
 		textField_2.setColumns(10);
 		
 		button = new JButton("Buscar");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JList<Mensaje3> lista = new JList<Mensaje3>();
+				lista.setCellRenderer(new MensajeCellRenderer2());
+				DefaultListModel<Mensaje3> modelo = new DefaultListModel<Mensaje3>();
+				
+				//TODO: Obtener los datos
+
+				List<Mensaje3> mensajes = AppChat.getUnicaInstancia().buscarMensajes(textField_1.getText(), textField_2.getText(), txtTexto.getText());
+						
+				//Conversión manual de List<Mensaje> a DefaultListModel<Mensaje> 
+				for(Mensaje3 mensaje: mensajes) {
+					modelo.addElement(mensaje);
+				}
+				lista.setModel(modelo);
+				
+				panelMensajes.add(new JScrollPane(lista), BorderLayout.CENTER);
+			}
+		});
 		GridBagConstraints gbc_button = new GridBagConstraints();
 		gbc_button.gridx = 2;
 		gbc_button.gridy = 2;
@@ -126,25 +147,7 @@ public class VentanaBuscar extends JFrame {
 		contentPane.add(panelMensajes, BorderLayout.CENTER);
 		panelMensajes.setLayout(new BorderLayout(20, 20));
 		
-		JList<Mensaje3> lista = new JList<Mensaje3>();
-		lista.setCellRenderer(new MensajeCellRenderer2());
-		DefaultListModel<Mensaje3> modelo = new DefaultListModel<Mensaje3>();
 		
-		//TODO: Obtener los datos
-//		Usuario Juan = new Usuario("Juan");
-//		Usuario Maria = new Usuario("Maria");
-//		Mensaje m1 = new Mensaje("Hola", Juan, Maria);
-//		Mensaje m2 = new Mensaje("Adios", Maria, Juan);
-//		List<Mensaje> mensajes = new LinkedList<>();	
-//		mensajes.add(m1);
-//		mensajes.add(m2);			
-//		//Conversión manual de List<Mensaje> a DefaultListModel<Mensaje> 
-//		for(Mensaje mensaje: mensajes) {
-//			modelo.addElement(mensaje);
-//		}
-//		lista.setModel(modelo);
-//		
-		panelMensajes.add(new JScrollPane(lista), BorderLayout.CENTER);
 		
 	}
 
