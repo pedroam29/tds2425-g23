@@ -9,10 +9,10 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
-import tds.appchat.modelo.Mensaje3;
+import tds.appchat.modelo.Mensaje;
 
 public class MensajeCellRenderer2 extends JPanel
-implements ListCellRenderer<Mensaje3>{
+implements ListCellRenderer<Mensaje>{
 	private JLabel emisorLabel;
 	private JLabel receptorLabel;
 	private JLabel textLabel;
@@ -32,10 +32,10 @@ implements ListCellRenderer<Mensaje3>{
 	}
 	
 	@Override
-	public Component getListCellRendererComponent(JList<? extends Mensaje3> list, Mensaje3 mensaje, int index,
+	public Component getListCellRendererComponent(JList<? extends Mensaje> list, Mensaje mensaje, int index,
 			boolean isSelected, boolean cellHasFocus) {
-		emisorLabel.setText(mensaje.getTlfEmisor());
-		receptorLabel.setText(mensaje.getTlfReceptor());
+		emisorLabel.setText(mensaje.getEmisor().getTelefono());
+		receptorLabel.setText(mensaje.getEmisor().getTelefono());
 		textLabel.setText(mensaje.getTexto());
 
 		if (isSelected) {

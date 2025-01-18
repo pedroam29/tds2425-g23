@@ -38,6 +38,12 @@ public class Mensaje {
 	public void setTexto(String texto) {
 		this.texto = texto;
 	}
+	public int getEmoticono() {
+		return this.emoticono;
+	}
+	public void setEmoticono(int emoticono) {
+		this.emoticono = emoticono;
+	}
 	public Usuario getEmisor() {
 		return emisor;
 	}
@@ -72,6 +78,9 @@ public class Mensaje {
 	public boolean esEmisor(Usuario u) {
 		return emisor.equals(u);
 	}
+	public boolean esTextoEmoticono() {
+		return this.texto.isEmpty();
+	}
 	
 	public Mensaje(String texto, LocalDateTime fechaHora) {
 		this.texto = texto;
@@ -94,4 +103,23 @@ public class Mensaje {
 		this.grupo = g;
 		mensajeGrupo = true;
 	}
+	
+	public Mensaje(int emoticono, LocalDateTime fechaHora, Usuario emisor, Usuario receptor) {
+		this.texto = "";
+		this.emoticono = emoticono;
+		this.fechaHora = fechaHora;
+		this.emisor = emisor;
+		this.receptor = receptor;
+		mensajeGrupo = false;
+	}
+	
+	public Mensaje(int emoticono, LocalDateTime fechaHora, Usuario emisor, Grupo g) {
+		this.texto = "";
+		this.emoticono = emoticono;
+		this.fechaHora = fechaHora;
+		this.emisor = emisor;
+		this.grupo = g;
+		mensajeGrupo = true;
+	}
+	
 }

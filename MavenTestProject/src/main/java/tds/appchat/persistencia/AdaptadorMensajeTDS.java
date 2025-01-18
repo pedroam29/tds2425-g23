@@ -13,7 +13,6 @@ import beans.Entidad;
 import beans.Propiedad;
 import tds.appchat.modelo.Grupo;
 import tds.appchat.modelo.Mensaje;
-import tds.appchat.modelo.Mensaje3;
 import tds.appchat.modelo.Usuario;
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;
@@ -63,6 +62,8 @@ public class AdaptadorMensajeTDS implements IAdaptadorMensajeDAO {
 		//Los atributos del mensaje
 		Propiedad texto = new Propiedad(TEXTO, mensaje.getTexto());
 		Propiedad hora = new Propiedad(HORA, mensaje.getFechaHora().toString());
+		Propiedad emoticono = new Propiedad(EMOTICONO, Integer.toString(mensaje.getEmoticono()));
+		
 		System.out.println("Se inserta: " + mensaje.getFechaHora().toString());
 		Propiedad mensajeGrupo = new Propiedad(MENSAJE_GRUPO, Boolean.toString(mensaje.isMensajeGrupo()));
 		
@@ -72,7 +73,7 @@ public class AdaptadorMensajeTDS implements IAdaptadorMensajeDAO {
 		
 		Propiedad grupo = new Propiedad(GRUPO, mensaje.isMensajeGrupo() ? Integer.toString(mensaje.getGrupo().getCodigo()) : "NA");
 		
-		eMensaje.setPropiedades(new ArrayList<Propiedad>(Arrays.asList(texto, hora,  receptor, emisor, grupo, mensajeGrupo)));
+		eMensaje.setPropiedades(new ArrayList<Propiedad>(Arrays.asList(texto, hora, emoticono, receptor, emisor, grupo, mensajeGrupo)));
 		eMensaje = servPersistencia.registrarEntidad(eMensaje);
 		
 		mensaje.setCodigo(eMensaje.getId());
@@ -114,6 +115,8 @@ public class AdaptadorMensajeTDS implements IAdaptadorMensajeDAO {
                 prop.setValor(Integer.toString(mensaje.getEmisor().getCodigo()));
             } else if (prop.getNombre().equals(TEXTO)) {
                 prop.setValor(mensaje.getTexto());
+            } else if (prop.getNombre().equals(EMOTICONO)) {
+                prop.setValor(Integer.toString(mensaje.getEmoticono()));
             }
         }	
 	}
@@ -123,19 +126,19 @@ public class AdaptadorMensajeTDS implements IAdaptadorMensajeDAO {
 		//Comprobar si se encuentra en el PoolDAO se devuelve
 		if (PoolDAO.getInstancia().contiene(codigo))
 			return (Mensaje) PoolDAO.getInstancia().getObjeto(codigo);
-		System.out.println("Codigo: " + Integer.toString(codigo));
+		
 		Entidad eMensaje = servPersistencia.recuperarEntidad(codigo);
+		
 		String texto = servPersistencia.recuperarPropiedadEntidad(eMensaje, TEXTO);
-		//TODO: quitar
-		System.out.println(servPersistencia.recuperarPropiedadEntidad(eMensaje, HORA) + servPersistencia.recuperarPropiedadEntidad(eMensaje, TEXTO));
 		LocalDateTime hora = LocalDateTime.parse(servPersistencia.recuperarPropiedadEntidad(eMensaje, HORA));
 		
 		Mensaje mensaje = new Mensaje(texto, hora);
 		mensaje.setCodigo(codigo);
+		
 		PoolDAO.getInstancia().addObjeto(codigo, mensaje);
 		
 		//Una vez insertado en el PoolDao ya se pueden obtener el resto de atributos
-		
+		int emoticono = Integer.parseInt(servPersistencia.recuperarPropiedadEntidad(eMensaje, EMOTICONO));
 		Boolean mensajeGrupo = Boolean.parseBoolean(servPersistencia.recuperarPropiedadEntidad(eMensaje, MENSAJE_GRUPO));
 		
 		Grupo grupo = mensajeGrupo ? adaptadorGrupo.recuperarGrupo(Integer.parseInt(servPersistencia.recuperarPropiedadEntidad(eMensaje, GRUPO))) : null; 
@@ -147,6 +150,7 @@ public class AdaptadorMensajeTDS implements IAdaptadorMensajeDAO {
 		mensaje.setMensajeGrupo(mensajeGrupo);
 		mensaje.setEmisor(emisor);
 		mensaje.setReceptor(receptor);
+		mensaje.setEmoticono(emoticono);
 		
 		return mensaje;
 	}

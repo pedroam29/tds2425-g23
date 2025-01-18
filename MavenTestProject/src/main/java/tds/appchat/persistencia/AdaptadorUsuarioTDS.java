@@ -20,7 +20,6 @@ import tds.appchat.modelo.Contacto;
 import tds.appchat.modelo.Descuento;
 import tds.appchat.modelo.Grupo;
 import tds.appchat.modelo.Mensaje;
-import tds.appchat.modelo.Mensaje3;
 import tds.appchat.modelo.Usuario;
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;

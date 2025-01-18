@@ -17,7 +17,6 @@ import tds.appchat.controlador.AppChat;
 import tds.appchat.modelo.Contacto;
 import tds.appchat.modelo.ContactoIndividual;
 import tds.appchat.modelo.Grupo;
-import tds.appchat.modelo.Mensaje3;
 import tds.appchat.modelo.Usuario;
 
 import java.awt.BorderLayout;

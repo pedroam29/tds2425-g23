@@ -25,7 +25,7 @@ import javax.swing.JButton;
 import javax.swing.border.TitledBorder;
 
 import tds.appchat.controlador.AppChat;
-import tds.appchat.modelo.Mensaje3;
+import tds.appchat.modelo.Mensaje;
 import tds.appchat.modelo.Usuario;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -121,16 +121,14 @@ public class VentanaBuscar extends JFrame {
 		button = new JButton("Buscar");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JList<Mensaje3> lista = new JList<Mensaje3>();
+				JList<Mensaje> lista = new JList<Mensaje>();
 				lista.setCellRenderer(new MensajeCellRenderer2());
-				DefaultListModel<Mensaje3> modelo = new DefaultListModel<Mensaje3>();
+				DefaultListModel<Mensaje> modelo = new DefaultListModel<Mensaje>();
 				
-				//TODO: Obtener los datos
-
-				List<Mensaje3> mensajes = AppChat.getUnicaInstancia().buscarMensajes(textField_1.getText(), textField_2.getText(), txtTexto.getText());
+				List<Mensaje> mensajes = AppChat.getUnicaInstancia().buscarMensajes(textField_1.getText(), textField_2.getText(), txtTexto.getText());
 						
 				//Conversión manual de List<Mensaje> a DefaultListModel<Mensaje> 
-				for(Mensaje3 mensaje: mensajes) {
+				for(Mensaje mensaje: mensajes) {
 					modelo.addElement(mensaje);
 				}
 				lista.setModel(modelo);

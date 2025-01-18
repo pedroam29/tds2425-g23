@@ -216,6 +216,10 @@ public class Usuario {
 				.anyMatch(c -> c instanceof ContactoIndividual && ((ContactoIndividual) c).isTelefono(telefono));
 	}
 	
+	public Optional<Contacto> obtenerContactoPorNombre(String nombreContacto) {
+		Optional<Contacto> contacto = contactos.stream().filter(c -> c.isNombre(nombreContacto)).findFirst();
+		return contacto;
+	}
 	
 	//////////////
 	// MENSAJES //
@@ -246,11 +250,30 @@ public class Usuario {
 	}
 	
 	/**
+	 * Se envia de tipo emoticono un mensaje a partir de un usuario
+	 * @param Usuario usuario receptor
+	 * @param Texto cuerpo del mensaje
+	 * @return
+	 */
+	public Mensaje enviarMensaje(Usuario u, int emoticono) {
+		Mensaje m = new Mensaje(emoticono, LocalDateTime.now() , this, u);
+		u.recibirMensaje(m);
+		if (mensajesPorUsuario.containsKey(u.getTelefono()))
+			mensajesPorUsuario.get(u.getTelefono()).add(m);
+		else {
+			List<Mensaje> mensajes = new LinkedList<Mensaje>();
+			mensajes.add(m);
+			mensajesPorUsuario.put(u.getTelefono(), mensajes);
+		}
+		return m;
+	}
+	
+	/**
 	 * 
 	 * @param Mensaje que envia el usuario al grupo.
 	 * 
 	 * @param Grupo al que enviar
-	 * @param texto: cuerpo del mensaje
+	 * @param emoticono: emoticono identificado por int
 	 * @return Lista de los mensajes individuales que se le ha mandado a cada integrante del grupo
 	 */
 	public List<Mensaje> enviarMensajeGrupo(Mensaje m, Grupo g, String texto){
@@ -265,6 +288,30 @@ public class Usuario {
 		//Mensajes que se envian a un grupo
 		List<Mensaje> mensajes = g.getMiembros().stream()	//Se hace un stream de los contactos
 												.map(c -> enviarMensaje(c.getUsuario(), texto)) //Se envia mensaje 
+												.collect(Collectors.toList());	//Se almaena como lista
+		return mensajes;
+	}
+	
+	/**
+	 * 
+	 * @param Mensaje que envia el usuario al grupo.
+	 * 
+	 * @param Grupo al que enviar
+	 * @param emoticono: emoticono identificado por int
+	 * @return Lista de los mensajes individuales que se le ha mandado a cada integrante del grupo
+	 */
+	public List<Mensaje> enviarMensajeGrupo(Mensaje m, Grupo g, int emoticono){
+		if(mensajesGrupos.containsKey(g)) {
+			mensajesGrupos.get(g).add(m);
+		} else {
+			List<Mensaje> msjGrupo = new LinkedList<Mensaje>();
+			msjGrupo.add(m);
+			mensajesGrupos.put(g, msjGrupo);
+		}
+		
+		//Mensajes que se envian a un grupo
+		List<Mensaje> mensajes = g.getMiembros().stream()	//Se hace un stream de los contactos
+												.map(c -> enviarMensaje(c.getUsuario(), emoticono)) //Se envia mensaje 
 												.collect(Collectors.toList());	//Se almaena como lista
 		return mensajes;
 	}
@@ -345,6 +392,13 @@ public class Usuario {
 				.filter(c -> c instanceof ContactoIndividual
 						&& ((ContactoIndividual) c).isTelefono(u.getTelefono())) //Contacto que sea ContactoIndividual y qye 
 				.findFirst().get();
+	}
+	
+	public List<Mensaje> obtenerMensajesContacto(Contacto c){
+		if (c instanceof Grupo)
+			return obtenerConversacionGrupo((Grupo) c);
+		else
+			return obtenerConversacionUsuario(((ContactoIndividual) c).getUsuario());
 	}
 	
 	public boolean esUsuarioContacto(Usuario u) {

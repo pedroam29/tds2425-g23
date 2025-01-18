@@ -3,7 +3,6 @@ package tds.appchat.persistencia;
 import java.util.List;
 
 import tds.appchat.modelo.Mensaje;
-import tds.appchat.modelo.Mensaje3;
 
 public interface IAdaptadorMensajeDAO {
 	public void registrarMensaje(Mensaje mensaje);

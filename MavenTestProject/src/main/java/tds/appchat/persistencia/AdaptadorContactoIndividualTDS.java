@@ -10,7 +10,6 @@ import beans.Entidad;
 import beans.Propiedad;
 
 import tds.appchat.modelo.ContactoIndividual;
-import tds.appchat.modelo.Mensaje3;
 import tds.appchat.modelo.Usuario;
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;

@@ -1,12 +1,14 @@
 package tds.appchat.vista;
 
 import java.awt.EventQueue;
+import java.awt.GridLayout;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -19,7 +21,6 @@ import tds.appchat.modelo.Contacto;
 import tds.appchat.modelo.ContactoIndividual;
 import tds.appchat.modelo.Grupo;
 import tds.appchat.modelo.Mensaje;
-import tds.appchat.modelo.Mensaje3;
 import tds.appchat.vista.MensajeCellRenderer;
 import tds.appchat.modelo.Usuario;
 
@@ -38,6 +39,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 
 import javax.security.auth.callback.TextOutputCallback;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -183,10 +185,13 @@ public class VentanaPrincipal extends JFrame {
 		for (Mensaje m : mensajes) {
 			//Se comprueba si se es emisor o receptor, en ese casos se pondrá de un color u otro
 			int tipo = AppChat.getUnicaInstancia().esUsuarioEmisor(m) ? BubbleText.SENT : BubbleText.RECEIVED;
-			Color color = AppChat.getUnicaInstancia().esUsuarioEmisor(m) ? Color.GREEN: Color.GRAY;
-			
-			//TODO: Hacer que salga el nombre de contacto o el número de teléfono según sea necesario
-			BubbleText b = new BubbleText(chat, m.getTexto() , color, m.getEmisor().getNombre() , tipo); 
+			Color color = AppChat.getUnicaInstancia().esUsuarioEmisor(m) ? Color.GREEN: Color.LIGHT_GRAY;
+			BubbleText b;
+			if (m.esTextoEmoticono()) {
+				b = new BubbleText(chat, m.getEmoticono() , color, m.getEmisor().getNombre() , tipo, 24); 
+			} else {
+				b = new BubbleText(chat, m.getTexto() , color, m.getEmisor().getNombre() , tipo); 
+			}
 			chat.add(b);
 		}
 		//Se vuelve a pintar
@@ -354,7 +359,6 @@ public class VentanaPrincipal extends JFrame {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				Mensaje m = lista.getSelectedValue();
-				System.out.println("Mensaje obtenido de la lista: \n" + m);
 				//TODO: Puede que este if sobre
 				if (m != null)
 					abrirChat(m);
@@ -394,13 +398,52 @@ public class VentanaPrincipal extends JFrame {
 		JPanel enviar = new JPanel();
 		panelChatActual.add(enviar, BorderLayout.SOUTH);
 		enviar.setLayout(new BoxLayout(enviar, BoxLayout.X_AXIS));
-		
-		
+				
+
+		JButton btnEmoticono = new JButton(":)");
+		enviar.add(btnEmoticono);
 		
 		textFieldEnviar = new JTextField();
 		enviar.add(textFieldEnviar);
 		textFieldEnviar.setColumns(10);
-		
+				
+        JPopupMenu emojiMenu = new JPopupMenu();
+        emojiMenu.setLayout(new GridLayout(2, 4, 5, 5)); 
+        
+        
+        for (int i = 0; i < BubbleText.MAXICONO; i++) { 
+            ImageIcon emojiIcon = BubbleText.getEmoji(i); 
+            final int emojiId = i;
+            JButton emojiButtonMenu = new JButton(emojiIcon);
+            emojiButtonMenu.setFocusable(false);
+            emojiButtonMenu.setBorder(BorderFactory.createEmptyBorder());
+            emojiButtonMenu.setContentAreaFilled(false);
+
+            // Acción al seleccionar un emoticono
+            emojiButtonMenu.addActionListener(e -> {
+            	if (!esGrupo && usuarioSeleccionado == null)
+            		return;
+            	
+            	if (esGrupo)
+            	AppChat.getUnicaInstancia().enviarMensajeGrupo(grupoSeleccionado, emojiId);
+            		else
+            	AppChat.getUnicaInstancia().enviarMensaje(usuarioSeleccionado, emojiId);
+                
+            	BubbleText emojiBubble = new BubbleText(chat, emojiId, Color.GREEN, AppChat.getUnicaInstancia().getNombreUsuarioActual(), BubbleText.SENT, 24);
+                chat.add(emojiBubble); // Añadir la burbuja al chat
+                chat.revalidate();
+                chat.repaint();
+                emojiMenu.setVisible(false); // Cerrar el menú
+                
+            });
+            emojiMenu.add(emojiButtonMenu);
+        }
+        
+        //Cuando se hace click que se abra
+        btnEmoticono.addActionListener(e -> {
+            emojiMenu.show(btnEmoticono, btnEmoticono.getWidth() / 2, btnEmoticono.getHeight() / 2);
+        });
+        
 		JButton btnEnviar = new JButton("Enviar");
 		
 		//AppChat.getUnicaInstancia().enviarMensaje(null, textFieldEnviar.getText());
@@ -425,24 +468,14 @@ public class VentanaPrincipal extends JFrame {
 					
 					b = new BubbleText(chat, texto , Color.GREEN, AppChat.getUnicaInstancia().getNombreUsuarioActual() , BubbleText.SENT); 
 					chat.add(b);
+					textFieldEnviar.setText("");
 					actualizarListaMensajes();
 				}
 			}
 		});
-		enviar.add(btnEnviar);
 		
-//		panelConversacionActual = new JPanel();
-//		panelChatActual.add(panelConversacionActual, BorderLayout.CENTER);
-//		
-//		panelConversacionActual.setLayout(new BoxLayout(panelChatActual,BoxLayout.Y_AXIS));
-//		panelConversacionActual.setSize(400,700);
-//		panelConversacionActual.setMinimumSize(new Dimension(400,700));
-//		panelConversacionActual.setMaximumSize(new Dimension(400,700));
-//		panelConversacionActual.setPreferredSize(new Dimension(400,700));
-//		//Appchat.obtenerMensajesChat(usuario)
-//		
-//		
-		
+		 
+		enviar.add(btnEnviar);		
 	}
 
 }
