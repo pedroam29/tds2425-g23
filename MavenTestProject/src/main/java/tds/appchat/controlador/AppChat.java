@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -32,6 +33,7 @@ import tds.appchat.persistencia.IAdaptadorMensajeDAO;
 import tds.appchat.persistencia.IAdaptadorUsuarioDAO;
 import tds.appchat.vista.ContactoCellRenderer;
 import tds.appchat.vista.VentanaLogin;
+
 
 import java.awt.Image;
 import java.io.FileNotFoundException;
@@ -265,6 +267,34 @@ public class AppChat {
 			}
 		}
 		return null;
+	}
+	
+	//////////////////////////
+	///BUSQUEDA DE MENSAJES///
+	//////////////////////////
+	
+	public List<Mensaje3> getMensajes(Contacto contacto) {
+		// Si la conversacion es conmigo mismo es suficiente con mostrar mis mensajes
+		if (contacto instanceof ContactoIndividual && !((ContactoIndividual) contacto).isUser(usuarioActual)) {
+			return Stream
+					.concat(contacto.getMensajesEnviados().stream(),
+							contacto.getMensajesRecibidos(Optional.of(usuarioActual)).stream())
+					.sorted().collect(Collectors.toList());
+		} else {
+			// Dentro de los enviados estan contenidos todos los mensajes
+			return contacto.getMensajesEnviados().stream().sorted().collect(Collectors.toList());
+		}
+	}
+	
+	public List<Mensaje3> buscarMensajes(String telefono, String contacto, String text) {
+		// Recupero los mensajes que he enviado
+		List<Mensaje3> mensajes = AppChat.getUnicaInstancia().contactosUsuarioActual().stream()
+				.flatMap(c -> AppChat.getUnicaInstancia().getMensajes(c).stream()).collect(Collectors.toList());
+
+		return mensajes.stream()
+				.filter(m -> telefono == null || telefono.isEmpty() || m.getTlfEmisor().equals(telefono))
+				.filter(m -> text == "" || m.getTexto().contains(text))
+				.collect(Collectors.toList());
 	}
 	
 	////
