@@ -7,7 +7,7 @@ public class DescuentoMensaje extends Descuento{
 	
 	public final static String ID = "DM";
 	
-	private static int NUM_MENSAJES = 2000;
+	private static int NUM_MENSAJES = 5;
 	
 	private double totalDescuento = 0.7;
 	@Override

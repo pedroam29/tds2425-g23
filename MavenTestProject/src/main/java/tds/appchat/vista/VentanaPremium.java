@@ -17,6 +17,8 @@ import javax.swing.JPanel;
 
 import tds.appchat.controlador.AppChat;
 import tds.appchat.modelo.Descuento;
+import tds.appchat.modelo.Premium;
+
 import java.awt.SystemColor;
 import javax.swing.UIManager;
 
@@ -31,7 +33,7 @@ public class VentanaPremium extends JFrame {
 		gbl_panel.columnWidths = new int[]{10, 0, 0, 0, 0, 10, 0};
 		gbl_panel.rowHeights = new int[]{0, 0, 10, 0, 0, 0, 0, 3, 0, 10, 0};
 		gbl_panel.columnWeights = new double[]{0.0, 1.0, 1.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
 		
 		JLabel lblPremium = new JLabel("PREMIUM");
@@ -52,7 +54,7 @@ public class VentanaPremium extends JFrame {
 		
 		//Obtener descuento
 		
-//		Descuento descuento = AppChat.getUnicaInstancia().obtenerDescuento();
+
 //		Descuento descuento = null;
 //		En caso de que exista un descuento
 //		El precio actual se tachará y se pondrá el precio rebajado debajo
@@ -60,8 +62,9 @@ public class VentanaPremium extends JFrame {
 		
 		JLabel lblPrecioOriginal = new JLabel(precioOriginal);
 		
-		//if (descuento != null){
-		lblPrecioOriginal.setText("<html><strike>" + precioOriginal + "</strike></html>");			
+		Descuento descuento = AppChat.getUnicaInstancia().obtenerDescuento();
+		if (descuento != null){
+			lblPrecioOriginal.setText("<html><strike>" + precioOriginal + "</strike></html>");			
 		
 		JLabel label = new JLabel("");
 		GridBagConstraints gbc_label = new GridBagConstraints();
@@ -69,7 +72,18 @@ public class VentanaPremium extends JFrame {
 		gbc_label.gridx = 3;
 		gbc_label.gridy = 6;
 		panel.add(label, gbc_label);
-		//}
+
+		JLabel lblPrecioDescuento = new JLabel(String.format("%.2f", Double.toString(descuento.calcularDescuento(Premium.getPrecioPremium()))));
+		lblPrecioDescuento.setIcon(new ImageIcon(VentanaPremium.class.getResource("/imagenes/descuento.png")));
+		lblPrecioDescuento.setForeground(new Color(154, 205, 50));
+		lblPrecioDescuento.setFont(new Font("Dialog", Font.PLAIN, 58));
+		GridBagConstraints gbc_lblPreciodescuento = new GridBagConstraints();
+		gbc_lblPreciodescuento.insets = new Insets(0, 0, 5, 5);
+		gbc_lblPreciodescuento.gridx = 2;
+		gbc_lblPreciodescuento.gridy = 6;
+		panel.add(lblPrecioDescuento, gbc_lblPreciodescuento);
+		
+		}
 		
 		BotonGeneral btnPagarPremium = new BotonGeneral("Realizar Pago");
 		
@@ -114,15 +128,7 @@ public class VentanaPremium extends JFrame {
 		
 		//String precioDescontado = new String(Double.toString(descuento.calcularDescuento(AppChat.getUnicaInstancia().obtenerPrecioPremium())) + "€");
 		//JLabel lblPreciodescuento = new JLabel(precioDescontado);
-		JLabel lblPrecioDescuento = new JLabel("12,9");
-		lblPrecioDescuento.setIcon(new ImageIcon(VentanaPremium.class.getResource("/imagenes/descuento.png")));
-		lblPrecioDescuento.setForeground(new Color(154, 205, 50));
-		lblPrecioDescuento.setFont(new Font("Dialog", Font.PLAIN, 58));
-		GridBagConstraints gbc_lblPreciodescuento = new GridBagConstraints();
-		gbc_lblPreciodescuento.insets = new Insets(0, 0, 5, 5);
-		gbc_lblPreciodescuento.gridx = 2;
-		gbc_lblPreciodescuento.gridy = 6;
-		panel.add(lblPrecioDescuento, gbc_lblPreciodescuento);
+		
 
 	}
 }

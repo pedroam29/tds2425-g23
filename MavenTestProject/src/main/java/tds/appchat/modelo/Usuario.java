@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -548,8 +549,9 @@ public class Usuario {
 	public long getTotalMensajesEnviadosUltimoMes()
 	{
 		//Necesario obtener
-		
-		return 0L;
+		return mensajesPorUsuario.values().stream()
+		            .flatMap(List::stream)  // Aplana las listas de mensajes
+		            .filter(mensaje -> mensaje.getFechaHora().isAfter(LocalDateTime.now().minus(1, ChronoUnit.MONTHS))).count();
 	}
 	
 	public void comprobarDescuentos() {
