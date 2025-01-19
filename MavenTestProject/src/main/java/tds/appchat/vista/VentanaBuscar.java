@@ -121,7 +121,6 @@ public class VentanaBuscar extends JFrame {
 	                textField_contacto.getText(), 
 	                txtTexto.getText()
 	        );
-	        System.out.println("Mensajes encontrados: " + mensajes);
 	        
 	        // Conversión manual de List<Mensaje> a DefaultListModel<Mensaje> 
 	        for (Mensaje mensaje : mensajes) {

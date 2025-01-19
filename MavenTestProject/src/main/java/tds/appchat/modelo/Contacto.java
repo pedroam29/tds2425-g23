@@ -30,7 +30,7 @@ public abstract class Contacto {
 	}
 	
 	public boolean isNombre(String nombre) {
-		return nombre.equals(nombre);
+		return this.nombre.equals(nombre);
 	}
 	
 	public void setNombre(String nombre) {

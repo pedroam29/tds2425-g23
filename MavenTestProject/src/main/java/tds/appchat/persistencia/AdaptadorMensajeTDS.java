@@ -63,8 +63,6 @@ public class AdaptadorMensajeTDS implements IAdaptadorMensajeDAO {
 		Propiedad texto = new Propiedad(TEXTO, mensaje.getTexto());
 		Propiedad hora = new Propiedad(HORA, mensaje.getFechaHora().toString());
 		Propiedad emoticono = new Propiedad(EMOTICONO, Integer.toString(mensaje.getEmoticono()));
-		
-		System.out.println("Se inserta: " + mensaje.getFechaHora().toString());
 		Propiedad mensajeGrupo = new Propiedad(MENSAJE_GRUPO, Boolean.toString(mensaje.isMensajeGrupo()));
 		
 		//Si es grupo
@@ -77,7 +75,6 @@ public class AdaptadorMensajeTDS implements IAdaptadorMensajeDAO {
 		eMensaje = servPersistencia.registrarEntidad(eMensaje);
 		
 		mensaje.setCodigo(eMensaje.getId());
-		System.out.println("SE INSERTA COMO CóDIGO: " + mensaje.getCodigo());
 		//Se inserta le objeto
 		
 

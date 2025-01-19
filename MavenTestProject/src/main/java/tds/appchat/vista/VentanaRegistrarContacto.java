@@ -87,9 +87,7 @@ public class VentanaRegistrarContacto extends JFrame {
 		panel_1.add(textField_nombre, gbc_textField_nombre);
 		textField_nombre.setColumns(10);
 		
-		if (!tlfPrincipal.isEmpty()) {
-			textField_nombre.setText(tlfPrincipal);
-		}
+
 		
 		JLabel lblNewLabel_2 = new JLabel("Teléfono: ");
 		GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
@@ -108,6 +106,10 @@ public class VentanaRegistrarContacto extends JFrame {
 		gbc_textField_telf.gridy = 2;
 		panel_1.add(textField_telf, gbc_textField_telf);
 		textField_telf.setColumns(10);
+		
+		if (!tlfPrincipal.isEmpty()) {
+			textField_telf.setText(tlfPrincipal);
+		}
 		
 		/**
 		 * Botón aeceptar: 

@@ -33,8 +33,9 @@ import tds.appchat.persistencia.IAdaptadorUsuarioDAO;
 import tds.appchat.vista.ContactoCellRenderer;
 import tds.appchat.vista.VentanaLogin;
 
-
+import java.awt.Font;
 import java.awt.Image;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -46,8 +47,11 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 
@@ -270,17 +274,17 @@ public class AppChat {
 		//De otra manera se 
 		List<Mensaje> mensajes;
 		Optional<Contacto> cnt = usuarioActual.obtenerContactoPorNombre(contacto);
-		if (cnt.isPresent())
+		if (cnt.isPresent()) {
 			mensajes = getMensajes(cnt.get());
-		else
+		} else
 		// Se recuperan los mensajes
 //			mensajes = AppChat.getUnicaInstancia().contactosUsuarioActual().stream()
 //					.flatMap(c -> AppChat.getUnicaInstancia().getMensajes(c).stream()).collect(Collectors.toList());
 			mensajes = usuarioActual.obtenerTodosMensajes();
-		//TODO: eliminar sysout
-		System.out.println("TODOS LOS MENSAJES: " + mensajes);
 		//Se obienen todos los mensajes de todos los contactos
 		//Se obtienen todos los mensajes cuyo nombre de contacto contenga:
+		//TODO: Borrar
+		//mensajes.forEach(m -> System.out.println("Mensaje: " + m.toString()));
 		
 		//Si no es un mensaje a un grupo
 		return mensajes.stream()
@@ -557,20 +561,46 @@ public class AppChat {
 	}
 	
 	//TODO: Mejorar. Versión simple que solo pone los mensajes así
-	public void convertirPDF(String ruta, List<Mensaje> conversacion) throws DocumentException {
+	public boolean convertirPDF(String ruta, String nombre,  List<Mensaje> conversacion) throws DocumentException {
 		FileOutputStream archivo = null;
-		try {
-			archivo = new FileOutputStream(ruta);
-		} catch (FileNotFoundException e) {	}
-		
+	    try {
+	        archivo = new FileOutputStream(ruta+File.separator + nombre + ".pdf");
+	    } catch (FileNotFoundException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+
 	    Document documento = new Document();
-		PdfWriter.getInstance(documento, archivo);
-		documento.open();
-		for (Mensaje m : conversacion) {
-			documento.add(new Paragraph(m.toString()));
-		}
-		
-		documento.close();
+	    try {
+	        PdfWriter.getInstance(documento, archivo);
+	        documento.open();
+
+	        // Título
+	        documento.add(new Paragraph("Conversación con: " + nombre));
+	        documento.add(new Paragraph(nombre + "Azul"));
+	        documento.add(Chunk.NEWLINE);
+
+	        for (Mensaje m : conversacion) {
+	            if (!m.esTextoEmoticono()) {
+	                String textoMensaje = m.getFechaHora() + " - " + m.getTexto();
+	                Paragraph parrafo = new Paragraph(textoMensaje);
+	                if (AppChat.getUnicaInstancia().esUsuarioEmisor(m)) {
+	                    parrafo.getFont().setColor(BaseColor.GREEN); // Azul para el emisor
+	                    parrafo.setAlignment(Element.ALIGN_RIGHT);
+	                } else {
+	                    parrafo.getFont().setColor(BaseColor.BLUE); // Verde para el receptor
+	                    parrafo.setAlignment(Element.ALIGN_RIGHT);
+	                }
+	                documento.add(parrafo);
+	            }
+	        }
+
+	    } catch (Exception e) {
+	    	return false;
+	    } finally {
+	        documento.close();
+	    }
+	    return true;
 	}
 	/**
 	 * 

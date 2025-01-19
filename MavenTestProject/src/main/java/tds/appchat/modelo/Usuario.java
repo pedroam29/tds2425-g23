@@ -344,15 +344,19 @@ public class Usuario {
 	public List<Mensaje> obtenerConversacionesRecientes(){
 		List<Mensaje> mensajes = new LinkedList<>();
 		
-		//Se supone que los mensajes en estas listas está insertado en orden
-		mensajes.addAll(mensajesPorUsuario.values().stream()
-			    .map(t -> t.get(t.size() - 1)) // Obtenemos el último valor sin hacer cast
-			    .collect(Collectors.toList()));		  //Se almacena en una lista
+		mensajes.addAll(mensajesPorUsuario.keySet().stream()
+				.map(u -> {
+					List<Mensaje> msj = mensajesPorUsuario.get(u);
+					return msj.get(msj.size() - 1);
+					}
+				).collect(Collectors.toList()));
 		
-		//Se insertan también los mensajes de los grupos
-		mensajes.addAll(mensajesGrupos.values().stream()
-			    .map(t -> t.get(t.size() - 1)) // Obtenemos el último valor sin hacer cast
-			    .collect(Collectors.toList()));
+		mensajes.addAll(mensajesGrupos.keySet().stream()
+				.map(g -> {
+					List<Mensaje> msj = mensajesPorUsuario.get(g);
+					return msj.get(msj.size() - 1);
+					}
+				).collect(Collectors.toList()));
 		
 		mensajes = mensajes.stream().sorted( (m1,m2) -> m1.getFechaHora().compareTo(m2.getFechaHora())).collect(Collectors.toList());
 		

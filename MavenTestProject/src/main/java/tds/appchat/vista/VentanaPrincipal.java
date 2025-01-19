@@ -395,19 +395,25 @@ public class VentanaPrincipal extends JFrame {
 							JOptionPane.ERROR_MESSAGE);
 				else {
 					List<Mensaje> mensajes;
+					String nombre;
 					if (esGrupo) {
+						nombre = grupoSeleccionado.getNombre();
 						mensajes = AppChat.getUnicaInstancia().obtenerConversacionGrupo(grupoSeleccionado);
 					} else if (usuarioSeleccionado != null) {
 						mensajes = AppChat.getUnicaInstancia().obtenerConversacion(usuarioSeleccionado);
+						nombre = (AppChat.getUnicaInstancia().esTelefonoContacto(usuarioSeleccionado.getTelefono()) ?
+								AppChat.getUnicaInstancia().obtenerNombreContactoDesdeTelefono(usuarioSeleccionado.getTelefono())
+								:usuarioSeleccionado.getTelefono());
 					} else {
 						return;
 					}
-					VentanaPDF v = new VentanaPDF(mensajes);
+					VentanaPDF v = new VentanaPDF(mensajes, nombre);
 					v.setVisible(true);
 				}
 					
 			}
 		});
+		
 		///////////////////
 		////   Panel   ////
 		///////////////////
