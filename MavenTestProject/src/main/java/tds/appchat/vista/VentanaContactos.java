@@ -316,6 +316,15 @@ public class VentanaContactos extends JFrame {
 		
 		panelBotonInsertarGrupo.add(btnInsertarGrupo);
 		
+		 addWindowListener(new WindowAdapter() {
+	            @Override
+	            public void windowClosing(java.awt.event.WindowEvent e) {
+	                VentanaPrincipal v = new VentanaPrincipal();
+	                v.setVisible(true);
+	                dispose();
+	            }
+	        });
+		
 	}
 
 }

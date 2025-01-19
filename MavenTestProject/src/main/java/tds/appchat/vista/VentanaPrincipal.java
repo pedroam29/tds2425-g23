@@ -165,7 +165,7 @@ public class VentanaPrincipal extends JFrame {
 	 */
 	public VentanaPrincipal() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 854, 577);
+		setBounds(100, 100, 905, 612);
 		BubbleText.noZoom();
 		getContentPane().setBackground(new Color(255, 255, 255));
 		contentPane = new JPanel();
@@ -241,7 +241,7 @@ public class VentanaPrincipal extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				VentanaContactos vContactos = new VentanaContactos();
 				vContactos.setVisible(true);
-				
+				dispose();
 			}
 		});
 		btnContactos.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/personas.png")));

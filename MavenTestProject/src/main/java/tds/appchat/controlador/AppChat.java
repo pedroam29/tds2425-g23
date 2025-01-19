@@ -121,6 +121,8 @@ public class AppChat {
 		return imagen;
 	}
 	
+	
+	
 	////
 	//Operaciones intermedias de acceso a atributos del usuario actual
 	///

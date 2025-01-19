@@ -28,6 +28,7 @@ public class Usuario {
 	private final String contrasena;
 	private String imagenPerfilUrl;
 	private String saludo;
+	//private URL imagenPerfil;
 	
 	//Generacion de descuentos
 	private final LocalDate fechaRegistro;
