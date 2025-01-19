@@ -41,19 +41,15 @@ public class ContactoIndividual extends Contacto{
 	public boolean isTelefono(String telefono) {
 		return usuario.isTelefono(telefono);
 	}
-	public Image getImagen(){
-		return usuario.getImagen();
+	public Image getImagen(int tam){
+		return usuario.getImagen(tam);
 	}
 	public URL getURLImagen() {
-		try {
-			return new URL(getUrlImagen());
-		} catch (MalformedURLException e) {
-			return ContactoIndividual.class.getResource("/imagenes/");
-		}
+		return usuario.getImagenPerfil();
 	}
-	public String getUrlImagen(){
-		return usuario.getImagenPerfilUrl();
-	}
+//	public String getUrlImagen(){
+//		return usuario.getImagenPerfilUrl();
+//	}
 	@Override
 	public String toString() {
 		return super.toString();

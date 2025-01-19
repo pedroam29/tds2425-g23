@@ -1,6 +1,7 @@
 package tds.appchat.modelo;
 
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -11,36 +12,67 @@ import java.util.Optional;
 import javax.imageio.ImageIO;
 
 public class Grupo extends Contacto{
-
-	private String imagen;
+	
+	private final static URL DEFAULT_IMAGEN = Grupo.class.getResource("/imagenes/personas-128.png");
+	
+	private URL imagen;
 	private List<ContactoIndividual> miembros;
+	
+	
+	public Grupo(String nombre, URL imagen) {
+		super(nombre);
+		this.imagen = imagen;
+		this.miembros = new LinkedList<ContactoIndividual>();
+	}
 	
 	public Grupo(String nombre, String imagen) {
 		super(nombre);
-		this.imagen = imagen;
-		this.miembros = new LinkedList<>();
+		try {
+			this.imagen = new URL(imagen);
+		} catch (MalformedURLException e) {
+			this.imagen = DEFAULT_IMAGEN;
+		}
+		this.miembros = new LinkedList<ContactoIndividual>();
 	}
-	
+	public Grupo(String nombre) {
+		super(nombre);
+		this.imagen = DEFAULT_IMAGEN;
+		this.miembros = new LinkedList<ContactoIndividual>();
+	}
 	public static URL imagenDefault() {
-		return Grupo.class.getResource("/imagenes/grupo-default.png");
+		return DEFAULT_IMAGEN;
 	}
 	
 	public URL getURLImagen() {
-		try {
-			return new URL(imagen);
-		} catch (MalformedURLException e) {
-			//No puede estar mal formada, se ha tomado correctamente
-			return imagenDefault();
-		}
+		return imagen;
 	}
 	
+	public void setURLImagen(URL imagen) {
+		this.imagen = imagen;
+	}
+	
+	public Image getImagen(int tam) {
+		BufferedImage image = null;
+		try {
+			image = ImageIO.read(imagen);
+		} catch (Exception e) {
+			try {
+				image = ImageIO.read(DEFAULT_IMAGEN);
+			} catch (Exception e2) {
+				
+			}
+		}
+		//Todas las imagenes serán en formato 1x1
+		Image imagenReescalada = image.getScaledInstance(tam, tam, Image.SCALE_SMOOTH);
+		return imagenReescalada;
+	}
 	/**
 	 * Devuelve la Imagen a partir de la URL de los atributos
 	 * @return imagen de perfil
 	 */
-	public String getUrlImagen() {
-		return imagen;
-	}
+//	public String getUrlImagen() {
+//		return imagen;
+//	}
 	
 	
 	public List<ContactoIndividual> getMiembros() {

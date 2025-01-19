@@ -270,7 +270,7 @@ public class VentanaContactos extends JFrame {
 		JButton botonInsertarContacto = new BotonGeneral("Añadir Contacto");
 		botonInsertarContacto.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				VentanaRegistrarContacto ventana = new VentanaRegistrarContacto();
+				VentanaRegistrarContacto ventana = new VentanaRegistrarContacto("");
 				ventana.setVisible(true);
 				//Una vez se haya añadido un contacto, cuando se cierre la ventana de añadir contactos, se
 				//actualizará la lista de contactos

@@ -47,6 +47,8 @@ import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import java.awt.SystemColor;
 import java.awt.FlowLayout;
@@ -64,9 +66,10 @@ public class VentanaPrincipal extends JFrame {
 	private boolean esGrupo = false;
 	
 	private JPanel chat;
-	JLabel lblNombreUsuarioChat;
-	
-	
+	private JLabel lblNombreUsuarioChat;
+	private JPanel panel_InfoUsuario;
+	private JButton btnAgregarusuariodesconocido;
+	private JLabel icononogramaGrupo;
 	//Modelo y lista para los mensajes
 	JList<Mensaje> lista;
 	DefaultListModel<Mensaje> modelo;
@@ -96,9 +99,13 @@ public class VentanaPrincipal extends JFrame {
 		usuarioSeleccionado = u;
 		grupoSeleccionado = null;
 		esGrupo = false;
-		if (AppChat.getUnicaInstancia().esUsuarioContacto(u))
+		if (AppChat.getUnicaInstancia().esUsuarioContacto(u)) {
 			lblNombreUsuarioChat.setText(AppChat.getUnicaInstancia().obtenerContactoUsuario(u).getNombre());
-		
+			btnAgregarusuariodesconocido.setVisible(false);
+		} else {
+			btnAgregarusuariodesconocido.setVisible(true);
+		}
+			
 		abrirConversacion(AppChat.getUnicaInstancia().obtenerConversacion(u));
 	}
 	/**
@@ -108,6 +115,7 @@ public class VentanaPrincipal extends JFrame {
 	 * @param Contacto
 	 */
 	private void abrirChat(Contacto c){
+		btnAgregarusuariodesconocido.setVisible(false);
 		lblNombreUsuarioChat.setText(c.getNombre());
 		if (c instanceof Grupo) {
 			grupoSeleccionado = (Grupo) c;
@@ -338,18 +346,43 @@ public class VentanaPrincipal extends JFrame {
 		panel.setLayout(new BorderLayout(0,0));
 		
 		panelChatActual.add(panel, BorderLayout.NORTH);
-
-
-		
-		lblNombreUsuarioChat = new JLabel();
-		panel.add(lblNombreUsuarioChat);
 		
 		//JButton btnExportarPDF = new JButton();
 		BotonImagen btnExportarPDF = new BotonImagen(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/pdf.png")));
 		panel.add(btnExportarPDF, BorderLayout.EAST);
 		
-		//
+		panel_InfoUsuario = new JPanel();
+		panel_InfoUsuario.setBackground(SystemColor.text);
+		panel.add(panel_InfoUsuario, BorderLayout.WEST);
+		panel_InfoUsuario.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
+		btnAgregarusuariodesconocido = new BotonImagen(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/agregar_usuario.png")));
+		btnAgregarusuariodesconocido.addActionListener(new ActionListener() {
+			
+			@Override
+				public void actionPerformed(ActionEvent e) {
+					VentanaRegistrarGrupo ventana = new VentanaRegistrarGrupo();
+					
+					ventana.setVisible(true);
+					//Una vez se haya añadido un grupo, cuando se cierre la ventana de añadir contactos, se
+					//actualizará la lista de contactos.
+					ventana.addWindowListener(new WindowAdapter() {
+	                    public void windowClosing(WindowEvent we) {
+	                    	actualizarListaMensajes();
+	                		ventana.setVisible(false);
+	                    }
+	                });
+				}
+		});
+		
+		lblNombreUsuarioChat = new JLabel();
+		panel_InfoUsuario.add(lblNombreUsuarioChat);
+		panel_InfoUsuario.add(btnAgregarusuariodesconocido);
+		//panel_InfoUsuario.add(icononogramaGrupo);
+		
+		//icononogramaGrupo.setVisible(false);
+		btnAgregarusuariodesconocido.setVisible(false);
+		//icononogramaGrupo.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/personas-128")));
 		
 		btnExportarPDF.addActionListener(new ActionListener() {
 			@Override
@@ -367,7 +400,7 @@ public class VentanaPrincipal extends JFrame {
 					} else {
 						return;
 					}
-					VentanaPDF v = new VentanaPDF(null);
+					VentanaPDF v = new VentanaPDF(mensajes);
 					v.setVisible(true);
 				}
 					
@@ -466,12 +499,17 @@ public class VentanaPrincipal extends JFrame {
 					//Si es un grupo lo que está abierto
 					if(esGrupo)
 						AppChat.getUnicaInstancia().enviarMensajeGrupo(grupoSeleccionado, texto);
-					else 
+					else if (usuarioSeleccionado != null)
 						AppChat.getUnicaInstancia().enviarMensaje(usuarioSeleccionado, texto);
+					else
+						return;
 					
+					//Se crea 
 					b = new BubbleText(chat, texto , Color.GREEN, AppChat.getUnicaInstancia().getNombreUsuarioActual() , BubbleText.SENT); 
 					chat.add(b);
+					//Se limpia 
 					textFieldEnviar.setText("");
+					//Se actualiza la lista de mensajes.
 					actualizarListaMensajes();
 				}
 			}

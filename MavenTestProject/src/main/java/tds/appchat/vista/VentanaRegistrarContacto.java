@@ -37,7 +37,7 @@ public class VentanaRegistrarContacto extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public VentanaRegistrarContacto() {
+	public VentanaRegistrarContacto(String tlfPrincipal) {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setResizable(false);
 		
@@ -76,6 +76,7 @@ public class VentanaRegistrarContacto extends JFrame {
 		gbc_lblNewLabel_1.gridy = 1;
 		panel_1.add(lblNewLabel_1, gbc_lblNewLabel_1);
 		
+
 		textField_nombre = new JTextField();
 		GridBagConstraints gbc_textField_nombre = new GridBagConstraints();
 		gbc_textField_nombre.gridwidth = 2;
@@ -85,6 +86,10 @@ public class VentanaRegistrarContacto extends JFrame {
 		gbc_textField_nombre.gridy = 1;
 		panel_1.add(textField_nombre, gbc_textField_nombre);
 		textField_nombre.setColumns(10);
+		
+		if (!tlfPrincipal.isEmpty()) {
+			textField_nombre.setText(tlfPrincipal);
+		}
 		
 		JLabel lblNewLabel_2 = new JLabel("Teléfono: ");
 		GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
@@ -116,19 +121,19 @@ public class VentanaRegistrarContacto extends JFrame {
 		panel_1.add(btnAceptar, gbc_btnAceptar);
 		
 						
-				JButton btnCancelar = new BotonGeneral("Cancelar");
-				GridBagConstraints gbc_btnCancelar = new GridBagConstraints();
-				gbc_btnCancelar.insets = new Insets(0, 0, 5, 5);
-				gbc_btnCancelar.gridx = 3;
-				gbc_btnCancelar.gridy = 4;
-				panel_1.add(btnCancelar, gbc_btnCancelar);	
+		JButton btnCancelar = new BotonGeneral("Cancelar");
+		GridBagConstraints gbc_btnCancelar = new GridBagConstraints();
+		gbc_btnCancelar.insets = new Insets(0, 0, 5, 5);
+		gbc_btnCancelar.gridx = 3;
+		gbc_btnCancelar.gridy = 4;
+		panel_1.add(btnCancelar, gbc_btnCancelar);	
 				
-				btnCancelar.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						 dispatchEvent(new WindowEvent(VentanaRegistrarContacto.this, WindowEvent.WINDOW_CLOSING));
-						dispose();
-					}
-				});
+		btnCancelar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				 dispatchEvent(new WindowEvent(VentanaRegistrarContacto.this, WindowEvent.WINDOW_CLOSING));
+				dispose();
+			}
+		});
 		
 		btnAceptar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

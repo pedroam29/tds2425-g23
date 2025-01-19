@@ -52,6 +52,9 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 
 public class AppChat {
+	
+	public final static int TAM_IMAGENES = 35;
+	
 	private static AppChat unicaInstancia;
 	private Usuario usuarioActual;
 	private RepositorioUsuarios repoUsuarios;
@@ -126,6 +129,7 @@ public class AppChat {
 	////
 	//Operaciones intermedias de acceso a atributos del usuario actual
 	///
+	
 	/**
 	 * @return devuelve el nombre del usuario actual
 	 */
@@ -162,9 +166,9 @@ public class AppChat {
 		return usuarioActual.isPremium();
 	}
 	
-	////
-	////
-	////
+	//////
+	//	//
+	//////
 	
 	
 	/**
@@ -172,13 +176,13 @@ public class AppChat {
 	 * @return Image de la foto de perfil del usuario.
 	 */
 	public Image getImagenUsuarioActual() {
-		return obtenerImagenPerfilUrl(35,35,usuarioActual.getImagenPerfilUrl());
+		return usuarioActual.getImagen(35);
 	}
 	
 	////
 	// Lógica del programa
 	////
-	public boolean registrarUsuario(String nombre, String telefono, String contrasena, Date fechaNacimiento, String imagenPerfilUrl, String saludo) {
+	public boolean registrarUsuario(String nombre, String telefono, String contrasena, Date fechaNacimiento, URL imagenPerfilUrl, String saludo) {
 		Usuario usr = new Usuario(nombre, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo);
 		if(repoUsuarios.agregarUsuario(usr)) {
 			usuarioActual = usr;	

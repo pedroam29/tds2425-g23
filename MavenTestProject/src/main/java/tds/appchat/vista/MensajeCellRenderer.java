@@ -37,6 +37,7 @@ public class MensajeCellRenderer extends JPanel
 		implements ListCellRenderer<Mensaje>{
 
 		private static final long serialVersionUID = 1L;
+		private static final int SIZE_IMAGES = 40;
 		
 		private JLabel labelIcono = new JLabel();
 	    private JLabel labelNombre = new JLabel();
@@ -71,12 +72,12 @@ public class MensajeCellRenderer extends JPanel
 	    public Component getListCellRendererComponent(JList<? extends Mensaje> list, Mensaje mensaje, int index,
 	                                                  boolean isSelected, boolean cellHasFocus) {
 	        if (mensaje.isMensajeGrupo()) {
-	        	labelIcono.setIcon(new ImageIcon(AppChat.obtenerImagenPerfilUrl(40, 40, mensaje.getGrupo().getUrlImagen())));
+	        	labelIcono.setIcon(new ImageIcon(mensaje.getGrupo().getImagen(SIZE_IMAGES)));
 	            labelNombre.setText(mensaje.getGrupo().getNombre());
 	            labelTexto.setText(mensaje.getTexto());
 	        } else {
 	            Usuario usr = AppChat.getUnicaInstancia().obtenerUsuarioDesdeMensaje(mensaje);
-	            labelIcono.setIcon(new ImageIcon(usr.getImagen().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
+	            labelIcono.setIcon(new ImageIcon(usr.getImagen(SIZE_IMAGES)));
 	            labelNombre.setText(usr.getTelefono());
 	            labelTexto.setText(mensaje.getTexto());
 
@@ -96,7 +97,7 @@ public class MensajeCellRenderer extends JPanel
 	        
 	        //Para que los elementos queden mas separados entre ellos se va a insertar un CompoundBorder
             setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, BotonGeneral.COLOR_INV),
+                BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK),
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)
             ));
 	        return this;

@@ -22,6 +22,8 @@ import tds.appchat.modelo.Grupo;
 public class ContactoCellRenderer extends JPanel
 	implements ListCellRenderer<Contacto>{
 	
+	public final static int SIZE_IMAGE = 40;
+	
 	private JLabel nombreLabel;
 	private JLabel imageLabel;
 	
@@ -45,11 +47,11 @@ public class ContactoCellRenderer extends JPanel
 		if (contacto instanceof Grupo) {
 			//Si es un grupo, además se añadirá un 
 			Grupo g = (Grupo) contacto;
-			imageLabel.setIcon(new ImageIcon(AppChat.obtenerImagenPerfilUrl(40,40,g.getUrlImagen())));
-			JLabel iconoGrupo = new JLabel(new ImageIcon(ContactoCellRenderer.class.getResource("/imagenes/flecha-inv.png")));			
+			imageLabel.setIcon(new ImageIcon(g.getImagen(SIZE_IMAGE)));
+			//JLabel iconoGrupo = new JLabel(new ImageIcon(ContactoCellRenderer.class.getResource("/imagenes/flecha-inv.png")));			
 		} else if (contacto instanceof ContactoIndividual) {
 			ContactoIndividual c = (ContactoIndividual) contacto;
-			imageLabel.setIcon(new ImageIcon(AppChat.obtenerImagenPerfilUrl(40,40,c.getUrlImagen())));
+			imageLabel.setIcon(new ImageIcon(c.getImagen(SIZE_IMAGE)));
 		}
 		
 		if (isSelected) {

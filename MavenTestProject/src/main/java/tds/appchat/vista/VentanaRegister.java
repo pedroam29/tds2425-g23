@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
+import java.util.Optional;
 
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
@@ -65,9 +66,37 @@ public class VentanaRegister extends JFrame {
 	private JLabel labelEmail;
 	private JButton btnNewButton;
 	
+	
 	/**
 	 * Create the frame.
 	 */
+	
+	private Optional<Image> obtenerImagen(String path){
+        Optional<Image> imagen = Optional.empty();  
+
+        URL url = null;
+        try {
+            url = new URL(path);  
+        } catch (MalformedURLException e2) {
+            JOptionPane.showMessageDialog(null, "La URL ingresada no es válida. Por favor, verifica la URL.", "Error de URL", JOptionPane.WARNING_MESSAGE);
+            return imagen;  
+        }
+        
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(url);  
+            if (image == null) {
+                JOptionPane.showMessageDialog(null, "No se pudo cargar la imagen desde la URL proporcionada.\nCompruebe su conexión a internet", "Error de Carga", JOptionPane.WARNING_MESSAGE);
+                return Optional.empty();  
+            }
+        } catch (IOException e1) {
+            JOptionPane.showMessageDialog(null, "No se pudo cargar la imagen desde la URL proporcionada.\nCompruebe su conexión a internet", "Error de Carga", JOptionPane.WARNING_MESSAGE);
+            return Optional.empty();  
+        }
+        imagen = Optional.of(image);
+        return imagen;  
+	}
+	
 	public VentanaRegister() {
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -270,25 +299,29 @@ public class VentanaRegister extends JFrame {
 		btnNewButton = new BotonGeneral("Cargar Imagen");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String path = textFieldImagenURL.getText();  // Obtener la URL ingresada por el usuario
-				
-				URL url = null;
-				try {
-					url = new URL(path);
-				} catch (MalformedURLException e2) {
-					JOptionPane.showMessageDialog(contentPane, "La URL ingresada no es válida. Por favor, verifica la URL.", "Error de URL", JOptionPane.WARNING_MESSAGE);
-		        }
-				try {
-					BufferedImage image = ImageIO.read(url);
-					Image resizedImage = image.getScaledInstance(128, 128, Image.SCALE_SMOOTH); // Reescalar la imagen
-					ImageIcon icono = new ImageIcon(resizedImage);
-		            labelImagenObtenida.setIcon(icono); //Mostrar la nueva imagen donde estaba la anterior
-				} catch (IOException e1) {
 		            // Muestra un mensaje de error si hay un problema al cargar la imagen
-		            JOptionPane.showMessageDialog(contentPane, "No se pudo cargar la imagen desde la URL proporcionada.\n Compruebe su conexion a internet", "Error de Carga", JOptionPane.WARNING_MESSAGE);
-		        }
+				URL url;
+				try {
+					url = new URL(textFieldImagenURL.getText());
+				} catch (MalformedURLException e1) {
+					JOptionPane.showMessageDialog(contentPane, "La imagen No es formato URL", "Error de Carga", JOptionPane.ERROR_MESSAGE);
+					labelImagenObtenida.setIcon(new ImageIcon(VentanaRegister.class.getResource("/imagenes/usuario-rojo.png")));
+					return;
+				}
+				Optional<Image> img = Optional.empty();
+				try {
+					 img = Optional.of(ImageIO.read(url));
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(contentPane, "No se puede obtener la imagen de la URL\nCompruebe su conexion a internet", "Error de Carga", JOptionPane.ERROR_MESSAGE);
+				}
+				if (img.isPresent()) {
+					labelImagenObtenida.setIcon(new ImageIcon(img.get().getScaledInstance(128, 128, Image.SCALE_SMOOTH)));
+				} else {
+					labelImagenObtenida.setIcon(new ImageIcon(VentanaRegister.class.getResource("/imagenes/usuario-rojo.png")));
+				}
 			}
 		});
+		
 		
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 		gbc_btnNewButton.insets = new Insets(0, 0, 0, 5);
@@ -308,33 +341,50 @@ public class VentanaRegister extends JFrame {
 				Date fechaNacimiento = dateChooser.getDate();
 				String imagenPerfilUrl = textFieldImagenURL.getText();
 				String saludo = textAreaSaludo.getText();
+
+
+				//Si está vacio tampoco se podrá hacer el login
+				registroPosible = !(nombre.isEmpty() || telefono.isEmpty() || contrasena.isEmpty()
+							|| contrasena2.isEmpty() || saludo.isEmpty() || fechaNacimiento == null);
 				
+				if (!registroPosible) {
+					//No se ha podido llamar a appChat hay campos incorrectos
+					JOptionPane.showMessageDialog(null, "Hay campos vacios o incorrectos", "Campos vacios", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				
-				//TODO: Solución momentánea para comprobar que los campos están llenos
-				registroPosible = !((nombre == "") || (telefono == "") || (contrasena == "") || (contrasena2 == "") 
-						|| (imagenPerfilUrl == "") || (saludo == "") || (fechaNacimiento == null));
+				URL url;
+				try {
+					url = new URL(imagenPerfilUrl);
+				} catch (MalformedURLException e1) {
+					JOptionPane.showMessageDialog(contentPane, "La imagen No es formato URL", "Error de Carga", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
+				try {
+					ImageIO.read(url);
+				} catch (IOException e1) {
+					JOptionPane.showMessageDialog(contentPane, "No se puede obtener la imagen de la URL\nCompruebe su conexion a internet", "Error de Carga", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				
 				if(!contrasena.equals(contrasena2)) {
 					JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden");
 					return;
 				}
-				
-				if (registroPosible) {				
+						
 					//Se realiza el registro 
-					boolean registro = AppChat.getUnicaInstancia().registrarUsuario(nombre, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo);
-					if (registro)
-					{
-						VentanaPrincipal principal = new VentanaPrincipal();
-						principal.setVisible(true);
-						//Una vez abierta la ventana principal, esta se cierra
-						dispose();
-					} else 
-						//No se ha podido realizar el registro: AppChat lo rechaza
-						JOptionPane.showMessageDialog(null, "El teléfono ya está registrado");
-				} else {
-					//No se ha podido llamar a appChat hay campos incorrectos
-					JOptionPane.showMessageDialog(null, "Hay campos incorrectos");
-				}
+				boolean registro = AppChat.getUnicaInstancia().registrarUsuario(nombre, telefono, contrasena, fechaNacimiento, url, saludo);
+				
+				if (registro)
+				{
+					VentanaPrincipal principal = new VentanaPrincipal();
+					principal.setVisible(true);
+					//Una vez abierta la ventana principal, esta se cierra
+					dispose();
+				} else 
+					//No se ha podido realizar el registro: AppChat lo rechaza
+					JOptionPane.showMessageDialog(null, "El teléfono ya está registrado");
 			}
 		});
 		

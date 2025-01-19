@@ -1,6 +1,7 @@
 package tds.appchat.modelo;
 
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,6 +22,10 @@ import tds.appchat.controlador.AppChat;
 
 
 public class Usuario {
+	
+	private final static URL URL_DEFAULT = Usuario.class.getResource("/imagenes/usuario.png");
+	
+	
 	private int codigo;
 	private final String nombre;
 	private final Date fechaNacimiento;
@@ -28,7 +33,7 @@ public class Usuario {
 	private final String contrasena;
 	private String imagenPerfilUrl;
 	private String saludo;
-	//private URL imagenPerfil;
+	private URL imagenPerfil;
 	
 	//Generacion de descuentos
 	private final LocalDate fechaRegistro;
@@ -43,13 +48,13 @@ public class Usuario {
 	
 	private List<Contacto> contactos;
 	
-	public Usuario(String nombre, String telefono, String contrasena,Date fechaNacimiento, String imagenPerfilUrl, String saludo) {
+	public Usuario(String nombre, String telefono, String contrasena,Date fechaNacimiento, URL imagenPerfil, String saludo) {
 		this.codigo = 0;
 		this.nombre = nombre;
 		this.telefono = telefono;
 		this.contrasena = contrasena;
 		this.fechaNacimiento = fechaNacimiento;
-		this.imagenPerfilUrl = imagenPerfilUrl;
+		this.imagenPerfil = imagenPerfil;
 		this.saludo = saludo;
 
 		this.contactos=new LinkedList<Contacto>();
@@ -88,16 +93,11 @@ public class Usuario {
 	            .orElse(null);                                              // Devuelve null si no encuentra nada
 	}
 	
-	public String getImagenPerfilUrl() {
-		return imagenPerfilUrl;
+	public URL getImagenPerfil() {
+		return imagenPerfil;
 	}
-	
-	public URL getURLImagen() {
-		try {
-			return new URL(imagenPerfilUrl);
-		} catch (MalformedURLException e) {
-			return Usuario.class.getResource("/imagenes/usuario-default.png");
-		}
+	public void setImagenPerfil(URL u) {
+		this.imagenPerfil = u;
 	}
 	
 	public List<Contacto> getContactos() {
@@ -168,17 +168,22 @@ public class Usuario {
 	 * Devuelve la Imagen a partir de la URL de los atributos
 	 * @return imagen de perfil
 	 */
-	public Image getImagen()
-	{
-		Image imagen = null;
+	public Image getImagen(int tam) {
+		BufferedImage image = null;
 		try {
-			URL urlImagen = getURLImagen();
-			imagen = (Image) ImageIO.read(urlImagen);
-		} catch (Exception e) {
-			
+			image = ImageIO.read(imagenPerfil);
+		} catch (IOException e) {
+			try {
+				image = ImageIO.read(URL_DEFAULT);
+			} catch (IOException e1) {
+				//Caso imposible que suceda a menos que se cambie
+				//La fotografia de lugar de la carpeta recursos
+			}
+			e.printStackTrace();
 		}
-		
-		return imagen;
+		//Todas las imagenes serán en formato 1x1
+		Image imagenReescalada = image.getScaledInstance(tam, tam, Image.SCALE_SMOOTH);
+		return imagenReescalada;
 	}
 	
 	public String getSaludo() {
@@ -571,7 +576,13 @@ public class Usuario {
 	
 	public void convertirPremium(){
 		this.premium = true;
-		this.rolUsuario = (descuento == null) ? new Premium() : new Premium(descuento);
+		this.rolUsuario = new Premium();
+	}
+	
+	public LocalDate obtenerFechaExpiracion() {
+		if (premium)
+			return ((Premium) rolUsuario).getFechaExpiracion();
+		return null;
 	}
 	
 	@Override

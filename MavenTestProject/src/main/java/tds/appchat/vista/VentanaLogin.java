@@ -133,7 +133,7 @@ public class VentanaLogin {
 				frame.dispose();
 			}
 		});
-		panelBotones.add(botonRegistrar);
+		panelBotones.add(botonRegistrar, BorderLayout.SOUTH);
 		
 		Component rigidArea = Box.createRigidArea(new Dimension(20, 20));
 		panelBotones.add(rigidArea);

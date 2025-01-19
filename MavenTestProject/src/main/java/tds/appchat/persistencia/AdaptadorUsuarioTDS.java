@@ -1,6 +1,8 @@
 package tds.appchat.persistencia;
 
 import java.lang.reflect.Array;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
@@ -70,7 +72,7 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 						new Propiedad("fechaNacimiento", dateFormat.format(usuario.getFechaNacimiento())),
 						new Propiedad("telefono", usuario.getTelefono()),
 						new Propiedad("contrasena", usuario.getContrasena()),
-						new Propiedad("imagenPerfil", usuario.getImagenPerfilUrl()),
+						new Propiedad("imagenPerfil", usuario.getImagenPerfil().toString()),
 						new Propiedad("saludo", usuario.getSaludo()),
 						new Propiedad("premium", Boolean.toString(usuario.isPremium())),
 						new Propiedad("descuento", usuario.getDescuentoID()),
@@ -110,7 +112,7 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 			} else if (prop.getNombre().equals("saludo")) {
 				prop.setValor(usuario.getSaludo());
 			} else if (prop.getNombre().equals("imagenPerfil")) {
-				prop.setValor(usuario.getImagenPerfilUrl());
+				prop.setValor(usuario.getImagenPerfil().toString());
 			//} else if (prop.getNombre().equals("mensajesRecibidos")) {
 			//	prop.setValor(obtenerCodigosMensajes(usuario.getRecibidos()));
 			} else if (prop.getNombre().equals("descuento")) {
@@ -171,8 +173,14 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 			//Si falla a la hora de convertir un string a fecha
 		}
 		contactos = obtenerContactosDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "contactos"));
-		
-		Usuario usr = new Usuario(usuario, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo);
+		URL imagenPerfil = null;
+		try {
+			imagenPerfil = new URL(imagenPerfilUrl);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Usuario usr = new Usuario(usuario, telefono, contrasena, fechaNacimiento, imagenPerfil, saludo);
 		//Se inserta en el PoolDao
 		PoolDAO.getInstancia().addObjeto(codigo, usr);
 		
