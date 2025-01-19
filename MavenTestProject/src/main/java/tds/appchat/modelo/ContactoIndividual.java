@@ -1,6 +1,8 @@
 package tds.appchat.modelo;
 
 import java.awt.Image;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,7 +44,13 @@ public class ContactoIndividual extends Contacto{
 	public Image getImagen(){
 		return usuario.getImagen();
 	}
-	
+	public URL getURLImagen() {
+		try {
+			return new URL(getUrlImagen());
+		} catch (MalformedURLException e) {
+			return ContactoIndividual.class.getResource("/imagenes/");
+		}
+	}
 	public String getUrlImagen(){
 		return usuario.getImagenPerfilUrl();
 	}

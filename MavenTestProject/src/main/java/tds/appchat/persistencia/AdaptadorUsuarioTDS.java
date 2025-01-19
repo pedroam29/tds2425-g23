@@ -18,8 +18,10 @@ import beans.Entidad;
 import beans.Propiedad;
 import tds.appchat.modelo.Contacto;
 import tds.appchat.modelo.Descuento;
+import tds.appchat.modelo.GestorRolUsuario;
 import tds.appchat.modelo.Grupo;
 import tds.appchat.modelo.Mensaje;
+import tds.appchat.modelo.RolUsuario;
 import tds.appchat.modelo.Usuario;
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;
@@ -72,10 +74,9 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 						new Propiedad("saludo", usuario.getSaludo()),
 						new Propiedad("premium", Boolean.toString(usuario.isPremium())),
 						new Propiedad("descuento", usuario.getDescuentoID()),
-						//new Propiedad("mensajesRecibidos", obtenerCodigosMensajes(usuario.getRecibidos())),
-						//new Propiedad("mensajesEnviados", obtenerCodigosMensajes(usuario.getEnviados())),
 						new Propiedad("mensajes", obtenerCodigosMensajes(usuario.getMensajesPorUsuario())),
 						new Propiedad("mensajesGrupos", obtenerCodigosMensajesGrupos(usuario.getMensajesGrupos())),
+						new Propiedad("rolUsuario", usuario.getRolUsuario().toString()),
 						new Propiedad("contactos", obtenerCodigosContactos(usuario.getContactos())))));
 
 		// registrar entidad usuario
@@ -100,8 +101,6 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 				prop.setValor(String.valueOf(usuario.getCodigo()));
 			} else if (prop.getNombre().equals("usuario")) {
 				prop.setValor(usuario.getNombre());
-			} else if (prop.getNombre().equals("email")) {
-				prop.setValor(usuario.getEmail());
 			} else if (prop.getNombre().equals("contrasena")) {
 				prop.setValor(usuario.getContrasena());
 			} else if (prop.getNombre().equals("fechaNacimiento")) {
@@ -116,6 +115,8 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 			//	prop.setValor(obtenerCodigosMensajes(usuario.getRecibidos()));
 			} else if (prop.getNombre().equals("descuento")) {
 				prop.setValor(usuario.getDescuentoID());
+			} else if (prop.getNombre().equals("rolUsuario")) {
+				prop.setValor(usuario.getRolUsuario().toString());
 			} else if (prop.getNombre().equals("premium")) {
 				prop.setValor(Boolean.toString(usuario.isPremium()));
 			//} else if(prop.getNombre().equals("mensajesEnviados")) {
@@ -138,7 +139,6 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		
 		Entidad eUsuario;
 		String usuario;
-		String email;
 		String contrasena;
 		Date fechaNacimiento = null;
 		String imagenPerfilUrl;
@@ -146,6 +146,7 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		String telefono;
 		Descuento descuento;
 		Boolean premium;
+		RolUsuario rol;
 		
 		HashMap<String, List<Mensaje>> mensajes;
 		HashMap<Grupo, List<Mensaje>> mensajesGrupo;
@@ -154,13 +155,13 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 
 		eUsuario = servPersistencia.recuperarEntidad(codigo);
 		usuario = servPersistencia.recuperarPropiedadEntidad(eUsuario, "usuario");
-		email = servPersistencia.recuperarPropiedadEntidad(eUsuario, "email");
 		contrasena = servPersistencia.recuperarPropiedadEntidad(eUsuario, "contrasena");
 		imagenPerfilUrl = servPersistencia.recuperarPropiedadEntidad(eUsuario, "imagenPerfil");
 		saludo = servPersistencia.recuperarPropiedadEntidad(eUsuario, "saludo");
 		telefono = servPersistencia.recuperarPropiedadEntidad(eUsuario, "telefono");
 		descuento = Descuento.fromString(servPersistencia.recuperarPropiedadEntidad(eUsuario, "descuento"));
 		premium = Boolean.parseBoolean(servPersistencia.recuperarPropiedadEntidad(eUsuario, "premium"));
+		rol = GestorRolUsuario.parseRol(servPersistencia.recuperarPropiedadEntidad(eUsuario, "rolUsuario"));
 		//recibidos = obtenerMensajesCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "mensajesRecibidos"));
 		//enviados = obtenerMensajesCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "mensajesEnviados"));
 		
@@ -171,7 +172,7 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		}
 		contactos = obtenerContactosDesdeCodigos(servPersistencia.recuperarPropiedadEntidad(eUsuario, "contactos"));
 		
-		Usuario usr = new Usuario(usuario, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo, email);
+		Usuario usr = new Usuario(usuario, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo);
 		//Se inserta en el PoolDao
 		PoolDAO.getInstancia().addObjeto(codigo, usr);
 		
@@ -183,9 +184,8 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		usr.setPremium(premium);
 		usr.setCodigo(codigo);
 		usr.setMensajesGrupos(mensajesGrupo);
-		//usr.setEnviados(enviados);
-		//usr.setRecibidos(recibidos);
 		usr.setMensajesPorUsuario(mensajes);
+		usr.setRolUsuario(rol);
 		return usr;
 	}
 
@@ -220,7 +220,12 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		
 	    return stringMensajes;
 	}
-	
+	/**
+	 * Se obtien el hash de mensajes a partir del string
+	 * 
+	 * @param mensajes
+	 * @return Hash de mensajes por usuario
+	 */
 	private HashMap<String,List<Mensaje>> obtenerMensajesCodigos(String mensajes) {
 		
 		AdaptadorMensajeTDS adaptadorMensaje = AdaptadorMensajeTDS.getUnicaInstancia();
@@ -230,11 +235,8 @@ public class AdaptadorUsuarioTDS implements IAdaptadorUsuarioDAO{
 		if (!mensajes.isEmpty()) {
 			for (String mensaje : mensajes.split(SEPARADOR_USUARIOS)) {
 				String[] mensajesPorUsuario = mensaje.split(SEPARADOR_USUARIO_MENSAJES);
-				System.out.println("Falla por: " + mensajesPorUsuario[0] + " Mensajes: " + mensajesPorUsuario[1].split(SEPARADOR_MENSAJES));
-				//Usuario u = adaptadorUsuario.recuperarUsuario(Integer.parseInt(mensajesPorUsuario[0]));
 				String tlf = mensajesPorUsuario[0];
-				System.out.println("Primer mensaje: " + mensajesPorUsuario[1].split(SEPARADOR_MENSAJES)[0]);
-				System.out.println("Resultado mensaje: " + adaptadorMensaje.recuperarMensaje(Integer.parseInt(mensajesPorUsuario[1].split(SEPARADOR_MENSAJES)[0])));
+				
 				List<Mensaje> msg = Arrays.stream(mensajesPorUsuario[1].split(SEPARADOR_MENSAJES))
 						.map(m -> adaptadorMensaje.recuperarMensaje(Integer.parseInt(m))).collect(Collectors.toList());
 				mapaMensajes.put(tlf, msg);

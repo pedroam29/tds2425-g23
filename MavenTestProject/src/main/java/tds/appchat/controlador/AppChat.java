@@ -40,6 +40,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.itextpdf.text.Document;
@@ -152,6 +156,9 @@ public class AppChat {
 		return usuarioActual.getContactoDesdeTelefono(t);
 	}
 	
+	public boolean esUsuarioActualPremium() {
+		return usuarioActual.isPremium();
+	}
 	
 	////
 	////
@@ -169,8 +176,8 @@ public class AppChat {
 	////
 	// Lógica del programa
 	////
-	public boolean registrarUsuario(String nombre, String telefono, String contrasena, Date fechaNacimiento, String imagenPerfilUrl, String saludo, String email) {
-		Usuario usr = new Usuario(nombre, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo, email);
+	public boolean registrarUsuario(String nombre, String telefono, String contrasena, Date fechaNacimiento, String imagenPerfilUrl, String saludo) {
+		Usuario usr = new Usuario(nombre, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo);
 		if(repoUsuarios.agregarUsuario(usr)) {
 			usuarioActual = usr;	
 			adaptadorUsuario.registrarUsuario(usr);
@@ -261,8 +268,11 @@ public class AppChat {
 			mensajes = getMensajes(cnt.get());
 		else
 		// Se recuperan los mensajes
-			mensajes = AppChat.getUnicaInstancia().contactosUsuarioActual().stream()
-					.flatMap(c -> AppChat.getUnicaInstancia().getMensajes(c).stream()).collect(Collectors.toList());
+//			mensajes = AppChat.getUnicaInstancia().contactosUsuarioActual().stream()
+//					.flatMap(c -> AppChat.getUnicaInstancia().getMensajes(c).stream()).collect(Collectors.toList());
+			mensajes = usuarioActual.obtenerTodosMensajes();
+		//TODO: eliminar sysout
+		System.out.println("TODOS LOS MENSAJES: " + mensajes);
 		//Se obienen todos los mensajes de todos los contactos
 		//Se obtienen todos los mensajes cuyo nombre de contacto contenga:
 		
@@ -509,7 +519,7 @@ public class AppChat {
 	/**
 	 * El manejo de convertir en premium
 	 */
-	public void convertirPremium(){
+	public boolean convertirPremium(){
 		//Si no es premium
 		if (!usuarioActual.isPremium()) {
 			//Con esta funcion se pondrá el descuento que más beneficie
@@ -518,8 +528,26 @@ public class AppChat {
 			if (pagoExitoso) {
 				usuarioActual.convertirPremium();
 				adaptadorUsuario.modificarUsuario(usuarioActual);
+				return true;
 			}
 		}
+		return false;
+	}
+	/**
+	 * Devuelve la fecha de expiración del rol premium
+	 * 
+	 * @return LocalDate
+	 */
+	public LocalDate obtenerExpiracionPremium() {
+		if (!usuarioActual.isPremium())
+			return null;
+		//Es premium por el flujo
+		return ((Premium) usuarioActual.getRolUsuario()).getFechaExpiracion();
+	}
+	
+	public boolean esRutaValida(String r) {
+		Path ruta = Paths.get(r);
+		return Files.exists(ruta);
 	}
 	
 	//TODO: Mejorar. Versión simple que solo pone los mensajes así

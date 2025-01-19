@@ -21,13 +21,27 @@ public class Grupo extends Contacto{
 		this.miembros = new LinkedList<>();
 	}
 	
-	public String getUrlImagen() {
-		return imagen;
+	public static URL imagenDefault() {
+		return Grupo.class.getResource("/imagenes/grupo-default.png");
 	}
+	
+	public URL getURLImagen() {
+		try {
+			return new URL(imagen);
+		} catch (MalformedURLException e) {
+			//No puede estar mal formada, se ha tomado correctamente
+			return imagenDefault();
+		}
+	}
+	
 	/**
 	 * Devuelve la Imagen a partir de la URL de los atributos
 	 * @return imagen de perfil
 	 */
+	public String getUrlImagen() {
+		return imagen;
+	}
+	
 	
 	public List<ContactoIndividual> getMiembros() {
 		return miembros;
@@ -51,10 +65,5 @@ public class Grupo extends Contacto{
 	public String toString() {
 		return super.toString();
 	}
-
 	
-//	public LinkedList<Mensaje> enviarMensaje(Mensaje message) {
-//		// TODO Auto-generated method stub
-//		
-//	}
 }

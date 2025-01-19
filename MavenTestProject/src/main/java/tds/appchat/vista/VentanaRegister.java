@@ -30,11 +30,13 @@ import javax.swing.JButton;
 import java.awt.Component;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import com.toedter.calendar.JDateChooser;
 
 import tds.appchat.controlador.AppChat;
+import java.awt.Color;
 
 public class VentanaRegister extends JFrame {
 
@@ -68,11 +70,12 @@ public class VentanaRegister extends JFrame {
 	 */
 	public VentanaRegister() {
 		
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setResizable(false);
 		
 		setBounds(100, 100, 712, 506);
 		contentPane = new JPanel();
+		contentPane.setBackground(Color.WHITE);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(contentPane);
@@ -99,6 +102,7 @@ public class VentanaRegister extends JFrame {
 		gbc_textFieldNombre.gridx = 2;
 		gbc_textFieldNombre.gridy = 1;
 		contentPane.add(textFieldNombre, gbc_textFieldNombre);
+		textFieldNombre.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		textFieldNombre.setColumns(10);
 		
 		JLabel labelApellidos = new JLabel("Apellidos:");
@@ -117,6 +121,7 @@ public class VentanaRegister extends JFrame {
 		gbc_textFieldApellidos.gridx = 2;
 		gbc_textFieldApellidos.gridy = 2;
 		contentPane.add(textFieldApellidos, gbc_textFieldApellidos);
+		textFieldApellidos.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		textFieldApellidos.setColumns(10);
 		
 		labelTelefono = new JLabel("Teléfono:");
@@ -134,24 +139,8 @@ public class VentanaRegister extends JFrame {
 		gbc_textFieldTelefono.gridx = 2;
 		gbc_textFieldTelefono.gridy = 3;
 		contentPane.add(textFieldTelefono, gbc_textFieldTelefono);
+		textFieldTelefono.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		textFieldTelefono.setColumns(10);
-		
-		labelEmail = new JLabel("Email");
-		GridBagConstraints gbc_labelEmail = new GridBagConstraints();
-		gbc_labelEmail.insets = new Insets(0, 0, 5, 5);
-		gbc_labelEmail.anchor = GridBagConstraints.EAST;
-		gbc_labelEmail.gridx = 3;
-		gbc_labelEmail.gridy = 3;
-		contentPane.add(labelEmail, gbc_labelEmail);
-		
-		textFieldEmail = new JTextField();
-		GridBagConstraints gbc_textFieldEmail = new GridBagConstraints();
-		gbc_textFieldEmail.insets = new Insets(0, 0, 5, 5);
-		gbc_textFieldEmail.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textFieldEmail.gridx = 4;
-		gbc_textFieldEmail.gridy = 3;
-		contentPane.add(textFieldEmail, gbc_textFieldEmail);
-		textFieldEmail.setColumns(10);
 		
 		labelPassword = new JLabel("Contraseña:");
 		GridBagConstraints gbc_labelPassword = new GridBagConstraints();
@@ -168,6 +157,7 @@ public class VentanaRegister extends JFrame {
 		gbc_textFieldPassword.gridx = 2;
 		gbc_textFieldPassword.gridy = 4;
 		contentPane.add(textFieldPassword, gbc_textFieldPassword);
+		textFieldPassword.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		
 		labelConfirmarPassword = new JLabel("Contraseña:");
 		GridBagConstraints gbc_labelConfirmarPassword = new GridBagConstraints();
@@ -184,6 +174,7 @@ public class VentanaRegister extends JFrame {
 		gbc_textFieldConfirmarPassword.gridx = 4;
 		gbc_textFieldConfirmarPassword.gridy = 4;
 		contentPane.add(textFieldConfirmarPassword, gbc_textFieldConfirmarPassword);
+		textFieldConfirmarPassword.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		
 		labelFecha = new JLabel("Fecha:");
 		GridBagConstraints gbc_labelFecha = new GridBagConstraints();
@@ -200,6 +191,7 @@ public class VentanaRegister extends JFrame {
 		gbc_dateChooser.gridx = 2;
 		gbc_dateChooser.gridy = 5;
 		contentPane.add(dateChooser, gbc_dateChooser);
+		dateChooser.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		
 		labelSaludo = new JLabel("Saludo:");
 		GridBagConstraints gbc_labelSaludo = new GridBagConstraints();
@@ -216,6 +208,7 @@ public class VentanaRegister extends JFrame {
 		gbc_textAreaSaludo.fill = GridBagConstraints.BOTH;
 		gbc_textAreaSaludo.gridx = 2;
 		gbc_textAreaSaludo.gridy = 6;
+		textAreaSaludo.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		contentPane.add(textAreaSaludo, gbc_textAreaSaludo);
 		
 		labelImagen = new JLabel("Imagen:");
@@ -234,6 +227,7 @@ public class VentanaRegister extends JFrame {
 		gbc_textFieldImagenURL.gridy = 6;
 		contentPane.add(textFieldImagenURL, gbc_textFieldImagenURL);
 		textFieldImagenURL.setColumns(10);
+		textFieldImagenURL.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		
 		labelImagenObtenida = new JLabel();
 		labelImagenObtenida.setIcon(new ImageIcon(VentanaRegister.class.getResource("/imagenes/usuario.png")));
@@ -244,6 +238,7 @@ public class VentanaRegister extends JFrame {
 		contentPane.add(labelImagenObtenida, gbc_labelImagenObtenida);
 		
 		panelBotones = new JPanel();
+		panelBotones.setBackground(Color.WHITE);
 		GridBagConstraints gbc_panelBotones = new GridBagConstraints();
 		gbc_panelBotones.insets = new Insets(0, 0, 0, 5);
 		gbc_panelBotones.fill = GridBagConstraints.BOTH;
@@ -252,7 +247,7 @@ public class VentanaRegister extends JFrame {
 		contentPane.add(panelBotones, gbc_panelBotones);
 		panelBotones.setLayout(new BoxLayout(panelBotones, BoxLayout.X_AXIS));
 		
-		botonCancelar = new JButton("Cancelar");
+		botonCancelar = new BotonGeneral("Cancelar");
 		botonCancelar.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -269,10 +264,10 @@ public class VentanaRegister extends JFrame {
 		panelBotones.add(horizontalGlue);
 		
 		//Botón aceptar: para que se acepte se tienen que pasar los requisitos
-		botonAceptar = new JButton("Aceptar");
+		botonAceptar = new BotonGeneral("Aceptar");
 		panelBotones.add(botonAceptar);
 		
-		btnNewButton = new JButton("Cargar Imagen");
+		btnNewButton = new BotonGeneral("Cargar Imagen");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String path = textFieldImagenURL.getText();  // Obtener la URL ingresada por el usuario
@@ -302,18 +297,6 @@ public class VentanaRegister extends JFrame {
 		contentPane.add(btnNewButton, gbc_btnNewButton);
 		
 		botonAceptar.addActionListener(new ActionListener() {
-			
-//			/**
-//			 * Función que comprieba si la contraseña es acorde a las exigencias de
-//			 * seguridad (número mínimo de caracteres, si hay mayúsculas ...)
-//			 * @param parámetro contraseña
-//			 * @return true si la contraseña es válida
-//			 */
-//			public boolean condicionPassword(String password)
-//			{
-//				return password != "";
-//			}
-			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				boolean registroPosible = true;
@@ -325,12 +308,11 @@ public class VentanaRegister extends JFrame {
 				Date fechaNacimiento = dateChooser.getDate();
 				String imagenPerfilUrl = textFieldImagenURL.getText();
 				String saludo = textAreaSaludo.getText();
-				String email = textFieldEmail.getText();
 				
 				
 				//TODO: Solución momentánea para comprobar que los campos están llenos
 				registroPosible = !((nombre == "") || (telefono == "") || (contrasena == "") || (contrasena2 == "") 
-						|| (imagenPerfilUrl == "") || (saludo == "") || (email == "") || (fechaNacimiento == null));
+						|| (imagenPerfilUrl == "") || (saludo == "") || (fechaNacimiento == null));
 				
 				if(!contrasena.equals(contrasena2)) {
 					JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden");
@@ -339,7 +321,7 @@ public class VentanaRegister extends JFrame {
 				
 				if (registroPosible) {				
 					//Se realiza el registro 
-					boolean registro = AppChat.getUnicaInstancia().registrarUsuario(nombre, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo, email);
+					boolean registro = AppChat.getUnicaInstancia().registrarUsuario(nombre, telefono, contrasena, fechaNacimiento, imagenPerfilUrl, saludo);
 					if (registro)
 					{
 						VentanaPrincipal principal = new VentanaPrincipal();
@@ -347,10 +329,8 @@ public class VentanaRegister extends JFrame {
 						//Una vez abierta la ventana principal, esta se cierra
 						dispose();
 					} else 
-					{
 						//No se ha podido realizar el registro: AppChat lo rechaza
 						JOptionPane.showMessageDialog(null, "El teléfono ya está registrado");
-					}
 				} else {
 					//No se ha podido llamar a appChat hay campos incorrectos
 					JOptionPane.showMessageDialog(null, "Hay campos incorrectos");

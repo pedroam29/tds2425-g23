@@ -18,9 +18,14 @@ import java.awt.GridBagLayout;
 import javax.swing.JTextField;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
+import java.awt.Color;
+import java.awt.Font;
 
 public class VentanaRegistrarContacto extends JFrame {
 
@@ -28,22 +33,6 @@ public class VentanaRegistrarContacto extends JFrame {
 	private JPanel contentPane;
 	private JTextField textField_nombre;
 	private JTextField textField_telf;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					VentanaRegistrarContacto frame = new VentanaRegistrarContacto();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.
@@ -60,19 +49,24 @@ public class VentanaRegistrarContacto extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel = new JPanel();
+		panel.setBackground(Color.WHITE);
 		contentPane.add(panel, BorderLayout.NORTH);
 		
-		JLabel lblNewLabel = new JLabel("Insertar nombre y teléfono");
-		panel.add(lblNewLabel);
+		JLabel lblAadirContacto = new JLabel("AÑADIR CONTACTO");
+		lblAadirContacto.setIcon(new ImageIcon(VentanaRegistrarContacto.class.getResource("/imagenes/usuario.png")));
+		lblAadirContacto.setFont(new Font("Dialog", Font.BOLD, 30));
+		panel.add(lblAadirContacto);
 		
 		JPanel panel_1 = new JPanel();
+		panel_1.setBackground(Color.WHITE);
 		contentPane.add(panel_1, BorderLayout.CENTER);
 		GridBagLayout gbl_panel_1 = new GridBagLayout();
 		gbl_panel_1.columnWidths = new int[]{5, 0, 0, 0, 0, 0};
-		gbl_panel_1.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panel_1.rowHeights = new int[]{10, 0, 0, 10, 0, 0, 0};
 		gbl_panel_1.columnWeights = new double[]{0.0, 0.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
-		gbl_panel_1.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_1.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel_1.setLayout(gbl_panel_1);
+	;
 		
 		JLabel lblNewLabel_1 = new JLabel("Nombre: ");
 		GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
@@ -97,7 +91,7 @@ public class VentanaRegistrarContacto extends JFrame {
 		gbc_lblNewLabel_2.insets = new Insets(0, 0, 5, 5);
 		gbc_lblNewLabel_2.anchor = GridBagConstraints.EAST;
 		gbc_lblNewLabel_2.gridx = 1;
-		gbc_lblNewLabel_2.gridy = 3;
+		gbc_lblNewLabel_2.gridy = 2;
 		panel_1.add(lblNewLabel_2, gbc_lblNewLabel_2);
 		
 		textField_telf = new JTextField();
@@ -106,7 +100,7 @@ public class VentanaRegistrarContacto extends JFrame {
 		gbc_textField_telf.insets = new Insets(0, 0, 5, 5);
 		gbc_textField_telf.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField_telf.gridx = 2;
-		gbc_textField_telf.gridy = 3;
+		gbc_textField_telf.gridy = 2;
 		panel_1.add(textField_telf, gbc_textField_telf);
 		textField_telf.setColumns(10);
 		
@@ -114,23 +108,24 @@ public class VentanaRegistrarContacto extends JFrame {
 		 * Botón aeceptar: 
 		 * 		 
 		 */
-		JButton btnAceptar = new JButton("Aceptar");
+		JButton btnAceptar = new BotonGeneral("Aceptar");
 		GridBagConstraints gbc_btnAceptar = new GridBagConstraints();
 		gbc_btnAceptar.insets = new Insets(0, 0, 5, 5);
 		gbc_btnAceptar.gridx = 2;
-		gbc_btnAceptar.gridy = 5;
+		gbc_btnAceptar.gridy = 4;
 		panel_1.add(btnAceptar, gbc_btnAceptar);
 		
 						
-				JButton btnCancelar = new JButton("Cancelar");
+				JButton btnCancelar = new BotonGeneral("Cancelar");
 				GridBagConstraints gbc_btnCancelar = new GridBagConstraints();
 				gbc_btnCancelar.insets = new Insets(0, 0, 5, 5);
 				gbc_btnCancelar.gridx = 3;
-				gbc_btnCancelar.gridy = 5;
+				gbc_btnCancelar.gridy = 4;
 				panel_1.add(btnCancelar, gbc_btnCancelar);	
 				
 				btnCancelar.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
+						 dispatchEvent(new WindowEvent(VentanaRegistrarContacto.this, WindowEvent.WINDOW_CLOSING));
 						dispose();
 					}
 				});

@@ -38,7 +38,6 @@ public abstract class Contacto {
 	}
 	
 	
-	
 	@Override
 	public String toString() {
 		return this.nombre;

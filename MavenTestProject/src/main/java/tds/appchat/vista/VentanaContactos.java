@@ -102,13 +102,14 @@ public class VentanaContactos extends JFrame {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 679, 486);
 		gridBagLayoutVentana = new JPanel();
+		gridBagLayoutVentana.setBackground(Color.WHITE);
 		gridBagLayoutVentana.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(gridBagLayoutVentana);
 		GridBagLayout gbl_gridBagLayoutVentana = new GridBagLayout();
 		gbl_gridBagLayoutVentana.columnWidths = new int[]{10, 0, 0, 0, 10, 0};
 		gbl_gridBagLayoutVentana.rowHeights = new int[]{10, 20, 0, 0, 5, 0, 5, 0};
-		gbl_gridBagLayoutVentana.columnWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_gridBagLayoutVentana.columnWeights = new double[]{0.0, 1.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
 		gbl_gridBagLayoutVentana.rowWeights = new double[]{0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		gridBagLayoutVentana.setLayout(gbl_gridBagLayoutVentana);
 		
@@ -139,12 +140,13 @@ public class VentanaContactos extends JFrame {
 		
 		//Inizalización de las listas
 		JList<Contacto> listaContactos = new JList<Contacto>();
+		listaContactos.setForeground(Color.BLACK);
 		listaContactos.setCellRenderer(new ContactoCellRenderer());
 		modeloContactos = new DefaultListModel<Contacto>();
 		//Función para actualizarListaContactos
 		listaContactos.setModel(actualizarListaContactos());
 		scrollPaneContactos.setViewportView(listaContactos);
-		
+		listaContactos.setPreferredSize(new Dimension(200, 200));
 		
 		JScrollPane scrollPaneGrupos = new JScrollPane();
 		GridBagConstraints gbc_scrollPanellGrupos = new GridBagConstraints();
@@ -181,6 +183,7 @@ public class VentanaContactos extends JFrame {
 					//listaContactosGrupo = new JList<>(contactosGrupo.toArray(new ContactoIndividual[0]));
 					//listaContactosGrupo.setCellRenderer(new ContactoCellRenderer());
 					scrollPaneGrupos.setViewportView(listaContactosGrupo);
+					listaContactosGrupo.setPreferredSize(new Dimension(200, 200));
 				}
 			}
 		});
@@ -256,6 +259,7 @@ public class VentanaContactos extends JFrame {
 		});
 		
 		JPanel panelBotonInsertarContacto = new JPanel();
+		panelBotonInsertarContacto.setBackground(Color.WHITE);
 		GridBagConstraints gbc_panelBotonInsertarContacto = new GridBagConstraints();
 		gbc_panelBotonInsertarContacto.insets = new Insets(0, 0, 5, 5);
 		gbc_panelBotonInsertarContacto.fill = GridBagConstraints.HORIZONTAL;
@@ -263,7 +267,7 @@ public class VentanaContactos extends JFrame {
 		gbc_panelBotonInsertarContacto.gridy = 5;
 		gridBagLayoutVentana.add(panelBotonInsertarContacto, gbc_panelBotonInsertarContacto);
 		
-		JButton botonInsertarContacto = new JButton("Añadir Contacto");
+		JButton botonInsertarContacto = new BotonGeneral("Añadir Contacto");
 		botonInsertarContacto.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				VentanaRegistrarContacto ventana = new VentanaRegistrarContacto();
@@ -283,6 +287,7 @@ public class VentanaContactos extends JFrame {
 		panelBotonInsertarContacto.add(botonInsertarContacto);
 		
 		JPanel panelBotonInsertarGrupo = new JPanel();
+		panelBotonInsertarGrupo.setBackground(Color.WHITE);
 		GridBagConstraints gbc_panel = new GridBagConstraints();
 		gbc_panel.insets = new Insets(0, 0, 5, 5);
 		gbc_panel.fill = GridBagConstraints.BOTH;
@@ -290,7 +295,7 @@ public class VentanaContactos extends JFrame {
 		gbc_panel.gridy = 5;
 		gridBagLayoutVentana.add(panelBotonInsertarGrupo, gbc_panel);
 		
-		JButton btnInsertarGrupo = new JButton("Añadir Grupo");
+		JButton btnInsertarGrupo = new BotonGeneral("Añadir Grupo");
 		
 		btnInsertarGrupo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

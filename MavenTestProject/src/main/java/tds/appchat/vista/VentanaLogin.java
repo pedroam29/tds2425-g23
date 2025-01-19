@@ -23,6 +23,10 @@ import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Color;
+import java.awt.Component;
+import javax.swing.Box;
+import java.awt.Dimension;
 
 public class VentanaLogin {
 
@@ -61,16 +65,20 @@ public class VentanaLogin {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.getContentPane().setBackground(Color.WHITE);
 		frame.setBounds(100, 100, 588, 430);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JLabel lblLogo = new JLabel("APPCHAT");
+		lblLogo.setBackground(Color.WHITE);
+		lblLogo.setForeground(new Color(0, 0, 0));
 		lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
-		lblLogo.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		lblLogo.setFont(new Font("Dialog", Font.BOLD, 53));
 		frame.getContentPane().add(lblLogo, BorderLayout.NORTH);
 		
 		
 		JPanel panelCentral = new JPanel();
+		panelCentral.setBackground(Color.WHITE);
 		frame.getContentPane().add(panelCentral, BorderLayout.CENTER);
 		GridBagLayout gbl_panel_1 = new GridBagLayout();
 		gbl_panel_1.columnWidths = new int[]{15, 0, 0, 15, 0};
@@ -114,9 +122,10 @@ public class VentanaLogin {
 		panelCentral.add(textfieldPassword, gbc_passwordField);
 		
 		JPanel panelBotones = new JPanel();
+		panelBotones.setBackground(Color.WHITE);
 		frame.getContentPane().add(panelBotones, BorderLayout.SOUTH);
 		
-		JButton botonRegistrar = new JButton("Registrar");
+		JButton botonRegistrar = new BotonGeneral("Registrar");
 		botonRegistrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				VentanaRegister registro = new VentanaRegister();
@@ -126,10 +135,19 @@ public class VentanaLogin {
 		});
 		panelBotones.add(botonRegistrar);
 		
-		JButton botonCancelar = new JButton("Cancelar");
+		Component rigidArea = Box.createRigidArea(new Dimension(20, 20));
+		panelBotones.add(rigidArea);
+		
+		JButton botonCancelar = new BotonGeneral("Cancelar");
+		botonCancelar.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+			}
+		});
 		panelBotones.add(botonCancelar);
 		
-		JButton botonAceptar = new JButton("Aceptar");
+		JButton botonAceptar = new BotonGeneral("Aceptar");
 		botonAceptar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//Recuperar datos de pantalla

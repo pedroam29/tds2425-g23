@@ -29,32 +29,17 @@ import tds.appchat.modelo.Mensaje;
 import tds.appchat.modelo.Usuario;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Color;
 
 public class VentanaBuscar extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtTexto;
-	private JTextField textField_1;
-	private JTextField textField_2;
+	private JTextField textField_telefono;
+	private JTextField textField_contacto;
 	private JButton button;
 	private JPanel panelMensajes;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					VentanaBuscar frame = new VentanaBuscar();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.
@@ -69,6 +54,7 @@ public class VentanaBuscar extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		
 		JPanel panelBuscar = new JPanel();
+		panelBuscar.setBackground(Color.WHITE);
 		contentPane.add(panelBuscar, BorderLayout.NORTH);
 		panelBuscar.setLayout(new BoxLayout(panelBuscar, BoxLayout.Y_AXIS));
 		
@@ -78,6 +64,7 @@ public class VentanaBuscar extends JFrame {
 		panelBuscar.add(lblNewLabel);
 		
 		JPanel panel_1 = new JPanel();
+		panel_1.setBackground(Color.WHITE);
 		panelBuscar.add(panel_1);
 		GridBagLayout gbl_panel_1 = new GridBagLayout();
 		gbl_panel_1.columnWidths = new int[]{91, 0, 0, 0};
@@ -98,42 +85,60 @@ public class VentanaBuscar extends JFrame {
 		panel_1.add(txtTexto, gbc_txtTexto);
 		txtTexto.setColumns(10);
 		
-		textField_1 = new JTextField();
-		textField_1.setBorder(new TitledBorder(null, "Tel\u00E9fono", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		textField_telefono = new JTextField();
+		textField_telefono.setBorder(new TitledBorder(null, "Tel\u00E9fono", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
 		gbc_textField_1.insets = new Insets(0, 0, 0, 5);
 		gbc_textField_1.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField_1.gridx = 0;
 		gbc_textField_1.gridy = 2;
-		panel_1.add(textField_1, gbc_textField_1);
-		textField_1.setColumns(10);
+		panel_1.add(textField_telefono, gbc_textField_1);
+		textField_telefono.setColumns(10);
 		
-		textField_2 = new JTextField();
-		textField_2.setBorder(new TitledBorder(null, "Contacto", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		textField_contacto = new JTextField();
+		textField_contacto.setBorder(new TitledBorder(null, "Contacto", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GridBagConstraints gbc_textField_2 = new GridBagConstraints();
 		gbc_textField_2.insets = new Insets(0, 0, 0, 5);
 		gbc_textField_2.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField_2.gridx = 1;
 		gbc_textField_2.gridy = 2;
-		panel_1.add(textField_2, gbc_textField_2);
-		textField_2.setColumns(10);
+		panel_1.add(textField_contacto, gbc_textField_2);
+		textField_contacto.setColumns(10);
 		
-		button = new JButton("Buscar");
+		JPanel panelMensajes = new JPanel();
+		panelMensajes.setBackground(Color.WHITE);
+		contentPane.add(panelMensajes, BorderLayout.CENTER);
+		panelMensajes.setLayout(new BorderLayout(20, 20));
+		
+		button = new BotonGeneral("Buscar");
 		button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JList<Mensaje> lista = new JList<Mensaje>();
-				lista.setCellRenderer(new MensajeCellRenderer2());
-				DefaultListModel<Mensaje> modelo = new DefaultListModel<Mensaje>();
-				
-				List<Mensaje> mensajes = AppChat.getUnicaInstancia().buscarMensajes(textField_1.getText(), textField_2.getText(), txtTexto.getText());
-						
-				//Conversión manual de List<Mensaje> a DefaultListModel<Mensaje> 
-				for(Mensaje mensaje: mensajes) {
-					modelo.addElement(mensaje);
-				}
-				lista.setModel(modelo);
-				
-				panelMensajes.add(new JScrollPane(lista), BorderLayout.CENTER);
+			public void actionPerformed(ActionEvent e) {JList<Mensaje> lista = new JList<Mensaje>();
+	        lista.setCellRenderer(new MensajeCellRenderer2());
+	        DefaultListModel<Mensaje> modelo = new DefaultListModel<Mensaje>();
+	        
+	        List<Mensaje> mensajes = AppChat.getUnicaInstancia().buscarMensajes(
+	                textField_telefono.getText(), 
+	                textField_contacto.getText(), 
+	                txtTexto.getText()
+	        );
+	        System.out.println("Mensajes encontrados: " + mensajes);
+	        
+	        // Conversión manual de List<Mensaje> a DefaultListModel<Mensaje> 
+	        for (Mensaje mensaje : mensajes) {
+	            modelo.addElement(mensaje);
+	        }
+	        lista.setModel(modelo);
+	        
+	        // Agregar la lista dentro de un JScrollPane
+	        JScrollPane scrollPane = new JScrollPane(lista);
+	        
+	        // Limpiar el panel de mensajes antes de agregar el nuevo JScrollPane
+	        panelMensajes.removeAll();
+	        panelMensajes.add(scrollPane, BorderLayout.CENTER);
+	        
+	        // Forzar que el panel se actualice
+	        panelMensajes.revalidate();
+	        panelMensajes.repaint();
 			}
 		});
 		GridBagConstraints gbc_button = new GridBagConstraints();
@@ -141,9 +146,7 @@ public class VentanaBuscar extends JFrame {
 		gbc_button.gridy = 2;
 		panel_1.add(button, gbc_button);
 		
-		JPanel panelMensajes = new JPanel();
-		contentPane.add(panelMensajes, BorderLayout.CENTER);
-		panelMensajes.setLayout(new BorderLayout(20, 20));
+
 		
 		
 		

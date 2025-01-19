@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.Period;
 
 public class Premium implements RolUsuario {
-	
+	private final static String SEPARADOR = "***";
 	private final static double PRECIO_PREMIUM = 15.00;
 	//Un año de duración de suscripción de tipo Premium
 	private final static Period DURACION_SUSCRIPCION = Period.ofYears(1);
@@ -35,7 +35,30 @@ public class Premium implements RolUsuario {
 		return true;
 	}
 	
+	public void setFechaExpiracion(LocalDate fecha) {
+		this.fechaExpiracion = fecha;
+	}
+	public LocalDate getFechaExpiracion() {
+		return fechaExpiracion;
+	}
+	
 	public static double getPrecioPremium(){
 		return PRECIO_PREMIUM;
+	}
+	public double getPrecio() {
+		return descuentoAplicado == null ? PRECIO_PREMIUM : descuentoAplicado.calcularDescuento(PRECIO_PREMIUM);
+	}
+	@Override
+	public String toString() {
+
+		return fechaExpiracion.toString() +  SEPARADOR + ((descuentoAplicado == null) ? "" : descuentoAplicado.toString());
+	}
+	
+	public static RolUsuario fromString(String s) {
+		String [] elems = s.split(SEPARADOR);
+		Premium p = (elems[1].isEmpty()) ? new Premium() : new Premium(Descuento.fromString(elems[1])) ;
+		p.setFechaExpiracion(LocalDate.parse(elems[0]));
+		
+		return p;
 	}
 }

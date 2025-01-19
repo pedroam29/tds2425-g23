@@ -31,6 +31,7 @@ import java.awt.Color;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.BoxLayout;
+import javax.swing.ComboBoxEditor;
 import javax.swing.JLabel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -47,42 +48,21 @@ import javax.swing.ImageIcon;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.SystemColor;
+import java.awt.FlowLayout;
 
 public class VentanaPrincipal extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField textFieldEnviar;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					VentanaPrincipal frame = new VentanaPrincipal();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 	
-	///
-	// Usuario de la conversacion
-	///
-//	private Contacto contactoSeleccionado = null;
-//	private String telefonoSeleccionado = null;
-//	private boolean contactoActualConocido = false;
+	
 	
 	private Usuario usuarioSeleccionado = null;
 	private Grupo grupoSeleccionado = null;
 	private boolean esGrupo = false;
-	////
-	// Elementos de modificacion dinámica del chat
-	////
+	
 	private JPanel chat;
 	JLabel lblNombreUsuarioChat;
 	
@@ -92,21 +72,6 @@ public class VentanaPrincipal extends JFrame {
 	DefaultListModel<Mensaje> modelo;
 		
 
-//	private void actualizarInformacionContactoActual(String telefono) {
-////		if(AppChat.getUnicaInstancia().existeTelefono(telefono)) {
-////			actualizarInformacionContactoActual(AppChat.getUnicaInstancia().obtenerContactoDesdeTelefono(telefono));
-////			return;
-////		}
-//		//Se supondrá que si se ha llamado a esta función es porque no se encuentra en contactos
-//		telefonoSeleccionado = telefono;
-//		contactoSeleccionado = null;
-//		contactoActualConocido = false;
-//	}
-//	private void actualizarInformacionContactoActual(Contacto c) {
-//		contactoSeleccionado = c;
-//		telefonoSeleccionado = (c instanceof ContactoIndividual) ? ((ContactoIndividual) c).getTelefono() : "";
-//		contactoActualConocido = true;
-//	}
 	
 	/**
 	 * A partir de un mensaje se abre una conversacion en la ventana.
@@ -158,22 +123,6 @@ public class VentanaPrincipal extends JFrame {
 	}
 	
 	/**
-	 * Del mismo modo se debe poder abrir un chat que se tiene con un número
-	 * de teléfono, este puede o puede no estar registrado
-	 * 
-	 * @param telefono
-	 */
-//	private void abrirChat(String telefono) {
-//		if (AppChat.getUnicaInstancia().esTelefonoContacto(telefono)) {
-//			abrirChat(AppChat.getUnicaInstancia().obtenerContactoDesdeTelefono(telefono));
-//		}
-//	
-//		lblNombreUsuarioChat.setText(telefono);
-//		abrirConversacion(AppChat.getUnicaInstancia().obtenerConversacionDesdeTelefono(telefono));
-//		actualizarInformacionContactoActual(telefono);
-//	}
-	
-	/**
 	 * Toma como parámetro una lista de mensaje y se insertan
 	 * como bubble test en el panel del chat
 	 *  
@@ -218,6 +167,7 @@ public class VentanaPrincipal extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 854, 577);
 		BubbleText.noZoom();
+		getContentPane().setBackground(new Color(255, 255, 255));
 		contentPane = new JPanel();
 		
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -226,19 +176,23 @@ public class VentanaPrincipal extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		
 		JPanel panelNorte = new JPanel();
+		panelNorte.setBackground(Color.WHITE);
 		contentPane.add(panelNorte, BorderLayout.NORTH);
-		panelNorte.setLayout(new BoxLayout(panelNorte, BoxLayout.X_AXIS));
 	
 		JComboBox<Contacto> comboBox = new JComboBox<Contacto>();
 		//Para que se pueda editar.
 		comboBox.setEditable(true);
+		comboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		
 		Contacto [] contactosArray = AppChat.getUnicaInstancia().contactosUsuarioActualArray();
+		panelNorte.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		comboBox.setModel(new DefaultComboBoxModel<Contacto>(contactosArray));
 		panelNorte.add(comboBox);
 		
-		JButton btnEnviarSup = new JButton("Enviar");
-		btnEnviarSup.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/enviar-mensaje.png")));
+		BotonGeneral btnEnviarSup = new BotonGeneral("Enviar");
+		btnEnviarSup.setForeground(SystemColor.activeCaptionText);
+		
+		btnEnviarSup.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/enviar-correo-pressed.png")));
 		
 		btnEnviarSup.addActionListener(new ActionListener() {
 			@Override
@@ -265,7 +219,8 @@ public class VentanaPrincipal extends JFrame {
 		});
 		panelNorte.add(btnEnviarSup);
 		
-		JButton btnBuscar = new JButton("Buscar");
+		BotonGeneral btnBuscar = new BotonGeneral("Buscar");
+		btnBuscar.setForeground(SystemColor.activeCaptionText);
 		btnBuscar.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/buscar.png")));
 		btnBuscar.addActionListener(new ActionListener() {	
 			@Override
@@ -275,9 +230,13 @@ public class VentanaPrincipal extends JFrame {
 			}
 		});
 		
+		Component horizontalStrut = Box.createHorizontalStrut(20);
+		panelNorte.add(horizontalStrut);
+		
 		panelNorte.add(btnBuscar);
 		
-		JButton btnContactos = new JButton("Contactos");
+		BotonGeneral btnContactos = new BotonGeneral("Contactos");
+		btnContactos.setForeground(SystemColor.activeCaptionText);
 		btnContactos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				VentanaContactos vContactos = new VentanaContactos();
@@ -288,7 +247,10 @@ public class VentanaPrincipal extends JFrame {
 		btnContactos.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/personas.png")));
 		panelNorte.add(btnContactos);
 		
-		JButton btnPremium = new JButton("Premium");
+		JButton btnPremium = new BotonGeneral("Premium");
+		btnPremium.setForeground(SystemColor.activeCaptionText);
+		
+		
 		btnPremium.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -299,11 +261,11 @@ public class VentanaPrincipal extends JFrame {
 			}
 		});
 		
-		Component horizontalGlue_1 = Box.createHorizontalGlue();
-		panelNorte.add(horizontalGlue_1);
 		panelNorte.add(btnPremium);
+		btnPremium.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/moneda.png")));
 		
-		JButton btnAjustes = new JButton("Log Out");
+		BotonGeneral btnAjustes = new BotonGeneral("Log Out");
+		btnAjustes.setForeground(SystemColor.activeCaptionText);
 		btnAjustes.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				AppChat.getUnicaInstancia().logoutUsuario();
@@ -312,10 +274,9 @@ public class VentanaPrincipal extends JFrame {
 				dispose();
 			}
 		});
+		btnAjustes.setIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/cerrar-sesion.png")));
+
 		panelNorte.add(btnAjustes);
-		
-		Component horizontalGlue = Box.createHorizontalGlue();
-		panelNorte.add(horizontalGlue);
 		
 		JLabel lblNewLabel = new JLabel(AppChat.getUnicaInstancia().getNombreUsuarioActual());
 		panelNorte.add(lblNewLabel);
@@ -337,8 +298,9 @@ public class VentanaPrincipal extends JFrame {
 		JPanel panelMensajes = new JPanel();
 		contentPane.add(panelMensajes, BorderLayout.WEST);
 		panelMensajes.setLayout(new BorderLayout(0, 0));
-		
+		panelMensajes.setPreferredSize(new Dimension(250, 100));
 		lista = new JList<Mensaje>();
+		lista.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		lista.setCellRenderer(new MensajeCellRenderer());
 		
 //		modelo = new DefaultListModel<Mensaje>();
@@ -372,6 +334,9 @@ public class VentanaPrincipal extends JFrame {
 		panelChatActual.setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel = new JPanel();
+		panel.setBackground(new Color(255, 255, 255));
+		panel.setLayout(new BorderLayout(0,0));
+		
 		panelChatActual.add(panel, BorderLayout.NORTH);
 
 
@@ -379,15 +344,45 @@ public class VentanaPrincipal extends JFrame {
 		lblNombreUsuarioChat = new JLabel();
 		panel.add(lblNombreUsuarioChat);
 		
+		//JButton btnExportarPDF = new JButton();
+		BotonImagen btnExportarPDF = new BotonImagen(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/pdf.png")));
+		panel.add(btnExportarPDF, BorderLayout.EAST);
+		
+		//
+		
+		
+		btnExportarPDF.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//Si no es premium
+				if (!AppChat.getUnicaInstancia().esUsuarioActualPremium())
+					JOptionPane.showMessageDialog(VentanaPrincipal.this, "No se puede acceder a esto sin ser Premium", "Info",
+							JOptionPane.ERROR_MESSAGE);
+				else {
+					List<Mensaje> mensajes;
+					if (esGrupo) {
+						mensajes = AppChat.getUnicaInstancia().obtenerConversacionGrupo(grupoSeleccionado);
+					} else if (usuarioSeleccionado != null) {
+						mensajes = AppChat.getUnicaInstancia().obtenerConversacion(usuarioSeleccionado);
+					} else {
+						return;
+					}
+					VentanaPDF v = new VentanaPDF(null);
+					v.setVisible(true);
+				}
+					
+			}
+		});
 		///////////////////
 		////   Panel   ////
 		///////////////////
 		
 		chat = new JPanel();
+		chat.setBackground(SystemColor.text);
 		
 		JScrollPane scrollPane = new JScrollPane(chat);
 		panelChatActual.add(scrollPane, BorderLayout.CENTER);
-		
+		scrollPane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		
 		chat.setLayout(new BoxLayout(chat,BoxLayout.Y_AXIS));
 		chat.setSize(400,700);
@@ -400,7 +395,13 @@ public class VentanaPrincipal extends JFrame {
 		enviar.setLayout(new BoxLayout(enviar, BoxLayout.X_AXIS));
 				
 
-		JButton btnEmoticono = new JButton(":)");
+		//JButton btnEmoticono = new JButton(":)");
+		//BotonImagen btnEmoticono = new BotonImagen(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/contento.png")));
+		//btnEmoticono.setPressedIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/contento-pressed.png")));
+		//enviar.add(btnEmoticono);
+		
+		BotonImagen btnEmoticono = new BotonImagen(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/contento.png")));
+		btnEmoticono.setPressedIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/contento-pressed.png")));
 		enviar.add(btnEmoticono);
 		
 		textFieldEnviar = new JTextField();
@@ -444,7 +445,9 @@ public class VentanaPrincipal extends JFrame {
             emojiMenu.show(btnEmoticono, btnEmoticono.getWidth() / 2, btnEmoticono.getHeight() / 2);
         });
         
-		JButton btnEnviar = new JButton("Enviar");
+        BotonImagen btnEnviar = new BotonImagen(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/enviar-correo.png")));
+        btnEnviar.setPressedIcon(new ImageIcon(VentanaPrincipal.class.getResource("/imagenes/enviar-correo-pressed.png")));
+		//JButton btnEnviar = new JButton("Enviar");
 		
 		//AppChat.getUnicaInstancia().enviarMensaje(null, textFieldEnviar.getText());
 		
@@ -477,5 +480,7 @@ public class VentanaPrincipal extends JFrame {
 		 
 		enviar.add(btnEnviar);		
 	}
+	
+	
 
 }

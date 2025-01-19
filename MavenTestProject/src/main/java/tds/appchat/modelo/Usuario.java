@@ -24,7 +24,6 @@ public class Usuario {
 	private int codigo;
 	private final String nombre;
 	private final Date fechaNacimiento;
-	private final String email;
 	private final String telefono;
 	private final String contrasena;
 	private String imagenPerfilUrl;
@@ -41,24 +40,21 @@ public class Usuario {
 	private HashMap<String, List<Mensaje>> mensajesPorUsuario;
 	private HashMap<Grupo, List<Mensaje>> mensajesGrupos;
 	
-	//private List<Mensaje3> mensajesRecibidos;
-	//private List<Mensaje3> mensajesEnviados;
 	private List<Contacto> contactos;
 	
-	public Usuario(String nombre, String telefono, String contrasena,Date fechaNacimiento, String imagenPerfilUrl, String saludo, String email) {
+	public Usuario(String nombre, String telefono, String contrasena,Date fechaNacimiento, String imagenPerfilUrl, String saludo) {
 		this.codigo = 0;
 		this.nombre = nombre;
-		this.email = email;
 		this.telefono = telefono;
 		this.contrasena = contrasena;
 		this.fechaNacimiento = fechaNacimiento;
 		this.imagenPerfilUrl = imagenPerfilUrl;
 		this.saludo = saludo;
-		//this.mensajesRecibidos=new LinkedList<Mensaje3>();
-		//this.mensajesEnviados=new LinkedList<Mensaje3>();
+
 		this.contactos=new LinkedList<Contacto>();
 		this.descuento = null;
 		this.fechaRegistro = LocalDate.now();
+		this.rolUsuario = new Normal();
 		this.premium = false;
 		this.mensajesPorUsuario = new HashMap<String, List<Mensaje>>();
 		this.mensajesGrupos = new HashMap<Grupo, List<Mensaje>>();
@@ -68,7 +64,6 @@ public class Usuario {
 		this.codigo = 0;
 		this.nombre=nombre;
 		this.fechaNacimiento = new Date();
-		this.email = "";
 		this.telefono = "";
 		this.contrasena = "";
 		this.premium = false;
@@ -94,6 +89,14 @@ public class Usuario {
 	
 	public String getImagenPerfilUrl() {
 		return imagenPerfilUrl;
+	}
+	
+	public URL getURLImagen() {
+		try {
+			return new URL(imagenPerfilUrl);
+		} catch (MalformedURLException e) {
+			return Usuario.class.getResource("/imagenes/usuario-default.png");
+		}
 	}
 	
 	public List<Contacto> getContactos() {
@@ -123,10 +126,6 @@ public class Usuario {
 	public String getNombre() {
 		return nombre;
 	}
-
-	public String getEmail() {
-		return email;
-	}
 	public String getTelefono() {
 		return telefono;
 	}
@@ -146,6 +145,14 @@ public class Usuario {
 	public Descuento getDescuento(){
 		return descuento;
 	}
+	
+	public void setRolUsuario(RolUsuario rolUsuario) {
+		this.rolUsuario = rolUsuario;
+	}
+	public RolUsuario getRolUsuario() {
+		return rolUsuario;
+	}
+	
 	/**
 	 * Función para persistencia
 	 * @return
@@ -164,21 +171,12 @@ public class Usuario {
 	{
 		Image imagen = null;
 		try {
-			imagen = (Image) ImageIO.read(Usuario.class.getResource("/imagenes/flecha-inv.png"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			URL urlImagen = new URL(imagenPerfilUrl);
+			URL urlImagen = getURLImagen();
 			imagen = (Image) ImageIO.read(urlImagen);
-		} catch (MalformedURLException e) {
-			// La url no es correcta:
-			e.printStackTrace();
-		} catch (IOException e) {
-			// Fallo en la creación de la imagen.
-			e.printStackTrace();
+		} catch (Exception e) {
+			
 		}
+		
 		return imagen;
 	}
 	
@@ -382,6 +380,16 @@ public class Usuario {
 		//En caso de que no haya mensajes se devolverá una lista vacia.
 		return new LinkedList<Mensaje>();
 	}
+	
+	public List<Mensaje> obtenerTodosMensajes(){
+		
+		List<Mensaje> mensajes = mensajesPorUsuario.values().stream()
+				.flatMap(List::stream)
+				.collect(Collectors.toList());
+		
+		return mensajes;
+	}
+	
 	/**
 	 * Se obtiene un contacto a partir de un usuario
 	 * @param usuario
@@ -562,7 +570,7 @@ public class Usuario {
 	
 	public void convertirPremium(){
 		this.premium = true;
-		this.rolUsuario = new Premium(descuento);
+		this.rolUsuario = (descuento == null) ? new Premium() : new Premium(descuento);
 	}
 	
 	@Override

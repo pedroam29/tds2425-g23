@@ -19,10 +19,14 @@ import java.awt.GridBagLayout;
 import javax.swing.JTextField;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
+import java.awt.Font;
+import java.awt.Color;
 
 public class VentanaRegistrarGrupo extends JFrame {
 
@@ -60,12 +64,17 @@ public class VentanaRegistrarGrupo extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel = new JPanel();
+		panel.setBackground(Color.WHITE);
 		contentPane.add(panel, BorderLayout.NORTH);
 		
-		JLabel lblNewLabel = new JLabel("Insertar nombre y teléfono");
-		panel.add(lblNewLabel);
+		JLabel lblAddGrupo = new JLabel("AÑADIR GRUPO");
+		Grupo.class.getResource("");
+		lblAddGrupo.setIcon(new ImageIcon(Grupo.imagenDefault()));
+		lblAddGrupo.setFont(new Font("Dialog", Font.BOLD, 30));
+		panel.add(lblAddGrupo);
 		
 		JPanel panel_1 = new JPanel();
+		panel_1.setBackground(Color.WHITE);
 		contentPane.add(panel_1, BorderLayout.CENTER);
 		GridBagLayout gbl_panel_1 = new GridBagLayout();
 		gbl_panel_1.columnWidths = new int[]{5, 0, 0, 0, 0, 0};
@@ -79,7 +88,7 @@ public class VentanaRegistrarGrupo extends JFrame {
 		gbc_lblNewLabel_1.insets = new Insets(0, 0, 5, 5);
 		gbc_lblNewLabel_1.anchor = GridBagConstraints.EAST;
 		gbc_lblNewLabel_1.gridx = 1;
-		gbc_lblNewLabel_1.gridy = 1;
+		gbc_lblNewLabel_1.gridy = 2;
 		panel_1.add(lblNewLabel_1, gbc_lblNewLabel_1);
 		
 		textField_nombre = new JTextField();
@@ -88,7 +97,7 @@ public class VentanaRegistrarGrupo extends JFrame {
 		gbc_textField_nombre.insets = new Insets(0, 0, 5, 5);
 		gbc_textField_nombre.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField_nombre.gridx = 2;
-		gbc_textField_nombre.gridy = 1;
+		gbc_textField_nombre.gridy = 2;
 		panel_1.add(textField_nombre, gbc_textField_nombre);
 		textField_nombre.setColumns(10);
 		
@@ -113,7 +122,7 @@ public class VentanaRegistrarGrupo extends JFrame {
 		/**
 		 * Botón aceptar
 		 */
-		JButton btnNewButton = new JButton("Aceptar");
+		JButton btnNewButton = new BotonGeneral("Aceptar");
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 		gbc_btnNewButton.insets = new Insets(0, 0, 0, 5);
 		gbc_btnNewButton.gridx = 2;
@@ -122,8 +131,8 @@ public class VentanaRegistrarGrupo extends JFrame {
 		
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (textField_nombre.getText().isEmpty() | textField_imagen.getText().isEmpty())
-					JOptionPane.showMessageDialog(VentanaRegistrarGrupo.this, "Es necesario llenar los campos");
+				if (textField_nombre.getText().isEmpty())
+					JOptionPane.showMessageDialog(VentanaRegistrarGrupo.this, "Es necesario poner un nombre");
 				else {
 					try {
 						AppChat.getUnicaInstancia().crearGrupo(textField_nombre.getText(), textField_imagen.getText());	
@@ -137,7 +146,7 @@ public class VentanaRegistrarGrupo extends JFrame {
 			}
 		});
 				
-		JButton btnCancelar = new JButton("Cancelar");
+		JButton btnCancelar = new BotonGeneral("Cancelar");
 		GridBagConstraints gbc_btnNewButton_1 = new GridBagConstraints();
 		gbc_btnNewButton_1.insets = new Insets(0, 0, 0, 5);
 		gbc_btnNewButton_1.gridx = 3;
