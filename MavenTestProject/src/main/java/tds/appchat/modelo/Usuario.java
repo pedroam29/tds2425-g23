@@ -173,7 +173,7 @@ public class Usuario {
 		BufferedImage image = null;
 		try {
 			image = ImageIO.read(imagenPerfil);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			try {
 				image = ImageIO.read(URL_DEFAULT);
 			} catch (IOException e1) {
