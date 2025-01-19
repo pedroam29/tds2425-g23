@@ -361,7 +361,9 @@ public class VentanaPrincipal extends JFrame {
 			
 			@Override
 				public void actionPerformed(ActionEvent e) {
-					VentanaRegistrarGrupo ventana = new VentanaRegistrarGrupo();
+					if (esGrupo || usuarioSeleccionado == null)
+						return;
+					VentanaRegistrarContacto ventana = new VentanaRegistrarContacto(usuarioSeleccionado.getTelefono());
 					
 					ventana.setVisible(true);
 					//Una vez se haya añadido un grupo, cuando se cierre la ventana de añadir contactos, se
